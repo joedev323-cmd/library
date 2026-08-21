@@ -14,26 +14,19 @@ import java.util.Optional;
 public interface LoanRepository extends JpaRepository<Loan, Long> {
 
     // ---------------------------------------------------------
-    // Borrower loans
+    // MEMBER LOANS
     // ---------------------------------------------------------
 
-    @Query("""
-        SELECT l
-        FROM Loan l
-        WHERE l.borrower.borrowerId = :borrowerId
-        """)
-    List<Loan> findLoansByBorrowerId(
-            @Param("borrowerId") String borrowerId
-    );
+    List<Loan> findByBorrowerBorrowerId(String borrowerId);
 
     long countByBorrowerBorrowerIdAndStatus(
-            String borrowerId,
-            LoanStatus status
+        String borrowerId,
+        LoanStatus status
     );
 
 
     // ---------------------------------------------------------
-    // General loan statistics
+    // GENERAL LOAN STATISTICS
     // ---------------------------------------------------------
 
     long countByStatus(
@@ -47,7 +40,7 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
 
 
     // ---------------------------------------------------------
-    // Active loan for a specific accession
+    // ACTIVE LOAN FOR A SPECIFIC PHYSICAL COPY
     // ---------------------------------------------------------
 
     Optional<Loan> findByAccessionAccessionIdAndStatus(
@@ -57,7 +50,7 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
 
 
     // ---------------------------------------------------------
-    // Overdue loans
+    // OVERDUE LOANS
     // ---------------------------------------------------------
 
     List<Loan> findTop5ByStatusAndDueDateBeforeOrderByDueDateAsc(
@@ -67,15 +60,9 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
 
 
     // ---------------------------------------------------------
-    // Fines
+    // FINES
     // ---------------------------------------------------------
 
-    /**
-     * Total fines actually paid within a date range.
-     *
-     * This is what the Reports page should use for
-     * "Fines Collected (MTD)".
-     */
     @Query("""
         SELECT COALESCE(SUM(l.finePaid), 0)
         FROM Loan l
@@ -89,26 +76,39 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
 
 
     // ---------------------------------------------------------
-    // Popular catalogue categories
+    // POPULAR CATEGORIES
     // ---------------------------------------------------------
+    //
+    // New relationship:
+    //
+    // Loan -> Accession -> Book -> Category
+    //
+    // NOT:
+    // Loan -> Accession -> Book -> categories
+    //
 
-    /**
-     * Counts currently active loans grouped by category.
-     *
-     * Item -> categories is ManyToMany, so we join through
-     * l.accession.item.categories.
-     */
     @Query("""
         SELECT c.name, COUNT(l)
         FROM Loan l
         JOIN l.accession a
-        JOIN a.item i
-        JOIN i.categories c
-        WHERE l.status = com.example.libback.model.enums.LoanStatus.ACTIVE
+        JOIN a.book b
+        JOIN b.category c
+        WHERE l.status =
+            com.example.libback.model.enums.LoanStatus.ACTIVE
         GROUP BY c.name
         ORDER BY COUNT(l) DESC
         """)
     List<Object[]> findPopularCategories();
+
+
+    // ---------------------------------------------------------
+    // RECENT LOANS
+    // ---------------------------------------------------------
+
     List<Loan> findTop5ByOrderByLoanIdDesc();
 
+      long countByMemberMemberIdAndStatus(
+            String memberId,
+            LoanStatus status
+    );
 }

@@ -2,6 +2,7 @@ package com.example.libback.config;
 
 import com.example.libback.model.User;
 import com.example.libback.repository.UserRepository;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,17 +18,27 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-      
-        User user = userRepository.findByUsername(username) 
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+    public UserDetails loadUserByUsername(String username)
+            throws UsernameNotFoundException {
 
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getUsername()) 
-                .password(user.getPassword()) 
-                // FIXED: Changed .roles() to .authorities() because the database 
-                // already has the "ROLE_" prefix (e.g., "ROLE_ADMIN").
-                .authorities(user.getRole()) 
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() ->
+                    new UsernameNotFoundException(
+                        "User not found: " + username
+                    )
+                );
+
+        if (!user.isActive()) {
+            throw new UsernameNotFoundException(
+                "User account is inactive"
+            );
+        }
+
+        return org.springframework.security.core.userdetails.User
+                .builder()
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .roles(user.getRole().name())
                 .build();
     }
 }

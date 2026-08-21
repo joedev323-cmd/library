@@ -1,6 +1,6 @@
 package com.example.libback.service;
 
-import com.example.libback.model.Catergory;
+import com.example.libback.model.Category;
 import com.example.libback.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 
@@ -15,11 +15,11 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
-    public List<Catergory> getAllCategories() {
+    public List<Category> getAllCategories() {
         return categoryRepository.findAll();
     }
 
-    public Catergory saveCategory(Catergory category) {
+    public Category saveCategory(Category category) {
         return categoryRepository.save(category);
     }
 }

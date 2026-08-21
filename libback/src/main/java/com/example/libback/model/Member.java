@@ -4,39 +4,34 @@ import com.example.libback.model.enums.MemberType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "borrowers")
-public class Borrower {
+@Table(name = "members")
+public class Member {
 
     @Id
-    @NotBlank
     @Column(length = 50, nullable = false, updatable = false)
-    private String borrowerId;
+    private String memberId;
 
     @NotBlank
-    @Size(max = 255)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String name;
 
-    @NotBlank
     @Email
-    @Size(max = 255)
-    @Column(nullable = false, unique = true)
+    @NotBlank
+    @Column(nullable = false, unique = true, length = 255)
     private String email;
 
-    @Size(max = 20)
+    @Column(length = 20)
     private String phoneNumber;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private MemberType memberType = MemberType.staff;
+    private MemberType memberType = MemberType.STUDENT;
 
     @Column(nullable = false)
     private boolean active = true;
@@ -44,59 +39,24 @@ public class Borrower {
     @Column(nullable = false)
     private LocalDate registrationDate = LocalDate.now();
 
-    @OneToMany(
-            mappedBy = "borrower",
-            cascade = CascadeType.ALL
-    )
+    @OneToMany(mappedBy = "member")
     private Set<Loan> loans = new HashSet<>();
 
-    // --- ADDED FOR OPTION C ---
-    // @Transient tells JPA to completely ignore this field during database reads & writes
-    @Transient
-    private Integer borrowedCount = 0; 
-
-    public Borrower() {
+    public Member() {
     }
 
-    public Borrower(String borrowerId, String name, String email, MemberType memberType) {
-        this.borrowerId = borrowerId;
+    public Member(String memberId, String name, String email) {
+        this.memberId = memberId;
         this.name = name;
         this.email = email;
-        this.memberType = memberType;
     }
 
-    public void addLoan(Loan loan) {
-        loans.add(loan);
-        loan.setBorrower(this);
+    public String getMemberId() {
+        return memberId;
     }
 
-    public void removeLoan(Loan loan) {
-        loans.remove(loan);
-        loan.setBorrower(null);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Borrower borrower)) return false;
-        return Objects.equals(borrowerId, borrower.borrowerId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(borrowerId);
-    }
-
-    public boolean isActive() {
-        return this.active;
-    }
-
-    public String getBorrowerId() {
-        return borrowerId;
-    }
-
-    public void setBorrowerId(String borrowerId) {
-        this.borrowerId = borrowerId;
+    public void setMemberId(String memberId) {
+        this.memberId = memberId;
     }
 
     public String getName() {
@@ -131,6 +91,10 @@ public class Borrower {
         this.memberType = memberType;
     }
 
+    public boolean isActive() {
+        return active;
+    }
+
     public void setActive(boolean active) {
         this.active = active;
     }
@@ -149,14 +113,5 @@ public class Borrower {
 
     public void setLoans(Set<Loan> loans) {
         this.loans = loans;
-    }
-
-    // --- ADDED GETTER & SETTER FOR TRANSIENT FIELD ---
-    public Integer getBorrowedCount() {
-        return borrowedCount != null ? borrowedCount : 0;
-    }
-
-    public void setBorrowedCount(Integer borrowedCount) {
-        this.borrowedCount = borrowedCount;
     }
 }

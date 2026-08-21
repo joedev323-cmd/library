@@ -1,72 +1,106 @@
 package com.example.libback.controller;
 
-import com.example.libback.model.Borrower;
-import com.example.libback.repository.BorrowerRepository;
-import com.example.libback.repository.HoldRepository;
- 
+import com.example.libback.model.Member;
+import com.example.libback.repository.MemberRepository;
+import com.example.libback.repository.LoanRepository;
+import com.example.libback.model.enums.LoanStatus;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import com.example.libback.model.enums.LoanStatus;
 
 @Controller
-@RequiredArgsConstructor // Lombok automatically autowires borrowerRepository, holdRepository, and loanRepository
+@RequiredArgsConstructor
 public class MemberController {
 
-    private final BorrowerRepository borrowerRepository;
-    private final HoldRepository holdRepository; 
+    private final MemberRepository memberRepository;
+    private final LoanRepository loanRepository;
 
     @GetMapping("/admin/add/member")
     public String showAddMemberForm(Model model) {
-        model.addAttribute("borrower", new Borrower()); 
-        return "add-member"; 
+        model.addAttribute("member", new Member());
+        return "add-member";
     }
 
     @PostMapping("/admin/add/member")
-    public String registerMember(@ModelAttribute("borrower") Borrower borrower, Model model) {
+    public String registerMember(
+            @ModelAttribute("member") Member member,
+            Model model) {
+
         try {
-            if (borrowerRepository.existsByEmail(borrower.getEmail())) {
-                model.addAttribute("errorMessage", "This email address is already registered!");
-                model.addAttribute("borrower", borrower);
+
+            if (memberRepository.existsByEmail(member.getEmail())) {
+                model.addAttribute(
+                        "errorMessage",
+                        "This email address is already registered!"
+                );
+
+                model.addAttribute("member", member);
+
                 return "add-member";
             }
 
-            borrowerRepository.save(borrower);
+            memberRepository.save(member);
+
             return "redirect:/members";
 
         } catch (DataIntegrityViolationException e) {
-            model.addAttribute("errorMessage", "Registration failed: A duplicate constraint was violated.");
-            model.addAttribute("borrower", borrower);
+
+            model.addAttribute(
+                    "errorMessage",
+                    "Registration failed: A duplicate constraint was violated."
+            );
+
+            model.addAttribute("member", member);
+
             return "add-member";
         }
     }
 
     @GetMapping("/members")
-    public String showMembersPage(java.security.Principal principal, Model model) {
-        if (principal != null) {
-            model.addAttribute("username", principal.getName());
-        }
-        
-        // 1. Fetch the real database records
-        List<Borrower> members = borrowerRepository.findAll();
+    public String showMembersPage(
+            java.security.Principal principal,
+            Model model) {
 
-        // 2. Compute the borrowed count in memory
-        for (Borrower member : members) {
-            long activeLoans = holdRepository.countByBorrowerBorrowerIdAndStatus(member.getBorrowerId(), LoanStatus.ACTIVE);
-            
-            // Note: If you want to show 'activeLoans' on your HTML frontend,
-            // you will either need to map these to a DTO or set a transient field on your Borrower model!
+        if (principal != null) {
+            model.addAttribute(
+                    "username",
+                    principal.getName()
+            );
         }
-        
-        // 3. Send the fully calculated list straight to members.html
+
+        List<Member> members =
+                memberRepository.findAll();
+
+        /*
+         * Calculate active loans using LoanRepository.
+         *
+         * The old code incorrectly queried HoldRepository.
+         */
+        for (Member member : members) {
+
+            long activeLoans =
+                    loanRepository
+                            .countByMemberMemberIdAndStatus(
+                                    member.getMemberId(),
+                                    LoanStatus.ACTIVE
+                            );
+
+            /*
+             * Do not attach activeLoans to Member unless
+             * Member has a suitable @Transient field.
+             *
+             * For now this simply verifies the calculation
+             * is based on the new Loan -> Member relationship.
+             */
+        }
+
         model.addAttribute("members", members);
-        
-        return "members"; 
+
+        return "members";
     }
 }

@@ -1,14 +1,15 @@
 package com.example.libback.controller;
 
-import com.example.libback.model.Borrower;
-import com.example.libback.model.Item;
+import com.example.libback.model.Accession;
+import com.example.libback.model.Book;
+import com.example.libback.model.Member;
 import com.example.libback.model.enums.LoanStatus;
-import com.example.libback.repository.BorrowerRepository;
-import com.example.libback.repository.ItemRepository;
+import com.example.libback.repository.BookRepository;
 import com.example.libback.repository.CategoryRepository;
 import com.example.libback.repository.LoanRepository;
-import com.example.libback.service.BookService;
+import com.example.libback.repository.MemberRepository;
 import com.example.libback.service.AuditLogService;
+import com.example.libback.service.BookService;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,251 +20,524 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class CatalogueController {
 
     private final BookService bookService;
-    private final ItemRepository itemRepository;
-    private final BorrowerRepository borrowerRepository;
+    private final BookRepository bookRepository;
+    private final MemberRepository memberRepository;
     private final AuditLogService auditLogService;
     private final CategoryRepository categoryRepository;
     private final LoanRepository loanRepository;
 
-    public CatalogueController(BookService bookService, 
-                               ItemRepository itemRepository,
-                               BorrowerRepository borrowerRepository, 
-                               AuditLogService auditLogService,
-                               CategoryRepository categoryRepository,
-                               LoanRepository loanRepository) {
+    public CatalogueController(
+            BookService bookService,
+            BookRepository bookRepository,
+            MemberRepository memberRepository,
+            AuditLogService auditLogService,
+            CategoryRepository categoryRepository,
+            LoanRepository loanRepository
+    ) {
         this.bookService = bookService;
-        this.itemRepository = itemRepository;
-        this.borrowerRepository = borrowerRepository;
+        this.bookRepository = bookRepository;
+        this.memberRepository = memberRepository;
         this.auditLogService = auditLogService;
         this.categoryRepository = categoryRepository;
         this.loanRepository = loanRepository;
     }
 
+    // =========================================================
+    // CATALOGUE
+    // =========================================================
+
     @GetMapping("/Catalogue")
     public String getCatalogue(Model model) {
-        model.addAttribute("books", itemRepository.findAll());
+
+        model.addAttribute(
+                "books",
+                bookRepository.findAll()
+        );
+
         return "Catalogue";
     }
 
+    // =========================================================
+    // CIRCULATION PAGE
+    // =========================================================
+
     @GetMapping("/circulation")
     public String showCirculationPage() {
-        return "circulation";  
+        return "circulation";
     }
 
-    // =========================================================================
-    // RENDER DEDICATED DETAIL & COPY MANAGEMENT PAGE (GET)
-    // =========================================================================
+    // =========================================================
+    // BOOK DETAILS
+    // =========================================================
+
     @GetMapping("/catalog/{isbn}")
-    public String showBookDetails(@PathVariable("isbn") String isbn, Model model) {
-        String cleanIsbn = isbn.replaceAll("[^a-zA-Z0-9]", "");
-        
-        Item item = itemRepository.findById(cleanIsbn)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid ISBN: " + cleanIsbn));
-        
-        model.addAttribute("item", item);
-        model.addAttribute("accessions", item.getAccessions());
-        
-        return "Catalogue"; 
-    }
+    public String showBookDetails(
+            @PathVariable("isbn") String isbn,
+            Model model
+    ) {
 
-    // =========================================================================
-    // PROCESS BATCH ACCESSION FORM (POST)
-    // =========================================================================
-    @PostMapping("/catalog/{isbn}/accessions/batch")
-    public String processBatchAccessions(@PathVariable("isbn") String isbn,
-                                         @RequestParam("prefix") String prefix,
-                                         @RequestParam("quantity") int quantity,
-                                         @RequestParam("shelfLocation") String shelfLocation) {
-        
-        String cleanIsbn = isbn.replaceAll("[^a-zA-Z0-9]", "");
+        String cleanIsbn =
+                cleanIsbn(isbn);
 
-        bookService.generateBatchAccessions(cleanIsbn, prefix, quantity, shelfLocation);
+        Book book =
+                bookRepository.findByIsbn(cleanIsbn)
+                        .orElseThrow(() ->
+                                new IllegalArgumentException(
+                                        "Book not found with ISBN: "
+                                                + cleanIsbn
+                                )
+                        );
 
-        // Uses cleanIsbn as the key in your audit trace
-        auditLogService.logAction(
-                cleanIsbn, 
-                "BATCH_ADD_ACCESSIONS", 
-                "Batch generated " + quantity + " physical copies with prefix: " + prefix
+        model.addAttribute(
+                "book",
+                book
         );
 
-        return "redirect:/catalog/" + cleanIsbn + "?success";
+        model.addAttribute(
+                "accessions",
+                book.getAccessions()
+        );
+
+        return "Catalogue";
     }
 
-    @PostMapping("/admin/register-borrower")
-    public String registerStudent(@RequestParam("studentId") String studentId,
-                                  @RequestParam("name") String name,
-                                  @RequestParam("email") String email,
-                                  @RequestParam("memberType") String type) {
-        
-        Borrower student = new Borrower();
-        student.setBorrowerId(studentId); 
-        student.setName(name);
-        student.setEmail(email);
-        student.setMemberType(com.example.libback.model.enums.MemberType.valueOf(type.toUpperCase()));
+    // =========================================================
+    // BATCH ACCESSION GENERATION
+    // =========================================================
 
-        borrowerRepository.save(student);
+   @PostMapping("/catalog/{isbn}/accessions/batch")
+public String processBatchAccessions(
+        @PathVariable("isbn") String isbn,
+        @RequestParam("prefix") String prefix,
+        @RequestParam("quantity") int quantity,
+        @RequestParam("shelfLocation") String shelfLocation
+) {
+
+    String cleanIsbn =
+            isbn.replaceAll("[^a-zA-Z0-9]", "");
+
+    Book book = bookRepository.findByIsbn(cleanIsbn)
+            .orElseThrow(() ->
+                    new IllegalArgumentException(
+                            "Book not found with ISBN: " + cleanIsbn
+                    )
+            );
+
+    bookService.generateBatchAccessions(
+            book.getBookId(),
+            prefix,
+            quantity,
+            shelfLocation
+    );
+
+    auditLogService.logAction(
+            "BATCH_ADD_ACCESSIONS",
+            "BOOK",
+            String.valueOf(book.getBookId()),
+            "Batch generated "
+                    + quantity
+                    + " physical copies with prefix: "
+                    + prefix
+    );
+
+    return "redirect:/catalog/" + cleanIsbn + "?success";
+}
+
+
+    // =========================================================
+    // REGISTER MEMBER
+    // =========================================================
+
+    @PostMapping("/admin/register-borrower")
+    public String registerMember(
+            @RequestParam("studentId") String memberId,
+            @RequestParam("name") String name,
+            @RequestParam("email") String email,
+            @RequestParam("memberType") String type
+    ) {
+
+        Member member = new Member();
+
+        member.setMemberId(memberId);
+        member.setName(name);
+        member.setEmail(email);
+
+        member.setMemberType(
+                com.example.libback.model.enums.MemberType
+                        .valueOf(type.toUpperCase())
+        );
+
+        memberRepository.save(member);
+
+        auditLogService.logAction(
+                "REGISTER_MEMBER",
+                "MEMBER",
+                memberId,
+                "Registered member: " + name
+        );
 
         return "redirect:/members?success";
     }
 
-    // =========================================================================
-    // RENDER ADD FORM WITH CATEGORIES (GET)
-    // =========================================================================
+    // =========================================================
+    // ADD BOOK FORM
+    // =========================================================
+
     @GetMapping("/admin/catalog/add")
-    public String showAddBookForm(Model model) {
-        model.addAttribute("item", new Item()); 
-        model.addAttribute("categories", categoryRepository.findAll()); // Populates the HTML dropdown
-        return "add-book";  
+    public String showAddBookForm(
+            Model model
+    ) {
+
+        model.addAttribute(
+                "book",
+                new Book()
+        );
+
+        model.addAttribute(
+                "categories",
+                categoryRepository.findAll()
+        );
+
+        return "add-book";
     }
 
-    // =========================================================================
-    // PROCESS ADD BOOK FORM (POST)
-    // =========================================================================
+    // =========================================================
+    // ADD BOOK
+    // =========================================================
+
     @PostMapping("/admin/catalog/add")
-    public String processAddBook(@ModelAttribute Item newItem) {
-        if (newItem.getIsbn() != null) {
-            newItem.setIsbn(newItem.getIsbn().replaceAll("[^a-zA-Z0-9]", ""));
+    public String processAddBook(
+            @ModelAttribute("book") Book newBook
+    ) {
+
+        if (newBook.getIsbn() != null) {
+
+            newBook.setIsbn(
+                    cleanIsbn(newBook.getIsbn())
+            );
         }
-        
-        // Save the metadata (which includes Category selections bound by Thymeleaf!)
-        bookService.saveBook(newItem);
-        
-        // Log action with ISBN saved to track exactly which catalog item was touched
-        auditLogService.logAction(newItem.getIsbn(), "ADD_BOOK_CATALOG", "Added metadata details for book: " + newItem.getTitle());
-        
-        return "redirect:/catalog/" + newItem.getIsbn();
+
+        bookService.saveBook(newBook);
+
+        auditLogService.logAction(
+                "ADD_BOOK",
+                "BOOK",
+                newBook.getIsbn(),
+                "Added book: "
+                        + newBook.getTitle()
+        );
+
+        return "redirect:/catalog/"
+                + newBook.getIsbn();
     }
 
-    // =========================================================================
-    // RENDER EDIT FORM WITH CATEGORIES (GET)
-    // =========================================================================
+    // =========================================================
+    // EDIT BOOK FORM
+    // =========================================================
+
     @GetMapping("/Catalogue/edit/{isbn}")
-    public String showEditForm(@PathVariable("isbn") String isbn, Model model) {
-        String cleanIsbn = isbn.replaceAll("[^a-zA-Z0-9]", ""); 
-        
-        Item item = itemRepository.findById(cleanIsbn)
-                .orElseThrow(() -> new IllegalArgumentException("No catalog record found for ISBN: " + cleanIsbn));
-        
-        model.addAttribute("item", item);
-        model.addAttribute("categories", categoryRepository.findAll()); // Populates categories for editing
-        return "edit-book"; 
+    public String showEditForm(
+            @PathVariable("isbn") String isbn,
+            Model model
+    ) {
+
+        String cleanIsbn =
+                cleanIsbn(isbn);
+
+        Book book =
+                bookRepository.findByIsbn(cleanIsbn)
+                        .orElseThrow(() ->
+                                new IllegalArgumentException(
+                                        "No catalog record found for ISBN: "
+                                                + cleanIsbn
+                                )
+                        );
+
+        model.addAttribute(
+                "book",
+                book
+        );
+
+        model.addAttribute(
+                "categories",
+                categoryRepository.findAll()
+        );
+
+        return "edit-book";
     }
 
-    // =========================================================================
-    // SUBMIT UPDATED METADATA (POST)
-    // =========================================================================
+    // =========================================================
+    // UPDATE BOOK
+    // =========================================================
+
     @PostMapping("/Catalogue/update/{isbn}")
-    public String updateItem(@PathVariable("isbn") String isbn, @ModelAttribute("item") Item updatedItem) {
-        String cleanIsbn = isbn.replaceAll("[^a-zA-Z0-9]", "");
+    public String updateBook(
+            @PathVariable("isbn") String isbn,
+            @ModelAttribute("book") Book updatedBook
+    ) {
 
-        Item existingItem = itemRepository.findById(cleanIsbn)
-                .orElseThrow(() -> new IllegalArgumentException("No catalog record found for ISBN: " + cleanIsbn));
+        String cleanIsbn =
+                cleanIsbn(isbn);
 
-        // Transfer screen field changes to the managed DB record
-        existingItem.setTitle(updatedItem.getTitle());
-        existingItem.setAuthor(updatedItem.getAuthor());
-        existingItem.setPublisher(updatedItem.getPublisher());
-        existingItem.setEdition(updatedItem.getEdition());
-        existingItem.setDescription(updatedItem.getDescription());
-        
-        // Transfer updated categories
-        existingItem.setCategories(updatedItem.getCategories());
+        Book existingBook =
+                bookRepository.findByIsbn(cleanIsbn)
+                        .orElseThrow(() ->
+                                new IllegalArgumentException(
+                                        "No catalog record found for ISBN: "
+                                                + cleanIsbn
+                                )
+                        );
 
-        itemRepository.save(existingItem); 
-        
-        // Log updated details
-        auditLogService.logAction(cleanIsbn, "UPDATE_BOOK_METADATA", "Modified metadata details for book: " + existingItem.getTitle());
-        
-        return "redirect:/catalog/" + cleanIsbn; 
+        existingBook.setTitle(
+                updatedBook.getTitle()
+        );
+
+        existingBook.setAuthor(
+                updatedBook.getAuthor()
+        );
+
+        existingBook.setPublisher(
+                updatedBook.getPublisher()
+        );
+
+        existingBook.setEdition(
+                updatedBook.getEdition()
+        );
+
+        existingBook.setDescription(
+                updatedBook.getDescription()
+        );
+
+        existingBook.setCategory(
+                updatedBook.getCategory()
+        );
+
+        bookRepository.save(existingBook);
+
+        auditLogService.logAction(
+                "UPDATE_BOOK",
+                "BOOK",
+                cleanIsbn,
+                "Modified metadata for book: "
+                        + existingBook.getTitle()
+        );
+
+        return "redirect:/catalog/"
+                + cleanIsbn;
     }
 
-    // =========================================================================
-    // VIEW GLOBAL CATALOG REGISTER (GET)
-    // =========================================================================
+    // =========================================================
+    // CATALOGUE REGISTRY
+    // =========================================================
+
     @GetMapping("/admin/catalog/registry")
-    public String showCatalogRegistry(Model model) {
-        // This returns all items, even those with zero generated accessions
-        model.addAttribute("books", itemRepository.findAll());
-        return "catalog-registry"; 
+    public String showCatalogRegistry(
+            Model model
+    ) {
+
+        model.addAttribute(
+                "books",
+                bookRepository.findAll()
+        );
+
+        return "catalog-registry";
     }
 
-    // =========================================================================
-    // DELETE MASTER BLUEPRINT (POST)
-    // =========================================================================
+    // =========================================================
+    // DELETE BOOK
+    // =========================================================
+
     @PostMapping("/admin/catalog/delete/{isbn}")
-    public String deleteCatalogItem(@PathVariable("isbn") String isbn, RedirectAttributes redirectAttributes) {
-        String cleanIsbn = isbn.replaceAll("[^a-zA-Z0-9]", "");
+    public String deleteCatalogItem(
+            @PathVariable("isbn") String isbn,
+            RedirectAttributes redirectAttributes
+    ) {
 
-        Item item = itemRepository.findById(cleanIsbn)
-                .orElseThrow(() -> new IllegalArgumentException("No catalog record found for ISBN: " + cleanIsbn));
+        String cleanIsbn =
+                cleanIsbn(isbn);
 
-        // 1. Check if physical copies (Accessions) exist at all
-        if (item.getAccessions() != null && !item.getAccessions().isEmpty()) {
-            
-            // 2. Check if ANY of those physical copies currently have an ACTIVE loan record in the system
-            boolean hasActiveLoans = item.getAccessions().stream()
-                    .anyMatch(accession -> loanRepository
-                            .findByAccessionAccessionIdAndStatus(accession.getAccessionId(), LoanStatus.ACTIVE)
-                            .isPresent()
-                    );
+        Book book =
+                bookRepository.findByIsbn(cleanIsbn)
+                        .orElseThrow(() ->
+                                new IllegalArgumentException(
+                                        "No catalog record found for ISBN: "
+                                                + cleanIsbn
+                                )
+                        );
+
+        // -----------------------------------------------------
+        // Physical copies exist
+        // -----------------------------------------------------
+
+        if (book.getAccessions() != null
+                && !book.getAccessions().isEmpty()) {
+
+            boolean hasActiveLoans =
+                    book.getAccessions()
+                            .stream()
+                            .anyMatch(accession ->
+                                    loanRepository
+                                            .findByAccessionAccessionIdAndStatus(
+                                                    accession.getAccessionId(),
+                                                    LoanStatus.ACTIVE
+                                            )
+                                            .isPresent()
+                            );
 
             if (hasActiveLoans) {
-                redirectAttributes.addFlashAttribute("errorMessage", 
-                    "CRITICAL WARNING: Cannot delete this book! One or more physical copies are currently checked out by members.");
+
+                redirectAttributes.addFlashAttribute(
+                        "errorMessage",
+                        "Cannot delete this book. One or more physical copies are currently checked out."
+                );
+
                 return "redirect:/admin/catalog/registry";
             }
 
-            // 3. If copies exist but none are checked out, prevent accidental deletion of inventory
-            redirectAttributes.addFlashAttribute("errorMessage", 
-                "Cannot delete master registry record. Please delete the inactive physical accession copies first.");
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "Cannot delete this book while physical copies exist. Delete the physical copies first."
+            );
+
             return "redirect:/admin/catalog/registry";
         }
 
-        // Safe to delete if we passed all checks (0 physical copies exist)
-        itemRepository.delete(item);
-        
-        redirectAttributes.addFlashAttribute("successMessage", "Book blueprint successfully removed.");
+        // -----------------------------------------------------
+        // Safe to delete
+        // -----------------------------------------------------
+
+        bookRepository.delete(book);
+
+        auditLogService.logAction(
+                "DELETE_BOOK",
+                "BOOK",
+                cleanIsbn,
+                "Deleted book from catalogue"
+        );
+
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Book successfully removed."
+        );
+
         return "redirect:/admin/catalog/registry";
     }
 
-    // =========================================================================
-    // DELETE INDIVIDUAL PHYSICAL ACCESSION COPY (POST)
-    // =========================================================================
+    // =========================================================
+    // DELETE PHYSICAL ACCESSION
+    // =========================================================
+
     @PostMapping("/catalog/accession/delete/{accessionId}")
-    public String deleteAccessionCopy(@PathVariable("accessionId") String accessionId, 
-                                      @RequestParam("isbn") String isbn, 
-                                      RedirectAttributes redirectAttributes) {
-        
-        // 1. Safety Check: Is this specific barcode copy currently out on loan?
-        boolean isCurrentlyBorrowed = loanRepository
-                .findByAccessionAccessionIdAndStatus(accessionId, LoanStatus.ACTIVE)
-                .isPresent();
+    public String deleteAccessionCopy(
+            @PathVariable("accessionId") String accessionId,
+            @RequestParam("isbn") String isbn,
+            RedirectAttributes redirectAttributes
+    ) {
+
+        String cleanIsbn =
+                cleanIsbn(isbn);
+
+        // -----------------------------------------------------
+        // Cannot delete an active loan
+        // -----------------------------------------------------
+
+        boolean isCurrentlyBorrowed =
+                loanRepository
+                        .findByAccessionAccessionIdAndStatus(
+                                accessionId,
+                                LoanStatus.ACTIVE
+                        )
+                        .isPresent();
 
         if (isCurrentlyBorrowed) {
-            redirectAttributes.addFlashAttribute("errorMessage", 
-                "Cannot delete copy " + accessionId + "! It is currently out on loan.");
-            return "redirect:/catalog/" + isbn;
+
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "Cannot delete copy "
+                            + accessionId
+                            + ". It is currently checked out."
+            );
+
+            return "redirect:/catalog/"
+                    + cleanIsbn;
         }
 
-        // 2. Fetch the parent item and use our helper methods + orphanRemoval to delete it safely
-        Item item = itemRepository.findById(isbn)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid ISBN: " + isbn));
+        // -----------------------------------------------------
+        // Find book
+        // -----------------------------------------------------
 
-        item.getAccessions().stream()
-                .filter(acc -> acc.getAccessionId().equals(accessionId))
-                .findFirst()
-                .ifPresent(item::removeAccession); // Triggers JPA orphanRemoval to delete from DB
+        Book book =
+                bookRepository.findByIsbn(cleanIsbn)
+                        .orElseThrow(() ->
+                                new IllegalArgumentException(
+                                        "Book not found with ISBN: "
+                                                + cleanIsbn
+                                )
+                        );
 
-        itemRepository.save(item);
+        // -----------------------------------------------------
+        // Find accession
+        // -----------------------------------------------------
 
-        // 3. Log the audit trail
+        Accession accession =
+                book.getAccessions()
+                        .stream()
+                        .filter(a ->
+                                a.getAccessionId()
+                                        .equals(accessionId)
+                        )
+                        .findFirst()
+                        .orElseThrow(() ->
+                                new IllegalArgumentException(
+                                        "Accession not found: "
+                                                + accessionId
+                                )
+                        );
+
+        // -----------------------------------------------------
+        // Remove from parent collection
+        // -----------------------------------------------------
+
+        book.removeAccession(accession);
+
+        bookRepository.save(book);
+
+        // -----------------------------------------------------
+        // Audit
+        // -----------------------------------------------------
+
         auditLogService.logAction(
-                isbn, 
-                "DELETE_ACCESSION_COPY", 
-                "Removed physical copy barcode: " + accessionId
+                "DELETE_ACCESSION",
+                "ACCESSION",
+                accessionId,
+                "Removed physical copy from book "
+                        + cleanIsbn
         );
 
-        redirectAttributes.addFlashAttribute("successMessage", "Physical copy " + accessionId + " has been successfully removed.");
-        return "redirect:/catalog/" + isbn;
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Physical copy "
+                        + accessionId
+                        + " has been successfully removed."
+        );
+
+        return "redirect:/catalog/"
+                + cleanIsbn;
+    }
+
+    // =========================================================
+    // ISBN CLEANING
+    // =========================================================
+
+    private String cleanIsbn(String isbn) {
+
+        if (isbn == null) {
+            return null;
+        }
+
+        return isbn.replaceAll(
+                "[^a-zA-Z0-9]",
+                ""
+        );
     }
 }

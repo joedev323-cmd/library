@@ -2,6 +2,7 @@ package com.example.libback.model;
 
 import com.example.libback.model.enums.AvailabilityStatus;
 import com.example.libback.model.enums.ConditionStatus;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -13,43 +14,85 @@ import java.util.Objects;
 
 @Entity
 @Table(
-        name = "accessions",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"isbn", "copyNumber"}),
-                @UniqueConstraint(columnNames = "barcode")
-        }
+    name = "accessions",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            columnNames = {"book_id", "copy_number"}
+        ),
+        @UniqueConstraint(
+            columnNames = "barcode"
+        )
+    },
+    indexes = {
+        @Index(
+            name = "idx_accession_book",
+            columnList = "book_id"
+        ),
+        @Index(
+            name = "idx_accession_status",
+            columnList = "availability_status"
+        ),
+        @Index(
+            name = "idx_accession_barcode",
+            columnList = "barcode"
+        )
+    }
 )
 public class Accession {
 
     @Id
     @NotBlank
-    @Column(length = 50, nullable = false, updatable = false)
+    @Column(
+        length = 50,
+        nullable = false,
+        updatable = false
+    )
     private String accessionId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "isbn", nullable = false)
-    private Item item;
+    @ManyToOne(
+        fetch = FetchType.LAZY,
+        optional = false
+    )
+    @JoinColumn(
+        name = "book_id",
+        nullable = false
+    )
+    private Book book;
 
     @NotNull
     @Positive
-    @Column(nullable = false)
+    @Column(
+        name = "copy_number",
+        nullable = false
+    )
     private Integer copyNumber;
 
     @NotBlank
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(
+        nullable = false,
+        unique = true,
+        length = 100
+    )
     private String barcode;
 
-    @NotBlank
-    @Column(nullable = false, length = 50)
+    @Column(length = 50)
     private String shelfLocation;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private ConditionStatus conditionStatus = ConditionStatus.GOOD;
+    @Column(
+        nullable = false,
+        length = 20
+    )
+    private ConditionStatus conditionStatus =
+            ConditionStatus.GOOD;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private AvailabilityStatus availabilityStatus = AvailabilityStatus.AVAILABLE;
+    @Column(
+        nullable = false,
+        length = 20
+    )
+    private AvailabilityStatus availabilityStatus =
+            AvailabilityStatus.AVAILABLE;
 
     @NotNull
     @Column(nullable = false)
@@ -57,7 +100,11 @@ public class Accession {
 
     @NotNull
     @Positive
-    @Column(nullable = false)
+    @Column(
+        nullable = false,
+        precision = 10,
+        scale = 2
+    )
     private BigDecimal replacementCost;
 
     @Column(columnDefinition = "TEXT")
@@ -66,16 +113,17 @@ public class Accession {
     public Accession() {
     }
 
-    public Accession(String accessionId,
-                     Item item,
-                     Integer copyNumber,
-                     String barcode,
-                     String shelfLocation,
-                     LocalDate purchaseDate,
-                     BigDecimal replacementCost) {
-
+    public Accession(
+            String accessionId,
+            Book book,
+            Integer copyNumber,
+            String barcode,
+            String shelfLocation,
+            LocalDate purchaseDate,
+            BigDecimal replacementCost
+    ) {
         this.accessionId = accessionId;
-        this.item = item;
+        this.book = book;
         this.copyNumber = copyNumber;
         this.barcode = barcode;
         this.shelfLocation = shelfLocation;
@@ -84,7 +132,33 @@ public class Accession {
     }
 
     public boolean isAvailable() {
-        return availabilityStatus == AvailabilityStatus.AVAILABLE;
+        return availabilityStatus ==
+                AvailabilityStatus.AVAILABLE;
+    }
+
+    public boolean isBorrowed() {
+        return availabilityStatus ==
+                AvailabilityStatus.BORROWED;
+    }
+
+    public boolean isInMaintenance() {
+        return availabilityStatus ==
+                AvailabilityStatus.MAINTENANCE;
+    }
+
+    public boolean isLost() {
+        return availabilityStatus ==
+                AvailabilityStatus.LOST;
+    }
+
+    public boolean isDamaged() {
+        return availabilityStatus ==
+                AvailabilityStatus.DAMAGED;
+    }
+
+    public boolean isRetired() {
+        return availabilityStatus ==
+                AvailabilityStatus.RETIRED;
     }
 
     public String getAccessionId() {
@@ -95,12 +169,12 @@ public class Accession {
         this.accessionId = accessionId;
     }
 
-    public Item getItem() {
-        return item;
+    public Book getBook() {
+        return book;
     }
 
-    public void setItem(Item item) {
-        this.item = item;
+    public void setBook(Book book) {
+        this.book = book;
     }
 
     public Integer getCopyNumber() {
@@ -131,7 +205,9 @@ public class Accession {
         return conditionStatus;
     }
 
-    public void setConditionStatus(ConditionStatus conditionStatus) {
+    public void setConditionStatus(
+            ConditionStatus conditionStatus
+    ) {
         this.conditionStatus = conditionStatus;
     }
 
@@ -139,7 +215,9 @@ public class Accession {
         return availabilityStatus;
     }
 
-    public void setAvailabilityStatus(AvailabilityStatus availabilityStatus) {
+    public void setAvailabilityStatus(
+            AvailabilityStatus availabilityStatus
+    ) {
         this.availabilityStatus = availabilityStatus;
     }
 
@@ -155,7 +233,9 @@ public class Accession {
         return replacementCost;
     }
 
-    public void setReplacementCost(BigDecimal replacementCost) {
+    public void setReplacementCost(
+            BigDecimal replacementCost
+    ) {
         this.replacementCost = replacementCost;
     }
 
@@ -169,9 +249,19 @@ public class Accession {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Accession that)) return false;
-        return Objects.equals(accessionId, that.accessionId);
+
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof Accession accession)) {
+            return false;
+        }
+
+        return Objects.equals(
+            accessionId,
+            accession.accessionId
+        );
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.example.libback;
 
 import com.example.libback.model.User;
+import com.example.libback.model.enums.UserRole;
 import com.example.libback.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -31,7 +32,7 @@ public class LibbackApplication {
                 // Uses the global PasswordEncoder bean configured in your SecurityConfig
                 admin.setPassword(passwordEncoder.encode(adminPassword));
                 
-                admin.setRole("ADMIN");
+                admin.setRole(UserRole.LIBRARIAN);
 
                 userRepository.save(admin);
                 System.out.println(">>> Initial Admin account created! Username: " + adminUsername);

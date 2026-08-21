@@ -1,10 +1,11 @@
 package com.example.libback.service;
 
-import com.example.libback.model.Accession;
-import com.example.libback.model.Item;
 import com.example.libback.dto.BookSearchResultDto;
+import com.example.libback.model.Accession;
+import com.example.libback.model.Book;
 import com.example.libback.repository.AccessionRepository;
-import com.example.libback.repository.ItemRepository;
+import com.example.libback.repository.BookRepository;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,62 +17,155 @@ import java.util.List;
 @Service
 public class BookService {
 
-    private final ItemRepository itemRepository;
+    private final BookRepository bookRepository;
     private final AccessionRepository accessionRepository;
 
-    public BookService(ItemRepository itemRepository, AccessionRepository accessionRepository) {
-        this.itemRepository = itemRepository;
+    public BookService(
+            BookRepository bookRepository,
+            AccessionRepository accessionRepository
+    ) {
+        this.bookRepository = bookRepository;
         this.accessionRepository = accessionRepository;
     }
 
-    // NEW METHOD: Formats and processes search results specifically for public-search layout
+    // =========================================================
+    // CATALOGUE SEARCH
+    // =========================================================
+
     public List<BookSearchResultDto> searchCatalogWithCounts(String query) {
+
         if (query == null || query.trim().isEmpty()) {
             return new ArrayList<>();
         }
+
         return accessionRepository.searchCatalog(query.trim());
     }
 
-    // Keep your original entity search for alternative views if needed
-    public List<Item> searchBooks(String query) {
+    // =========================================================
+    // BOOK SEARCH
+    // =========================================================
+
+    public List<Book> searchBooks(String query) {
+
         if (query == null || query.trim().isEmpty()) {
-            return itemRepository.findAll();
+            return bookRepository.findAll();
         }
-        return itemRepository.searchByTitle(query);
+
+        return bookRepository.findByTitleContainingIgnoreCase(
+                query.trim()
+        );
     }
 
+    // =========================================================
+    // SAVE BOOK
+    // =========================================================
+
     @Transactional
-    public void saveBook(Item item) {
-        if (item.getTitle() == null || item.getTitle().trim().isEmpty()) {
-            throw new IllegalArgumentException("Book title cannot be blank.");
+    public Book saveBook(Book book) {
+
+        if (book.getTitle() == null ||
+                book.getTitle().trim().isEmpty()) {
+
+            throw new IllegalArgumentException(
+                    "Book title cannot be blank."
+            );
         }
-        itemRepository.save(item);
+
+        if (book.getIsbn() == null ||
+                book.getIsbn().trim().isEmpty()) {
+
+            throw new IllegalArgumentException(
+                    "ISBN cannot be blank."
+            );
+        }
+
+        if (book.getAuthor() == null ||
+                book.getAuthor().trim().isEmpty()) {
+
+            throw new IllegalArgumentException(
+                    "Book author cannot be blank."
+            );
+        }
+
+        if (book.getCategory() == null) {
+
+            throw new IllegalArgumentException(
+                    "Book category is required."
+            );
+        }
+
+        return bookRepository.save(book);
     }
 
-    @Transactional
-    public void generateBatchAccessions(String isbn, String prefix, int quantity, String shelfLocation) {
-        Item item = itemRepository.findById(isbn)
-                .orElseThrow(() -> new IllegalArgumentException("Book with ISBN " + isbn + " not found."));
+    // =========================================================
+    // GENERATE PHYSICAL COPIES
+    // =========================================================
 
-        long existingCount = accessionRepository.countByItemIsbn(isbn);
-        int nextCopyNumber = (int) existingCount + 1;
+    @Transactional
+    public void generateBatchAccessions(
+            Long bookId,
+            String prefix,
+            int quantity,
+            String shelfLocation
+    ) {
+
+        if (bookId == null) {
+            throw new IllegalArgumentException(
+                    "Book ID is required."
+            );
+        }
+
+        if (prefix == null || prefix.trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Accession prefix cannot be blank."
+            );
+        }
+
+        if (quantity <= 0) {
+            throw new IllegalArgumentException(
+                    "Quantity must be greater than zero."
+            );
+        }
+
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "Book not found with ID: " + bookId
+                        )
+                );
+
+        Integer maxCopy =
+                accessionRepository.findMaxCopyNumberByBookId(bookId);
+
+        int nextCopyNumber =
+                maxCopy == null ? 1 : maxCopy + 1;
 
         for (int i = 0; i < quantity; i++) {
-            Accession copy = new Accession();
-            String formattedId = prefix + "-" + String.format("%04d", nextCopyNumber);
-            
-            copy.setAccessionId(formattedId);
-            copy.setBarcode("BAR-" + formattedId); 
-            copy.setCopyNumber(nextCopyNumber);
-            copy.setShelfLocation(shelfLocation);
-            copy.setReplacementCost(BigDecimal.valueOf(20.00)); 
-            copy.setPurchaseDate(LocalDate.now());
 
-            item.addAccession(copy);
-            accessionRepository.save(copy);
-            
+            Accession accession = new Accession();
+
+            String accessionId =
+                    prefix.trim()
+                    + "-"
+                    + String.format("%04d", nextCopyNumber);
+
+            accession.setAccessionId(accessionId);
+            accession.setBarcode("BAR-" + accessionId);
+            accession.setCopyNumber(nextCopyNumber);
+            accession.setBook(book);
+            accession.setShelfLocation(shelfLocation);
+
+            accession.setReplacementCost(
+                    BigDecimal.valueOf(20.00)
+            );
+
+            accession.setPurchaseDate(
+                    LocalDate.now()
+            );
+
+            accessionRepository.save(accession);
+
             nextCopyNumber++;
         }
-        itemRepository.save(item);
     }
 }

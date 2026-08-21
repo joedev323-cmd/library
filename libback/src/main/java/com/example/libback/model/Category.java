@@ -1,11 +1,19 @@
 package com.example.libback.model;
 
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "categories")
-public class Catergory {
+@Table(
+    name = "categories",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = "name")
+    }
+)
+public class Category {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long categoryId;
@@ -13,26 +21,24 @@ public class Catergory {
     @Column(nullable = false, length = 100)
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id")
-    private Catergory parent;
-
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
-    private List<Catergory> subCategories;
-
     @Column(nullable = false)
     private Integer loanPeriodDays = 14;
 
     @Column(nullable = false)
     private Integer maxRenewals = 2;
 
-    public Catergory() {}
+    @OneToMany(mappedBy = "category")
+    private List<Book> books = new ArrayList<>();
 
-    public Catergory(Long categoryId, String name, Catergory parent, List<Catergory> subCategories, Integer loanPeriodDays, Integer maxRenewals) {
-        this.categoryId = categoryId;
+    public Category() {
+    }
+
+    public Category(
+            String name,
+            Integer loanPeriodDays,
+            Integer maxRenewals
+    ) {
         this.name = name;
-        this.parent = parent;
-        this.subCategories = subCategories;
         this.loanPeriodDays = loanPeriodDays;
         this.maxRenewals = maxRenewals;
     }
@@ -53,22 +59,6 @@ public class Catergory {
         this.name = name;
     }
 
-    public Catergory getParent() {
-        return parent;
-    }
-
-    public void setParent(Catergory parent) {
-        this.parent = parent;
-    }
-
-    public List<Catergory> getSubCategories() {
-        return subCategories;
-    }
-
-    public void setSubCategories(List<Catergory> subCategories) {
-        this.subCategories = subCategories;
-    }
-
     public Integer getLoanPeriodDays() {
         return loanPeriodDays;
     }
@@ -85,4 +75,11 @@ public class Catergory {
         this.maxRenewals = maxRenewals;
     }
 
+    public List<Book> getBooks() {
+        return books;
+    }
+
+    public void setBooks(List<Book> books) {
+        this.books = books;
+    }
 }

@@ -1,6 +1,6 @@
 package com.example.libback.model.enums;
 
-public enum userstatus {
+public enum UserStatus {
     ACTIVE,
     SUSPENDED
 }

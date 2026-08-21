@@ -1,6 +1,8 @@
 package com.example.libback.repository;
 
 import com.example.libback.model.User;
+import com.example.libback.model.enums.UserRole;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +32,7 @@ class UserRepositoryTest {
         user.setName("Alice Admin");
         user.setUsername("alice_admin");
         user.setPassword("hashed_password_123");
-        user.setRole("ADMIN");
+        user.setRole(UserRole.SUPER_ADMIN);
         
         entityManager.persistAndFlush(user);
 
@@ -61,7 +63,7 @@ class UserRepositoryTest {
         user1.setName("Alice Admin");
         user1.setUsername("alice_admin");
         user1.setPassword("pass1");
-        user1.setRole("ADMIN");
+        user1.setRole(UserRole.LIBRARIAN);
         entityManager.persistAndFlush(user1);
 
         // Arrange - Create a second user with the same username
@@ -69,7 +71,7 @@ class UserRepositoryTest {
         user2.setName("Bob Admin");
         user2.setUsername("alice_admin"); // Duplicate username!
         user2.setPassword("pass2");
-        user2.setRole("SUPER_ADMIN");
+        user2.setRole(UserRole.SUPER_ADMIN);
 
         // Act & Assert - Expect a DataIntegrityViolationException due to the unique constraint
         assertThatThrownBy(() -> {
@@ -85,7 +87,7 @@ class UserRepositoryTest {
         user.setName("Alice Admin");
         user.setUsername("alice_admin");
         user.setPassword(null); // Null password!
-        user.setRole("ADMIN");
+        user.setRole(UserRole.SUPER_ADMIN);
 
         // Act & Assert
         assertThatThrownBy(() -> {

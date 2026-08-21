@@ -1,32 +1,36 @@
 package com.example.libback.model;
 
+import com.example.libback.model.enums.UserRole;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "users")
 public class User {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;  
+    private Long userId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String name;
 
-    @Column(nullable = false, unique = true)
-    private String username; 
+    @Column(nullable = false, unique = true, length = 100)
+    private String username;
 
     @Column(nullable = false)
-    private String password; 
+    private String password;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private UserRole role;
 
     @Column(nullable = false)
-    private String role;
+    private boolean active = true;
 
-    
-    public User() {}
-    
-    public User(Long userId, String name, String username, String password, String role) {
-        this.userId = userId;
+    public User() {
+    }
+
+    public User(String name, String username, String password, UserRole role) {
         this.name = name;
         this.username = username;
         this.password = password;
@@ -65,13 +69,19 @@ public class User {
         this.password = password;
     }
 
-    public String getRole() {
+    public UserRole getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(UserRole role) {
         this.role = role;
     }
 
-    
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 }

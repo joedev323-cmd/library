@@ -1,83 +1,89 @@
 package com.example.libback.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "items")
-public class Item {
+@Table(
+    name = "books",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = "isbn")
+    }
+)
+public class Book {
 
     @Id
-    @NotBlank
-    @Size(min = 10, max = 13)
-    @Column(length = 13, nullable = false, updatable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long bookId;
+
+    @Column(nullable = false, unique = true, length = 20)
     private String isbn;
 
-    @NotBlank
-    @Size(max = 255)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String title;
 
-    @NotBlank
-    @Size(max = 255)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String author;
 
-    @Size(max = 255)
+    @Column(length = 255)
     private String publisher;
 
-    @Size(max = 100)
+    @Column(length = 100)
     private String edition;
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @ManyToMany
-    @JoinTable(
-            name = "item_categories",
-            joinColumns = @JoinColumn(name = "isbn"),
-            inverseJoinColumns = @JoinColumn(name = "category_id")
-    )
-    private Set<Catergory> categories = new HashSet<>();
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 
     @OneToMany(
-            mappedBy = "item",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
+        mappedBy = "book",
+        cascade = CascadeType.ALL,
+        orphanRemoval = false
     )
     private Set<Accession> accessions = new HashSet<>();
 
-    public Item() {
+    public Book() {
     }
 
-    public Item(String isbn,
-                String title,
-                String author,
-                String publisher,
-                String edition,
-                String description) {
-
+    public Book(
+            String isbn,
+            String title,
+            String author,
+            String publisher,
+            String edition,
+            String description,
+            Category category
+    ) {
         this.isbn = isbn;
         this.title = title;
         this.author = author;
         this.publisher = publisher;
         this.edition = edition;
         this.description = description;
+        this.category = category;
     }
 
     public void addAccession(Accession accession) {
         accessions.add(accession);
-        accession.setItem(this);
+        accession.setBook(this);
     }
 
     public void removeAccession(Accession accession) {
         accessions.remove(accession);
-        accession.setItem(null);
+        accession.setBook(null);
+    }
+
+    public Long getBookId() {
+        return bookId;
+    }
+
+    public void setBookId(Long bookId) {
+        this.bookId = bookId;
     }
 
     public String getIsbn() {
@@ -128,12 +134,12 @@ public class Item {
         this.description = description;
     }
 
-    public Set<Catergory> getCategories() {
-        return categories;
+    public Category getCategory() {
+        return category;
     }
 
-    public void setCategories(Set<Catergory> categories) {
-        this.categories = categories;
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
     public Set<Accession> getAccessions() {
@@ -142,17 +148,5 @@ public class Item {
 
     public void setAccessions(Set<Accession> accessions) {
         this.accessions = accessions;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Item item)) return false;
-        return Objects.equals(isbn, item.isbn);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(isbn);
     }
 }

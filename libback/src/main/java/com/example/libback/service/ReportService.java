@@ -8,8 +8,8 @@ import com.example.libback.model.Loan;
 import com.example.libback.model.enums.AvailabilityStatus;
 import com.example.libback.model.enums.LoanStatus;
 import com.example.libback.repository.AccessionRepository;
-import com.example.libback.repository.BorrowerRepository;
-import com.example.libback.repository.ItemRepository;
+import com.example.libback.repository.MemberRepository;
+import com.example.libback.repository.BookRepository;
 import com.example.libback.repository.LoanRepository;
 import com.example.libback.model.Accession;
 
@@ -29,14 +29,14 @@ public class ReportService {
 
     private final LoanRepository loanRepository;
     private final AccessionRepository accessionRepository;
-    private final BorrowerRepository borrowerRepository;
-    private final ItemRepository itemRepository;
+    private final MemberRepository borrowerRepository;
+    private final BookRepository itemRepository;
 
     public ReportService(
             LoanRepository loanRepository,
             AccessionRepository accessionRepository,
-            BorrowerRepository borrowerRepository,
-            ItemRepository itemRepository) {
+            MemberRepository borrowerRepository,
+            BookRepository itemRepository) {
 
         this.loanRepository = loanRepository;
         this.accessionRepository = accessionRepository;
@@ -322,17 +322,17 @@ public class ReportService {
          */
 
         dto.setBorrowerId(
-                loan.getBorrower()
-                        .getBorrowerId()
+                loan.getMember()
+                        .getMemberId()
         );
 
         dto.setBorrowerName(
-                loan.getBorrower()
+                loan.getMember()
                         .getName()
         );
 
         dto.setBorrowerEmail(
-                loan.getBorrower()
+                loan.getMember()
                         .getEmail()
         );
 
@@ -344,13 +344,13 @@ public class ReportService {
 
         dto.setIsbn(
                 loan.getAccession()
-                        .getItem()
+                        .getBook()
                         .getIsbn()
         );
 
         dto.setTitle(
                 loan.getAccession()
-                        .getItem()
+                        .getBook()
                         .getTitle()
         );
 
@@ -409,9 +409,9 @@ public class ReportService {
         String isbn = "";
         String title = "";
 
-        if (copy.getItem() != null) {
-            isbn = copy.getItem().getIsbn();
-            title = copy.getItem().getTitle();
+        if (copy.getBook() != null) {
+            isbn = copy.getBook().getIsbn();
+            title = copy.getBook().getTitle();
         }
 
         String availability = "";

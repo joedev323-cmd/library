@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -24,61 +25,112 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http
+    ) throws Exception {
 
         http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .cors(cors ->
+                cors.configurationSource(corsConfigurationSource())
+            )
 
-            .csrf(csrf -> csrf
-                .ignoringRequestMatchers("/api/**", "/h2/**")
+            .csrf(csrf ->
+                csrf.ignoringRequestMatchers("/api/**", "/h2/**")
             )
 
             .authorizeHttpRequests(auth -> auth
 
-                // React/API public endpoints
-                .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
+                // -----------------------------------------
+                // PUBLIC
+                // -----------------------------------------
 
-                // Development
-                .requestMatchers("/h2/**").permitAll()
-
-                // Existing public Thymeleaf pages/assets
                 .requestMatchers(
-                    "/css/**",
-                    "/js/**",
-                    "/img/**",
                     "/",
                     "/index",
                     "/login",
-                    "/catalog/search",
-                    "/admin/catalog/add",
-                    "/admin/add/member",
-                    "/catalog/accessions/batch",
-                    "/admin/register-borrower",
-                    "/Catalogue/edit/**",
-                    "/Catalogue/update/**"
+                    "/css/**",
+                    "/js/**",
+                    "/img/**",
+                    "/h2/**"
                 ).permitAll()
 
-                // Everything else remains protected
+                // Public catalogue
+                .requestMatchers(
+                    HttpMethod.GET,
+                    "/api/catalogue/**"
+                ).permitAll()
+
+                .requestMatchers(
+                    "/catalog/**"
+                ).permitAll()
+
+
+                // -----------------------------------------
+                // SUPERADMIN ONLY
+                // -----------------------------------------
+
+                .requestMatchers(
+                    "/api/users/**",
+                    "/admin/users/**"
+                ).hasRole("SUPERADMIN")
+
+
+                // -----------------------------------------
+                // LIBRARIAN + SUPERADMIN
+                // -----------------------------------------
+
+                .requestMatchers(
+                    "/api/books/**",
+                    "/api/categories/**",
+                    "/api/accessions/**",
+                    "/api/members/**",
+                    "/api/loans/**",
+                    "/api/reports/**"
+                ).hasAnyRole(
+                    "SUPERADMIN",
+                    "LIBRARIAN"
+                )
+
+                .requestMatchers(
+                    "/admin/books/**",
+                    "/admin/categories/**",
+                    "/admin/accessions/**",
+                    "/admin/members/**",
+                    "/admin/circulation/**",
+                    "/admin/reports/**"
+                ).hasAnyRole(
+                    "SUPERADMIN",
+                    "LIBRARIAN"
+                )
+
+
+                // -----------------------------------------
+                // EVERYTHING ELSE
+                // -----------------------------------------
+
                 .anyRequest().authenticated()
             )
 
-            .formLogin(form -> form
-                .loginPage("/login")
-                .loginProcessingUrl("/login")
-                .defaultSuccessUrl("/dashboard", true)
-                .permitAll()
+            .formLogin(form ->
+                form
+                    .loginPage("/login")
+                    .loginProcessingUrl("/login")
+                    .defaultSuccessUrl("/dashboard", true)
+                    .permitAll()
             )
 
-            .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/index")
-                .permitAll()
-            );
+            .logout(logout ->
+                logout
+                    .logoutUrl("/logout")
+                    .logoutSuccessUrl("/index")
+                    .permitAll()
+            )
 
-        // Needed for H2 console
-        http.headers(headers ->
-            headers.frameOptions(frame -> frame.sameOrigin())
-        );
+            .headers(headers ->
+                headers.frameOptions(frame ->
+                    frame.sameOrigin()
+                )
+            );
 
         return http.build();
     }
@@ -86,7 +138,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
-        CorsConfiguration configuration = new CorsConfiguration();
+        CorsConfiguration configuration =
+                new CorsConfiguration();
 
         configuration.setAllowedOrigins(
             List.of("http://localhost:5173")
@@ -110,9 +163,12 @@ public class SecurityConfig {
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source =
-            new UrlBasedCorsConfigurationSource();
+                new UrlBasedCorsConfigurationSource();
 
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration(
+            "/**",
+            configuration
+        );
 
         return source;
     }

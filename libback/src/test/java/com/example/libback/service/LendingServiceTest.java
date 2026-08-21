@@ -3,7 +3,7 @@ package com.example.libback.service;
 import com.example.libback.model.*;
 import com.example.libback.model.enums.AvailabilityStatus;
 import com.example.libback.repository.AccessionRepository;
-import com.example.libback.repository.BorrowerRepository;
+import com.example.libback.repository.MemberRepository;
 import com.example.libback.repository.LoanRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ class LendingServiceTest {
     private AccessionRepository accessionRepository;
     
     @Mock 
-    private BorrowerRepository borrowerRepository;
+    private MemberRepository borrowerRepository;
     
     @Mock 
     private LoanRepository loanRepository;
@@ -46,25 +46,25 @@ class LendingServiceTest {
         String staffId = "STF-303";
 
         // Setup Borrower
-        Borrower borrower = new Borrower();
-        borrower.setBorrowerId(borrowerId);
+        Member borrower = new Member();
+        borrower.setMemberId(borrowerId);
         borrower.setActive(true); // Bypasses the "is student account active" check
 
         // Setup Item & Category relationship using a Set
-        Catergory category = new Catergory();
+        Category category = new Category();
         category.setLoanPeriodDays(7);
 
-        Set<Catergory> categories = new HashSet<>();
+        Set<Category> categories = new HashSet<>();
         categories.add(category);
 
-        Item item = new Item();
+        Book item = new Book();
         item.setIsbn("1234567890123");
         item.setCategories(categories);
 
         // Setup Accession with exact setter: setAccessionId
         Accession accession = new Accession();
         accession.setAccessionId(accessionId);
-        accession.setItem(item);
+        accession.setBook(item);
         accession.setAvailabilityStatus(AvailabilityStatus.AVAILABLE);
 
         // Stub repository responses
@@ -79,7 +79,7 @@ class LendingServiceTest {
         // Assert
         assertNotNull(loan);
         assertEquals(accession, loan.getAccession());
-        assertEquals(borrower, loan.getBorrower());
+        assertEquals(borrower, loan.getMember());
         assertEquals(staffId, loan.getStaffId());
         assertEquals(AvailabilityStatus.BORROWED, accession.getAvailabilityStatus());
         assertTrue(loan.getDueDate().isAfter(LocalDateTime.now()));
@@ -98,8 +98,8 @@ class LendingServiceTest {
         String borrowerId = "BOR-202";
         String staffId = "STF-303";
 
-        Borrower borrower = new Borrower();
-        borrower.setBorrowerId(borrowerId);
+        Member borrower = new Member();
+        borrower.setMemberId(borrowerId);
         borrower.setActive(true);
 
         Accession occupiedAccession = new Accession();

@@ -66,9 +66,9 @@ public class ReportApiController {
 
                     csv(copy.getBarcode()),
 
-                    csv(copy.getItem().getIsbn()),
+                    csv(copy.getBook().getIsbn()),
 
-                    csv(copy.getItem().getTitle()),
+                    csv(copy.getBook().getTitle()),
 
                     csv(copy.getShelfLocation()),
 

@@ -1,6 +1,6 @@
 package com.example.libback.controller;
 
-import com.example.libback.repository.BorrowerRepository;
+import com.example.libback.repository.MemberRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -29,7 +29,7 @@ class MemberControllerTest {
     private MockMvc mockMvc;
  
     @MockitoBean 
-    private BorrowerRepository borrowerRepository;
+    private MemberRepository borrowerRepository;
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})

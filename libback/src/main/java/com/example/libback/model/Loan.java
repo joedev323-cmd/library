@@ -2,20 +2,18 @@ package com.example.libback.model;
 
 import com.example.libback.model.enums.LoanStatus;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 @Entity
 @Table(
     name = "loans",
     indexes = {
         @Index(name = "idx_loan_status", columnList = "status"),
-        @Index(name = "idx_due_date", columnList = "dueDate"),
-        @Index(name = "idx_borrower", columnList = "borrower_id"),
-        @Index(name = "idx_accession", columnList = "accession_id")
+        @Index(name = "idx_loan_due_date", columnList = "due_date"),
+        @Index(name = "idx_loan_member", columnList = "member_id"),
+        @Index(name = "idx_loan_accession", columnList = "accession_id")
     }
 )
 public class Loan {
@@ -29,13 +27,19 @@ public class Loan {
     private Accession accession;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "borrower_id", nullable = false)
-    private Borrower borrower;
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
+
+    /**
+     * The librarian/admin who issued the book.
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "issued_by", nullable = false)
+    private User issuedBy;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime checkoutDate;
 
-    @NotNull
     @Column(nullable = false)
     private LocalDateTime dueDate;
 
@@ -47,16 +51,12 @@ public class Loan {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal fineAccrued = BigDecimal.ZERO;
 
-    // ADDED: Tracks actual payments collected manually at the desk
     @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal finePaid = BigDecimal.ZERO; 
+    private BigDecimal finePaid = BigDecimal.ZERO;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private LoanStatus status = LoanStatus.ACTIVE;
-
-    @Column(length = 50)
-    private String staffId;
 
     public Loan() {
     }
@@ -77,8 +77,6 @@ public class Loan {
                 && dueDate.isBefore(LocalDateTime.now());
     }
 
-    // --- GETTERS AND SETTERS ---
-
     public Long getLoanId() {
         return loanId;
     }
@@ -95,12 +93,20 @@ public class Loan {
         this.accession = accession;
     }
 
-    public Borrower getBorrower() {
-        return borrower;
+    public Member getMember() {
+        return member;
     }
 
-    public void setBorrower(Borrower borrower) {
-        this.borrower = borrower;
+    public void setMember(Member member) {
+        this.member = member;
+    }
+
+    public User getIssuedBy() {
+        return issuedBy;
+    }
+
+    public void setIssuedBy(User issuedBy) {
+        this.issuedBy = issuedBy;
     }
 
     public LocalDateTime getCheckoutDate() {
@@ -143,7 +149,6 @@ public class Loan {
         this.fineAccrued = fineAccrued;
     }
 
-    // ADDED: Getter and Setter for finePaid
     public BigDecimal getFinePaid() {
         return finePaid;
     }
@@ -158,25 +163,5 @@ public class Loan {
 
     public void setStatus(LoanStatus status) {
         this.status = status;
-    }
-
-    public String getStaffId() {
-        return staffId;
-    }
-
-    public void setStaffId(String staffId) {
-        this.staffId = staffId;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Loan loan)) return false;
-        return Objects.equals(loanId, loan.loanId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(loanId);
     }
 }

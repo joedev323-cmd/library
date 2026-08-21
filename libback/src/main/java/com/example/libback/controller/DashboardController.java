@@ -5,7 +5,7 @@ import com.example.libback.dto.DashboardStats;
 import com.example.libback.model.Loan;
 import com.example.libback.model.enums.LoanStatus;
 import com.example.libback.repository.AccessionRepository;
-import com.example.libback.repository.BorrowerRepository;
+import com.example.libback.repository.MemberRepository;
 import com.example.libback.repository.LoanRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DashboardController {
 
-    private final BorrowerRepository borrowerRepository;
+    private final MemberRepository borrowerRepository;
     private final LoanRepository loanRepository;
     private final AccessionRepository accessionRepository;
 
@@ -53,13 +53,13 @@ List<Loan> recentLoans = loanRepository.findTop5ByOrderByLoanIdDesc();
 for (Loan loan : recentLoans) {
     // 1. Get the title from Item
     String bookTitle = "Unknown Title";
-    if (loan.getAccession() != null && loan.getAccession().getItem() != null) {
-        bookTitle = loan.getAccession().getItem().getTitle();
+    if (loan.getAccession() != null && loan.getAccession().getBook() != null) {
+        bookTitle = loan.getAccession().getBook().getTitle();
     }
 
     // 2. Get Borrower details
-    String borrowerName = (loan.getBorrower() != null) ? loan.getBorrower().getName() : "Unknown Member";
-    String borrowerId = (loan.getBorrower() != null) ? loan.getBorrower().getBorrowerId() : "N/A";
+    String borrowerName = (loan.getMember() != null) ? loan.getMember().getName() : "Unknown Member";
+    String borrowerId = (loan.getMember() != null) ? loan.getMember().getMemberId() : "N/A";
 
     // 3. Action
     String action = (loan.getStatus() == LoanStatus.RETURNED) ? "Returned" : "Issued";

@@ -1,8 +1,9 @@
 package com.example.libback.controller;
 
-import com.example.libback.model.Catergory;
+import com.example.libback.model.Category;
 import com.example.libback.repository.CategoryRepository;
 import com.example.libback.service.AuditLogService;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -14,43 +15,81 @@ public class CategoryController {
     private final CategoryRepository categoryRepository;
     private final AuditLogService auditLogService;
 
-    public CategoryController(CategoryRepository categoryRepository, AuditLogService auditLogService) {
+    public CategoryController(
+            CategoryRepository categoryRepository,
+            AuditLogService auditLogService
+    ) {
         this.categoryRepository = categoryRepository;
         this.auditLogService = auditLogService;
     }
 
-    // =========================================================================
-    // RENDER CATEGORY MANAGEMENT DASHBOARD (GET)
-    // =========================================================================
+    // =========================================================
+    // CATEGORY DASHBOARD
+    // =========================================================
+
     @GetMapping
     public String viewCategoryDashboard(Model model) {
-        model.addAttribute("categories", categoryRepository.findAll());
-        model.addAttribute("parentOptions", categoryRepository.findByParentIsNull());
-        model.addAttribute("newCategory", new Catergory());
+
+        model.addAttribute(
+                "categories",
+                categoryRepository.findAll()
+        );
+
+        model.addAttribute(
+                "newCategory",
+                new Category()
+        );
+
         return "categories";
     }
 
-    // =========================================================================
-    // PROCESS NEW CATEGORY REGISTRATION (POST)
-    // =========================================================================
+    // =========================================================
+    // CREATE CATEGORY
+    // =========================================================
+
     @PostMapping("/add")
-    public String processAddCategory(@ModelAttribute("newCategory") Catergory newCategory,
-                                     @RequestParam(value = "parentId", required = false) Long parentId) {
-        
-        // Handle nested parent relation safely if a parent ID was selected
-        if (parentId != null) {
-            Catergory parent = categoryRepository.findById(parentId)
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid Parent Category ID: " + parentId));
-            newCategory.setParent(parent);
+    public String processAddCategory(
+            @ModelAttribute("newCategory") Category newCategory
+    ) {
+
+        if (newCategory.getName() == null ||
+                newCategory.getName().trim().isEmpty()) {
+
+            throw new IllegalArgumentException(
+                    "Category name cannot be blank."
+            );
         }
 
-        categoryRepository.save(newCategory);
+        newCategory.setName(
+                newCategory.getName().trim()
+        );
 
-        // Track category registration event in our security log tracking system
+        if (categoryRepository.existsByName(
+                newCategory.getName()
+        )) {
+
+            throw new IllegalArgumentException(
+                    "Category already exists: "
+                    + newCategory.getName()
+            );
+        }
+
+        Category savedCategory =
+                categoryRepository.save(newCategory);
+
+        // =====================================================
+        // AUDIT
+        // =====================================================
+
         auditLogService.logAction(
-                "CAT-" + newCategory.getCategoryId(),
                 "CREATE_CATEGORY",
-                "Created library category: " + newCategory.getName() + " (Loan Period: " + newCategory.getLoanPeriodDays() + " days)"
+                "CATEGORY",
+                String.valueOf(savedCategory.getCategoryId()),
+                "Created library category: "
+                        + savedCategory.getName()
+                        + " (Loan Period: "
+                        + savedCategory.getLoanPeriodDays()
+                        + " days)"
         );
 
         return "redirect:/admin/categories?success";

@@ -1,7 +1,7 @@
 package com.example.libback.repository;
 
-import com.example.libback.model.Accession;
 import com.example.libback.dto.BookSearchResultDto;
+import com.example.libback.model.Accession;
 import com.example.libback.model.enums.AvailabilityStatus;
 
 import jakarta.persistence.LockModeType;
@@ -17,10 +17,6 @@ import java.util.Optional;
 public interface AccessionRepository
         extends JpaRepository<Accession, String> {
 
-    // ---------------------------------------------------------
-    // Lock accession during circulation operations
-    // ---------------------------------------------------------
-
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""
         SELECT a
@@ -31,34 +27,38 @@ public interface AccessionRepository
             @Param("id") String id
     );
 
+    long countByBookBookId(Long bookId);
 
-    // ---------------------------------------------------------
-    // Item copy count
-    // ---------------------------------------------------------
-
-    long countByItemIsbn(
-            String isbn
+    long countByBookBookIdAndAvailabilityStatus(
+            Long bookId,
+            AvailabilityStatus status
     );
-
-
-    // ---------------------------------------------------------
-    // Inventory statistics
-    // ---------------------------------------------------------
 
     long countByAvailabilityStatus(
-            AvailabilityStatus availabilityStatus
+            AvailabilityStatus status
     );
 
+    @Query("""
+        SELECT COALESCE(MAX(a.copyNumber), 0)
+        FROM Accession a
+        WHERE a.book.bookId = :bookId
+        """)
+    Integer findMaxCopyNumberByBookId(
+            @Param("bookId") Long bookId
+    );
 
-    // ---------------------------------------------------------
-    // Catalogue search
-    // ---------------------------------------------------------
+    List<Accession> findByBookBookId(Long bookId);
 
+    List<Accession> findByAvailabilityStatus(
+            AvailabilityStatus status
+    );
+
+    // PUBLIC CATALOGUE SEARCH
     @Query("""
         SELECT new com.example.libback.dto.BookSearchResultDto(
-            a.item.title,
-            a.item.author,
-            a.item.isbn,
+            a.book.title,
+            a.book.author,
+            a.book.isbn,
             a.shelfLocation,
             SUM(
                 CASE
@@ -72,18 +72,13 @@ public interface AccessionRepository
         )
         FROM Accession a
         WHERE
-            LOWER(a.item.title)
-                LIKE LOWER(CONCAT('%', :query, '%'))
-            OR
-            LOWER(a.item.author)
-                LIKE LOWER(CONCAT('%', :query, '%'))
-            OR
-            LOWER(a.item.isbn)
-                LIKE LOWER(CONCAT('%', :query, '%'))
+            LOWER(a.book.title) LIKE LOWER(CONCAT('%', :query, '%'))
+            OR LOWER(a.book.author) LIKE LOWER(CONCAT('%', :query, '%'))
+            OR LOWER(a.book.isbn) LIKE LOWER(CONCAT('%', :query, '%'))
         GROUP BY
-            a.item.title,
-            a.item.author,
-            a.item.isbn,
+            a.book.title,
+            a.book.author,
+            a.book.isbn,
             a.shelfLocation
         """)
     List<BookSearchResultDto> searchCatalog(
