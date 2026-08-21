@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found</title>
+    <link rel="stylesheet" th:href="@{/css/tailwind.css}">
+  </head>
+
+  <body class="bg-gray-100 min-h-screen flex items-center justify-center px-4">
+    <div class="w-full max-w-md text-center">
+
+      <div class="flex justify-center mb-6">
+        <div
+          class="w-24 h-24 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+        </div>
+      </div>
+
+      <h1
+        class="text-9xl font-extrabold text-purple-600 tracking-widest">404</h1>
+
+      <div
+        class="bg-white rounded-xl shadow-sm p-8 mt-4 border border-gray-100">
+        <h2 class="text-2xl font-medium text-gray-800 mb-2">We've hit a
+          spine-chilling error!</h2>
+        <p class="text-gray-500 text-sm leading-relaxed mb-6">
+          The page you are looking for seems to have been completely <span
+            class="font-semibold text-purple-600">misfiled</span>, borrowed
+          indefinitely, or simply never written into our catalog.
+        </p>
+
+        <div class="space-y-2">
+          <a th:href="@{/}"
+            class="block w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 rounded-md text-sm transition shadow-sm">
+            Return to Circulation Desk
+          </a>
+          <button onclick="history.back()"
+            class="block w-full bg-gray-50 hover:bg-gray-100 text-gray-600 font-medium py-3 rounded-md text-sm border border-gray-200 transition">
+            Go Back a Chapter
+          </button>
+        </div>
+      </div>
+
+      <p class="text-xs text-gray-400 mt-6">BiblioHub Catalog Management System
+        &copy; 2026</p>
+    </div>
+  </body>
+</html>
