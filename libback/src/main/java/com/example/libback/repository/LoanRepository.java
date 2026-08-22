@@ -17,13 +17,7 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
     // MEMBER LOANS
     // ---------------------------------------------------------
 
-    List<Loan> findByBorrowerBorrowerId(String borrowerId);
-
-    long countByBorrowerBorrowerIdAndStatus(
-        String borrowerId,
-        LoanStatus status
-    );
-
+    List<Loan> findByMemberMemberId(String memberId);
 
     // ---------------------------------------------------------
     // GENERAL LOAN STATISTICS
