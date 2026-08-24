@@ -1,16 +1,16 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Library Catalog Detail</title>
-    <link rel="stylesheet" th:href="@{/css/tailwind.css}">
+    <link rel="stylesheet" th:href="@{/css/tailwind.css}" />
   </head>
 
   <body class="bg-gray-100 min-h-screen flex">
-
     <aside
-      class="w-64 bg-white shadow-md hidden md:flex flex-col justify-between">
+      class="w-64 bg-white shadow-md hidden md:flex flex-col justify-between"
+    >
       <div>
         <div class="p-6 border-b border-gray-100">
           <h1 class="text-2xl font-light text-gray-800 flex items-center gap-2">
@@ -20,52 +20,102 @@
         </div>
 
         <nav class="p-4 space-y-1">
-          <a th:href="@{/dashboard}"
-            class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg text-gray-600 hover:bg-gray-50 hover:text-purple-600 transition">
-            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z" />
+          <a
+            th:href="@{/dashboard}"
+            class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg text-gray-600 hover:bg-gray-50 hover:text-purple-600 transition"
+          >
+            <svg
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z"
+              />
             </svg>
             Dashboard
           </a>
 
-          <a th:href="@{/Catalogue}"
-            class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg bg-purple-50 text-purple-600 transition ">
-            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          <a
+            th:href="@{/Catalogue}"
+            class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg bg-purple-50 text-purple-600 transition"
+          >
+            <svg
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+              />
             </svg>
             Book Catalog
           </a>
 
-          <a th:href="@{/circulation}"
-            class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg text-gray-600 hover:bg-gray-50 hover:text-purple-600 transition">
-            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+          <a
+            th:href="@{/circulation}"
+            class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg text-gray-600 hover:bg-gray-50 hover:text-purple-600 transition"
+          >
+            <svg
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+              />
             </svg>
             Issue / Returns
           </a>
 
-          <a th:href="@{/members}"
-            class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg text-gray-600 hover:bg-gray-50 hover:text-purple-600 transition">
-            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.114-1.28.319-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          <a
+            th:href="@{/members}"
+            class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg text-gray-600 hover:bg-gray-50 hover:text-purple-600 transition"
+          >
+            <svg
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.114-1.28.319-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+              />
             </svg>
             Members
           </a>
 
-          <a th:href="@{/reports}"
-            class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg text-gray-600 hover:bg-gray-50 hover:text-purple-600 transition">
-            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          <a
+            th:href="@{/reports}"
+            class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg text-gray-600 hover:bg-gray-50 hover:text-purple-600 transition"
+          >
+            <svg
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              />
             </svg>
             Reports
           </a>
@@ -74,12 +124,22 @@
 
       <div class="p-4 border-t border-gray-100">
         <form th:action="@{/logout}" method="post">
-          <button type="submit"
-            class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50 transition">
-            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          <button
+            type="submit"
+            class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50 transition"
+          >
+            <svg
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+              />
             </svg>
             Log Out
           </button>
@@ -88,67 +148,110 @@
     </aside>
 
     <div class="flex-1 flex flex-col min-w-0 overflow-x-hidden">
-
       <header
-        class="bg-white shadow-sm h-16 flex items-center justify-between px-6 z-10">
+        class="bg-white shadow-sm h-16 flex items-center justify-between px-6 z-10"
+      >
         <div class="flex items-center gap-4">
-          <h2
-            class="text-xl font-semibold text-gray-800 md:block hidden">Catalog
-            Asset Management</h2>
+          <h2 class="text-xl font-semibold text-gray-800 md:block hidden">
+            Catalog Asset Management
+          </h2>
         </div>
 
         <div class="flex items-center gap-4">
           <div class="text-right hidden sm:block">
-            <p class="text-sm font-medium text-gray-800"
-              th:text="${#authentication.name}">Librarian</p>
+            <p
+              class="text-sm font-medium text-gray-800"
+              th:text="${#authentication.name}"
+            >
+              Librarian
+            </p>
             <p class="text-xs text-gray-500">Staff Dashboard</p>
           </div>
           <div
-            class="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-medium">
-            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            class="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-medium"
+          >
+            <svg
+              class="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              />
             </svg>
           </div>
         </div>
       </header>
 
       <main class="p-6 space-y-6 flex-1 overflow-y-auto">
-
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <div
-            class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+          >
             <div>
-              <h2 class="text-2xl font-semibold text-gray-800 mb-1"
-                th:text="${item?.title}">Book Title</h2>
-              <h5 class="text-lg font-medium text-purple-600"
-                th:text="'By ' + ${item?.author}">Author Name</h5>
+              <h2
+                class="text-2xl font-semibold text-gray-800 mb-1"
+                th:text="${item?.title}"
+              >
+                Book Title
+              </h2>
+              <h5
+                class="text-lg font-medium text-purple-600"
+                th:text="'By ' + ${item?.author}"
+              >
+                Author Name
+              </h5>
               <p class="text-sm text-gray-500 mt-2 flex items-center gap-2">
                 <span class="font-semibold text-gray-700">ISBN:</span>
                 <span
                   class="font-mono bg-gray-100 px-2 py-0.5 rounded text-gray-800"
-                  th:text="${item?.isbn}">0000000000</span>
+                  th:text="${item?.isbn}"
+                  >0000000000</span
+                >
               </p>
             </div>
 
             <div class="flex items-center gap-3 flex-shrink-0">
-              <a th:href="@{/Catalogue/edit/{isbn}(isbn=${item?.isbn})}"
-                class="inline-flex items-center justify-center bg-white border border-gray-300 hover:border-purple-600 text-gray-700 hover:text-purple-600 font-medium px-4 py-2.5 rounded-lg text-sm transition shadow-sm gap-2">
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                  stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              <a
+                th:href="@{/Catalogue/edit/{isbn}(isbn=${item?.isbn})}"
+                class="inline-flex items-center justify-center bg-white border border-gray-300 hover:border-purple-600 text-gray-700 hover:text-purple-600 font-medium px-4 py-2.5 rounded-lg text-sm transition shadow-sm gap-2"
+              >
+                <svg
+                  class="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                  />
                 </svg>
                 Edit Book
               </a>
 
-              <a th:href="@{/admin/catalog/add}"
-                class="inline-flex items-center justify-center bg-purple-600 hover:bg-purple-700 text-white font-medium px-4 py-2.5 rounded-lg text-sm transition shadow-sm gap-2">
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                  stroke="currentColor" stroke-width="2.5">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M12 4v16m8-8H4" />
+              <a
+                th:href="@{/admin/catalog/add}"
+                class="inline-flex items-center justify-center bg-purple-600 hover:bg-purple-700 text-white font-medium px-4 py-2.5 rounded-lg text-sm transition shadow-sm gap-2"
+              >
+                <svg
+                  class="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 4v16m8-8H4"
+                  />
                 </svg>
                 Register New Title
               </a>
@@ -157,51 +260,63 @@
         </div>
 
         <div
-          class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+        >
           <div
-            class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
-            <h3 class="font-medium text-gray-800 text-lg">Batch Add Physical
-              Copies (Accessions)</h3>
+            class="px-6 py-5 border-b border-gray-100 flex items-center justify-between"
+          >
+            <h3 class="font-medium text-gray-800 text-lg">
+              Batch Add Physical Copies (Accessions)
+            </h3>
           </div>
           <div class="p-6 bg-gray-50/50">
             <form
               th:action="@{/catalog/{id}/accessions/batch(id=${item?.isbn})}"
               method="POST"
-              class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+              class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end"
+            >
               <div>
-                <label
-                  class="block text-sm font-medium text-gray-600 mb-1">Prefix /
-                  Type</label>
-                <input type="text"
+                <label class="block text-sm font-medium text-gray-600 mb-1"
+                  >Prefix / Type</label
+                >
+                <input
+                  type="text"
                   name="prefix"
                   class="w-full bg-white border border-gray-200 rounded px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition text-gray-800"
                   placeholder="e.g., MAG-202606"
-                  required>
+                  required
+                />
               </div>
               <div>
-                <label
-                  class="block text-sm font-medium text-gray-600 mb-1">Quantity
-                  to Generate</label>
-                <input type="number"
+                <label class="block text-sm font-medium text-gray-600 mb-1"
+                  >Quantity to Generate</label
+                >
+                <input
+                  type="number"
                   name="quantity"
                   class="w-full bg-white border border-gray-200 rounded px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition text-gray-800"
                   min="1"
                   value="1"
-                  required>
+                  required
+                />
               </div>
               <div>
-                <label
-                  class="block text-sm font-medium text-gray-600 mb-1">Initial
-                  Location (Shelf)</label>
-                <input type="text"
+                <label class="block text-sm font-medium text-gray-600 mb-1"
+                  >Initial Location (Shelf)</label
+                >
+                <input
+                  type="text"
                   name="shelfLocation"
                   class="w-full bg-white border border-gray-200 rounded px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition text-gray-800"
                   placeholder="e.g., A-12"
-                  required>
+                  required
+                />
               </div>
               <div>
-                <button type="submit"
-                  class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 rounded-md transition shadow-sm text-center text-sm">
+                <button
+                  type="submit"
+                  class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 rounded-md transition shadow-sm text-center text-sm"
+                >
                   Generate Accessions
                 </button>
               </div>
@@ -210,16 +325,19 @@
         </div>
 
         <div
-          class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+        >
           <div class="px-6 py-5 border-b border-gray-100">
-            <h3 class="text-lg font-medium text-gray-800">Tracked Accessions
-              (Copies)</h3>
+            <h3 class="text-lg font-medium text-gray-800">
+              Tracked Accessions (Copies)
+            </h3>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead>
                 <tr
-                  class="bg-gray-50 text-gray-500 text-xs font-semibold uppercase tracking-wider border-b border-gray-100">
+                  class="bg-gray-50 text-gray-500 text-xs font-semibold uppercase tracking-wider border-b border-gray-100"
+                >
                   <th class="px-6 py-4">Accession ID</th>
                   <th class="px-6 py-4">Copy No.</th>
                   <th class="px-6 py-4">Barcode</th>
@@ -229,25 +347,46 @@
                 </tr>
               </thead>
               <tbody class="text-sm text-gray-600 divide-y divide-gray-100">
-                <tr th:each="copy : ${accessions}"
-                  class="hover:bg-gray-50/70 transition">
-                  <td class="px-6 py-4 font-mono font-bold text-purple-600"
-                    th:text="${copy?.accessionId}">MAG-20260617-0001</td>
-                  <td class="px-6 py-4 font-mono"
-                    th:text="${copy?.copyNumber}">1</td>
-                  <td class="px-6 py-4 font-mono text-gray-700"
-                    th:text="${copy?.barcode}">BC-998231</td>
-                  <td class="px-6 py-4 text-gray-800"
-                    th:text="${copy?.shelfLocation}">Shelf A-12</td>
-                  <td class="px-6 py-4">
-                    <span class="px-2.5 py-1 text-xs font-medium rounded-full"
-                      th:classappend="${copy?.conditionStatus?.name() == 'GOOD' ? 'bg-green-50 text-green-700' : (copy?.conditionStatus?.name() == 'DAMAGED' ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-700')}"
-                      th:text="${copy?.conditionStatus}">GOOD</span>
+                <tr
+                  th:each="copy : ${accessions}"
+                  class="hover:bg-gray-50/70 transition"
+                >
+                  <td
+                    class="px-6 py-4 font-mono font-bold text-purple-600"
+                    th:text="${copy?.accessionId}"
+                  >
+                    MAG-20260617-0001
+                  </td>
+                  <td class="px-6 py-4 font-mono" th:text="${copy?.copyNumber}">
+                    1
+                  </td>
+                  <td
+                    class="px-6 py-4 font-mono text-gray-700"
+                    th:text="${copy?.barcode}"
+                  >
+                    BC-998231
+                  </td>
+                  <td
+                    class="px-6 py-4 text-gray-800"
+                    th:text="${copy?.shelfLocation}"
+                  >
+                    Shelf A-12
                   </td>
                   <td class="px-6 py-4">
-                    <span class="px-2.5 py-1 text-xs font-medium rounded-full"
+                    <span
+                      class="px-2.5 py-1 text-xs font-medium rounded-full"
+                      th:classappend="${copy?.conditionStatus?.name() == 'GOOD' ? 'bg-green-50 text-green-700' : (copy?.conditionStatus?.name() == 'DAMAGED' ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-700')}"
+                      th:text="${copy?.conditionStatus}"
+                      >GOOD</span
+                    >
+                  </td>
+                  <td class="px-6 py-4">
+                    <span
+                      class="px-2.5 py-1 text-xs font-medium rounded-full"
                       th:classappend="${copy?.availabilityStatus?.name() == 'AVAILABLE' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}"
-                      th:text="${copy?.availabilityStatus}">AVAILABLE</span>
+                      th:text="${copy?.availabilityStatus}"
+                      >AVAILABLE</span
+                    >
                   </td>
                 </tr>
               </tbody>
@@ -256,6 +395,5 @@
         </div>
       </main>
     </div>
-
   </body>
 </html>

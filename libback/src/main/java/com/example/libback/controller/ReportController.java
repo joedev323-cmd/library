@@ -28,15 +28,13 @@ public class ReportController {
 
         model.addAttribute(
                 "metrics",
-                reportService.generateSystemMetrics()
-        );
+                reportService.generateSystemMetrics());
 
         model.addAttribute(
                 "overdueLoans",
-                reportService.getOverdueLoans()
-        );
-        
-        return "reports";
+                reportService.getOverdueLoans());
+
+        return "reports/index";
     }
 
     /**
@@ -51,8 +49,7 @@ public class ReportController {
         response.setContentType("text/csv");
         response.setHeader(
                 "Content-Disposition",
-                "attachment; filename=inventory_audit_manifest.csv"
-        );
+                "attachment; filename=inventory_audit_manifest.csv");
 
         String csv = reportService.generateInventoryCsv();
 

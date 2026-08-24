@@ -23,7 +23,7 @@ public class MemberController {
     @GetMapping("/admin/add/member")
     public String showAddMemberForm(Model model) {
         model.addAttribute("member", new Member());
-        return "add-member";
+        return "members/add";
     }
 
     @PostMapping("/admin/add/member")
@@ -36,12 +36,11 @@ public class MemberController {
             if (memberRepository.existsByEmail(member.getEmail())) {
                 model.addAttribute(
                         "errorMessage",
-                        "This email address is already registered!"
-                );
+                        "This email address is already registered!");
 
                 model.addAttribute("member", member);
 
-                return "add-member";
+                return "members/add";
             }
 
             memberRepository.save(member);
@@ -52,12 +51,12 @@ public class MemberController {
 
             model.addAttribute(
                     "errorMessage",
-                    "Registration failed: A duplicate constraint was violated."
-            );
+                    "Registration failed: A duplicate constraint was violated.");
 
             model.addAttribute("member", member);
 
-            return "add-member";
+            return "members/add";
+
         }
     }
 
@@ -69,12 +68,10 @@ public class MemberController {
         if (principal != null) {
             model.addAttribute(
                     "username",
-                    principal.getName()
-            );
+                    principal.getName());
         }
 
-        List<Member> members =
-                memberRepository.findAll();
+        List<Member> members = memberRepository.findAll();
 
         /*
          * Calculate active loans using LoanRepository.
@@ -83,12 +80,10 @@ public class MemberController {
          */
         for (Member member : members) {
 
-            long activeLoans =
-                    loanRepository
-                            .countByMemberMemberIdAndStatus(
-                                    member.getMemberId(),
-                                    LoanStatus.ACTIVE
-                            );
+            long activeLoans = loanRepository
+                    .countByMemberMemberIdAndStatus(
+                            member.getMemberId(),
+                            LoanStatus.ACTIVE);
 
             /*
              * Do not attach activeLoans to Member unless
@@ -101,6 +96,6 @@ public class MemberController {
 
         model.addAttribute("members", members);
 
-        return "members";
+        return "members/list";
     }
 }

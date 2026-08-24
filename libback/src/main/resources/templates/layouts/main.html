@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      th:fragment="layout(content)">
+
+<head th:replace="~{fragments/head :: head}"></head>
+
+<body class="bg-gray-50 min-h-screen flex">
+
+    <!-- Sidebar -->
+    <aside th:replace="~{fragments/sidebar :: sidebar}">
+    </aside>
+
+    <!-- Application -->
+    <div class="flex-1 flex flex-col min-w-0">
+
+        <!-- Navbar -->
+        <header th:replace="~{fragments/navbar :: navbar}">
+        </header>
+
+        <!-- Page content -->
+        <main class="flex-1 overflow-y-auto p-6">
+
+            <div th:replace="${content}">
+                Page content
+            </div>
+
+        </main>
+
+    </div>
+
+</body>
+</html>

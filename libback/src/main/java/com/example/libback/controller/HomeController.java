@@ -27,7 +27,7 @@ public class HomeController {
 
     @GetMapping("/login")
     public String showLoginPage() {
-        return "login";
+        return "auth/login";
     }
 
     @GetMapping("/catalog/search")
@@ -40,6 +40,6 @@ public class HomeController {
         model.addAttribute("query", query);
         model.addAttribute("books", results); 
         
-        return "public-search"; 
+        return "public/public"; 
     }
 }

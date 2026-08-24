@@ -51,7 +51,8 @@ public class SecurityConfig {
                     "/css/**",
                     "/js/**",
                     "/img/**",
-                    "/h2/**"
+                    "/h2/**",
+                    "/api/**"
                 ).permitAll()
 
                 // Public catalogue

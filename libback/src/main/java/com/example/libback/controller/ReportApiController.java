@@ -16,78 +16,71 @@ import java.util.List;
 @RequestMapping("/api/reports")
 public class ReportApiController {
 
-    private final ReportService reportService;
-    private final AccessionRepository accessionRepository;
+        private final ReportService reportService;
+        private final AccessionRepository accessionRepository;
 
-    public ReportApiController(
-            ReportService reportService,
-            AccessionRepository accessionRepository) {
+        public ReportApiController(
+                        ReportService reportService,
+                        AccessionRepository accessionRepository) {
 
-        this.reportService = reportService;
-        this.accessionRepository = accessionRepository;
-    }
-
-    @GetMapping
-    public ResponseEntity<ReportsResponseDto> getReports() {
-
-        ReportsResponseDto report =
-                reportService.generateReport();
-
-        return ResponseEntity.ok(report);
-    }
-
-    @GetMapping("/export-inventory")
-    public void exportInventory(
-            HttpServletResponse response) throws IOException {
-
-        response.setContentType("text/csv");
-
-        response.setHeader(
-                "Content-Disposition",
-                "attachment; filename=inventory_audit_manifest.csv"
-        );
-
-        List<Accession> allCopies =
-                accessionRepository.findAll();
-
-        PrintWriter writer =
-                response.getWriter();
-
-        writer.println(
-                "Accession ID,Barcode,ISBN,Title,Shelf Location,Availability Status"
-        );
-
-        for (Accession copy : allCopies) {
-
-            writer.printf(
-                    "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"%n",
-
-                    csv(copy.getAccessionId()),
-
-                    csv(copy.getBarcode()),
-
-                    csv(copy.getBook().getIsbn()),
-
-                    csv(copy.getBook().getTitle()),
-
-                    csv(copy.getShelfLocation()),
-
-                    csv(
-                            copy.getAvailabilityStatus()
-                                    .name()
-                    )
-            );
+                this.reportService = reportService;
+                this.accessionRepository = accessionRepository;
         }
 
-        writer.flush();
-    }
+        @GetMapping
+        public ResponseEntity<ReportsResponseDto> getReports() {
 
-    private String csv(String value) {
+                ReportsResponseDto report = reportService.generateReport();
 
-        if (value == null) {
-            return "";
+                return ResponseEntity.ok(report);
         }
 
-        return value.replace("\"", "\"\"");
-    }
+        @GetMapping("/export-inventory")
+        public void exportInventory(
+                        HttpServletResponse response) throws IOException {
+
+                response.setContentType("text/csv");
+
+                response.setHeader(
+                                "Content-Disposition",
+                                "attachment; filename=inventory_audit_manifest.csv");
+
+                List<Accession> allCopies = accessionRepository.findAll();
+
+                PrintWriter writer = response.getWriter();
+
+                writer.println(
+                                "Accession ID,Barcode,ISBN,Title,Shelf Location,Availability Status");
+
+                for (Accession copy : allCopies) {
+
+                        writer.printf(
+                                        "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"%n",
+
+                                        csv(copy.getAccessionId()),
+
+                                        csv(copy.getBarcode()),
+
+                                        csv(copy.getBook().getIsbn()),
+
+                                        csv(copy.getBook().getTitle()),
+
+                                        csv(copy.getShelfLocation()),
+
+                                        csv(
+                                                        copy.getAvailabilityStatus()
+                                                                        .name()));
+                }
+
+                writer.flush();
+        }
+
+        private String csv(String value) {
+
+                if (value == null) {
+                        return "";
+                }
+
+                return value.replace("\"", "\"\"");
+        }
 }

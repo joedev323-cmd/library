@@ -13,8 +13,7 @@ public class ApiTestController {
     @GetMapping("/health")
     public Map<String, String> health() {
         return Map.of(
-            "status", "ok",
-            "application", "libback"
-        );
+                "status", "ok",
+                "application", "libback");
     }
 }
