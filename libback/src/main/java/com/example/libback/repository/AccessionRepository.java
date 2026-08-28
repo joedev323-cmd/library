@@ -3,9 +3,12 @@ package com.example.libback.repository;
 import com.example.libback.dto.BookSearchResultDto;
 import com.example.libback.model.Accession;
 import com.example.libback.model.enums.AvailabilityStatus;
+import com.example.libback.model.enums.ConditionStatus;
 
 import jakarta.persistence.LockModeType;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
@@ -38,6 +41,20 @@ public interface AccessionRepository
             AvailabilityStatus status
     );
 
+    List<Accession> findByBookBookIdOrderByCopyNumberAsc(
+            Long bookId
+    );
+
+    /*
+     * PAGINATED ACCESSIONS
+     *
+     * Used by the catalogue/book details page.
+     */
+    Page<Accession> findByBookBookIdOrderByCopyNumberAsc(
+            Long bookId,
+            Pageable pageable
+    );
+
     @Query("""
         SELECT COALESCE(MAX(a.copyNumber), 0)
         FROM Accession a
@@ -47,6 +64,8 @@ public interface AccessionRepository
             @Param("bookId") Long bookId
     );
 
+    boolean existsById(String accessionId);
+
     List<Accession> findByBookBookId(Long bookId);
 
     List<Accession> findByAvailabilityStatus(
@@ -54,6 +73,7 @@ public interface AccessionRepository
     );
 
     // PUBLIC CATALOGUE SEARCH
+
     @Query("""
         SELECT new com.example.libback.dto.BookSearchResultDto(
             a.book.title,
@@ -84,4 +104,34 @@ public interface AccessionRepository
     List<BookSearchResultDto> searchCatalog(
             @Param("query") String query
     );
+    @Query("""
+    SELECT a
+    FROM Accession a
+    WHERE
+        (
+            :search IS NULL
+            OR :search = ''
+            OR LOWER(a.accessionId) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR LOWER(a.barcode) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR LOWER(a.book.title) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR LOWER(a.book.isbn) LIKE LOWER(CONCAT('%', :search, '%'))
+            OR LOWER(a.shelfLocation) LIKE LOWER(CONCAT('%', :search, '%'))
+        )
+        AND (
+            :status IS NULL
+            OR a.availabilityStatus = :status
+        )
+        AND (
+            :condition IS NULL
+            OR a.conditionStatus = :condition
+        )
+    ORDER BY a.book.title ASC, a.copyNumber ASC
+    """)
+Page<Accession> searchRegistry(
+        @Param("search") String search,
+        @Param("status") AvailabilityStatus status,
+        @Param("condition") ConditionStatus condition,
+        Pageable pageable
+);
+
 }

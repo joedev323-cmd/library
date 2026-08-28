@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+
+<head>
+    <title>Add Book</title>
+</head>
+
+<body>
+
+<div layout:fragment="content">
+
+    <div class="mx-auto max-w-5xl space-y-6">
+
+        <!-- =====================================================
+             PAGE HEADER
+             ===================================================== -->
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-wider text-purple-600">
+                    Catalogue
+                </p>
+
+                <h1 class="mt-1 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
+                    Add Book
+                </h1>
+
+                <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+                    Create a catalogue record for a new title. Physical
+                    copies can be added after the book has been saved.
+                </p>
+            </div>
+
+            <a th:href="@{/Catalogue}"
+               class="inline-flex w-fit items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50">
+
+                <svg class="h-4 w-4"
+                     fill="none"
+                     viewBox="0 0 24 24"
+                     stroke="currentColor"
+                     stroke-width="2">
+
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M15 19l-7-7 7-7"/>
+
+                </svg>
+
+                Back to Catalogue
+            </a>
+
+        </div>
+
+        <!-- =====================================================
+             FLASH / ERROR MESSAGE
+             ===================================================== -->
+        <div th:replace="~{fragments/flash-message :: flash}"></div>
+
+        <!-- =====================================================
+             VALIDATION ERRORS
+             ===================================================== -->
+        <div th:if="${#fields.hasErrors('*')}"
+             class="rounded-2xl border border-red-200 bg-red-50 p-5">
+
+            <div class="flex gap-3">
+
+                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-100 text-red-600">
+
+                    <svg class="h-5 w-5"
+                         fill="none"
+                         viewBox="0 0 24 24"
+                         stroke="currentColor"
+                         stroke-width="2">
+
+                        <path stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="M12 9v4m0 4h.01M10.29 3.86l-7.5 13A2 2 0 004.53 20h14.94a2 2 0 001.74-3.14l-7.5-13a2 2 0 00-3.42 0z"/>
+
+                    </svg>
+
+                </div>
+
+                <div>
+                    <h2 class="text-sm font-semibold text-red-800">
+                        Please check the form
+                    </h2>
+
+                    <p class="mt-1 text-sm text-red-700">
+                        Some information is missing or invalid. Review
+                        the highlighted fields and try again.
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- =====================================================
+             FORM CARD
+             ===================================================== -->
+        <form th:action="@{/admin/catalog/add}"
+              th:object="${book}"
+              method="post"
+              class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+
+            <!-- =================================================
+                 FORM HEADER
+                 ================================================= -->
+            <div class="border-b border-slate-100 px-5 py-5 sm:px-6">
+
+                <div class="flex items-start gap-4">
+
+                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-purple-50 text-purple-600">
+
+                        <svg class="h-5 w-5"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke="currentColor"
+                             stroke-width="2">
+
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+
+                        </svg>
+
+                    </div>
+
+                    <div>
+                        <h2 class="text-base font-semibold text-slate-900">
+                            Book information
+                        </h2>
+
+                        <p class="mt-1 text-sm text-slate-500">
+                            Enter the bibliographic details for this title.
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- =================================================
+                 BOOK DETAILS
+                 ================================================= -->
+            <div class="px-5 py-6 sm:px-6">
+
+                <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+
+                    <!-- ISBN -->
+                    <div>
+                        <label for="isbn"
+                               class="block text-sm font-semibold text-slate-700">
+                            ISBN
+                            <span class="text-red-500">*</span>
+                        </label>
+
+                        <input id="isbn"
+                               type="text"
+                               th:field="*{isbn}"
+                               required
+                               autocomplete="off"
+                               placeholder="978..."
+                               class="mt-2 block w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-purple-400 focus:bg-white focus:ring-2 focus:ring-purple-100">
+
+                        <p class="mt-1.5 text-xs text-slate-400">
+                            Enter the ISBN-10 or ISBN-13.
+                        </p>
+
+                        <p th:if="${#fields.hasErrors('isbn')}"
+                           th:errors="*{isbn}"
+                           class="mt-1.5 text-xs font-medium text-red-600">
+                        </p>
+                    </div>
+
+                    <!-- Title -->
+                    <div>
+                        <label for="title"
+                               class="block text-sm font-semibold text-slate-700">
+                            Title
+                            <span class="text-red-500">*</span>
+                        </label>
+
+                        <input id="title"
+                               type="text"
+                               th:field="*{title}"
+                               required
+                               placeholder="Enter book title"
+                               class="mt-2 block w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-purple-400 focus:bg-white focus:ring-2 focus:ring-purple-100">
+
+                        <p th:if="${#fields.hasErrors('title')}"
+                           th:errors="*{title}"
+                           class="mt-1.5 text-xs font-medium text-red-600">
+                        </p>
+                    </div>
+
+                    <!-- Author -->
+                    <div>
+                        <label for="author"
+                               class="block text-sm font-semibold text-slate-700">
+                            Author
+                            <span class="text-red-500">*</span>
+                        </label>
+
+                        <input id="author"
+                               type="text"
+                               th:field="*{author}"
+                               required
+                               placeholder="Author name"
+                               class="mt-2 block w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-purple-400 focus:bg-white focus:ring-2 focus:ring-purple-100">
+
+                        <p th:if="${#fields.hasErrors('author')}"
+                           th:errors="*{author}"
+                           class="mt-1.5 text-xs font-medium text-red-600">
+                        </p>
+                    </div>
+
+                    <!-- Publisher -->
+                    <div>
+                        <label for="publisher"
+                               class="block text-sm font-semibold text-slate-700">
+                            Publisher
+                        </label>
+
+                        <input id="publisher"
+                               type="text"
+                               th:field="*{publisher}"
+                               placeholder="Publisher name"
+                               class="mt-2 block w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-purple-400 focus:bg-white focus:ring-2 focus:ring-purple-100">
+                    </div>
+
+                    <!-- Edition -->
+                    <div>
+                        <label for="edition"
+                               class="block text-sm font-semibold text-slate-700">
+                            Edition
+                        </label>
+
+                        <input id="edition"
+                               type="text"
+                               th:field="*{edition}"
+                               placeholder="e.g. 2nd Edition"
+                               class="mt-2 block w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-purple-400 focus:bg-white focus:ring-2 focus:ring-purple-100">
+                    </div>
+
+                    <!-- Category -->
+                    <div>
+                        <label for="category"
+                               class="block text-sm font-semibold text-slate-700">
+                            Category
+                        </label>
+
+                        <select id="category"
+                                th:field="*{category}"
+                                class="mt-2 block w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-purple-400 focus:bg-white focus:ring-2 focus:ring-purple-100">
+
+                            <option value="">
+                                Select category
+                            </option>
+
+                            <option th:each="category : ${categories}"
+                                    th:value="${category.categoryId}"
+                                    th:text="${category.name}">
+                                Category
+                            </option>
+
+                        </select>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="md:col-span-2">
+
+                        <label for="description"
+                               class="block text-sm font-semibold text-slate-700">
+                            Description
+                        </label>
+
+                        <textarea id="description"
+                                  th:field="*{description}"
+                                  rows="5"
+                                  placeholder="Optional description of the book..."
+                                  class="mt-2 block w-full resize-y rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-purple-400 focus:bg-white focus:ring-2 focus:ring-purple-100"></textarea>
+
+                        <p class="mt-1.5 text-xs text-slate-400">
+                            A short description can help staff identify
+                            the title in the catalogue.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- =================================================
+                 INFORMATION PANEL
+                 ================================================= -->
+            <div class="px-5 pb-6 sm:px-6">
+
+                <div class="rounded-2xl border border-purple-100 bg-purple-50 p-4 sm:p-5">
+
+                    <div class="flex gap-3">
+
+                        <div class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-purple-100 text-purple-600">
+
+                            <svg class="h-5 w-5"
+                                 fill="none"
+                                 viewBox="0 0 24 24"
+                                 stroke="currentColor"
+                                 stroke-width="2">
+
+                                <path stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z"/>
+
+                            </svg>
+
+                        </div>
+
+                        <div>
+                            <p class="text-sm font-semibold text-purple-900">
+                                Physical copies are added separately
+                            </p>
+
+                            <p class="mt-1 text-sm leading-6 text-purple-700">
+                                This form creates the catalogue record for
+                                the title. After saving, you can generate
+                                physical copies, assign accession numbers
+                                and set shelf locations from the book
+                                details page.
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- =================================================
+                 FORM ACTIONS
+                 ================================================= -->
+            <div class="flex flex-col-reverse gap-3 border-t border-slate-100 bg-slate-50/70 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+
+                <p class="text-xs text-slate-400">
+                    <span class="text-red-500">*</span>
+                    Required fields
+                </p>
+
+                <div class="flex flex-col-reverse gap-3 sm:flex-row">
+
+                    <a th:href="@{/Catalogue}"
+                       class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+
+                        Cancel
+
+                    </a>
+
+                    <button type="submit"
+                            class="inline-flex items-center justify-center gap-2 rounded-xl bg-purple-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-300 focus:ring-offset-2">
+
+                        <svg class="h-4 w-4"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke="currentColor"
+                             stroke-width="2">
+
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="M12 4v16m8-8H4"/>
+
+                        </svg>
+
+                        Save Book
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

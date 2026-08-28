@@ -8,8 +8,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class CirculationLogDto {
     private String bookTitle;
-    private String borrowerName;
-    private String borrowerId;
+    private String memberName;
+    private String memberId;
     private String action; // e.g., "Issued" or "Returned"
     private LocalDate dueDate;
     private String status; // "On Loan", "In Library", or "Overdue"

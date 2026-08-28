@@ -30,55 +30,103 @@ public class SecurityConfig {
     ) throws Exception {
 
         http
+
+            // =====================================================
+            // CORS
+            // =====================================================
             .cors(cors ->
                 cors.configurationSource(corsConfigurationSource())
             )
 
+            // =====================================================
+            // CSRF
+            // =====================================================
             .csrf(csrf ->
-                csrf.ignoringRequestMatchers("/api/**", "/h2/**")
+                csrf.ignoringRequestMatchers(
+                    "/api/**",
+                    "/h2/**"
+                )
             )
 
+            // =====================================================
+            // AUTHORIZATION
+            // =====================================================
             .authorizeHttpRequests(auth -> auth
 
-                // -----------------------------------------
-                // PUBLIC
-                // -----------------------------------------
+                // -------------------------------------------------
+                // PUBLIC PAGES
+                // -------------------------------------------------
 
                 .requestMatchers(
                     "/",
                     "/index",
-                    "/login",
+                    "/login"
+                ).permitAll()
+
+                // Static resources
+                .requestMatchers(
                     "/css/**",
                     "/js/**",
                     "/img/**",
-                    "/h2/**",
-                    "/api/**"
+                    "/favicon.ico"
                 ).permitAll()
 
-                // Public catalogue
+
+                // -------------------------------------------------
+                // PUBLIC CATALOGUE
+                // -------------------------------------------------
+
+                // Public catalogue pages
+                .requestMatchers(
+                    HttpMethod.GET,
+                    "/cantalog/**"
+                ).permitAll()
+
+                // Public catalogue API
                 .requestMatchers(
                     HttpMethod.GET,
                     "/api/catalogue/**"
                 ).permitAll()
 
+
+                // -------------------------------------------------
+                // H2 CONSOLE
+                // -------------------------------------------------
+
                 .requestMatchers(
-                    "/catalog/**"
+                    "/h2/**"
                 ).permitAll()
 
 
-                // -----------------------------------------
+                // -------------------------------------------------
+                // PUBLIC API
+                // -------------------------------------------------
+
+                /*
+                 * If your entire API is intentionally public,
+                 * keep this.
+                 *
+                 * Otherwise remove "/api/**" from the PUBLIC
+                 * section and secure individual API endpoints below.
+                 */
+                .requestMatchers(
+                    "/api/**"
+                ).permitAll()
+
+
+                // -------------------------------------------------
                 // SUPERADMIN ONLY
-                // -----------------------------------------
+                // -------------------------------------------------
 
                 .requestMatchers(
                     "/api/users/**",
                     "/admin/users/**"
-                ).hasRole("SUPERADMIN")
+                ).hasRole("SUPER_ADMIN")
 
 
-                // -----------------------------------------
+                // -------------------------------------------------
                 // LIBRARIAN + SUPERADMIN
-                // -----------------------------------------
+                // -------------------------------------------------
 
                 .requestMatchers(
                     "/api/books/**",
@@ -88,11 +136,12 @@ public class SecurityConfig {
                     "/api/loans/**",
                     "/api/reports/**"
                 ).hasAnyRole(
-                    "SUPERADMIN",
+                    "SUPER_ADMIN",
                     "LIBRARIAN"
                 )
 
                 .requestMatchers(
+                    "/admin/catalog/**",
                     "/admin/books/**",
                     "/admin/categories/**",
                     "/admin/accessions/**",
@@ -100,18 +149,35 @@ public class SecurityConfig {
                     "/admin/circulation/**",
                     "/admin/reports/**"
                 ).hasAnyRole(
-                    "SUPERADMIN",
+                    "SUPER_ADMIN",
                     "LIBRARIAN"
                 )
 
 
-                // -----------------------------------------
+                // -------------------------------------------------
+                // STAFF PAGES
+                // -------------------------------------------------
+
+                .requestMatchers(
+                    "/dashboard",
+                    "/circulation",
+                    "/reports"
+                ).hasAnyRole(
+                    "SUPER_ADMIN",
+                    "LIBRARIAN"
+                )
+
+
+                // -------------------------------------------------
                 // EVERYTHING ELSE
-                // -----------------------------------------
+                // -------------------------------------------------
 
                 .anyRequest().authenticated()
             )
 
+            // =====================================================
+            // FORM LOGIN
+            // =====================================================
             .formLogin(form ->
                 form
                     .loginPage("/login")
@@ -120,6 +186,9 @@ public class SecurityConfig {
                     .permitAll()
             )
 
+            // =====================================================
+            // LOGOUT
+            // =====================================================
             .logout(logout ->
                 logout
                     .logoutUrl("/logout")
@@ -127,6 +196,9 @@ public class SecurityConfig {
                     .permitAll()
             )
 
+            // =====================================================
+            // H2 CONSOLE
+            // =====================================================
             .headers(headers ->
                 headers.frameOptions(frame ->
                     frame.sameOrigin()
@@ -136,6 +208,11 @@ public class SecurityConfig {
         return http.build();
     }
 
+
+    // =============================================================
+    // CORS CONFIGURATION
+    // =============================================================
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
@@ -143,7 +220,9 @@ public class SecurityConfig {
                 new CorsConfiguration();
 
         configuration.setAllowedOrigins(
-            List.of("http://localhost:5173")
+            List.of(
+                "http://localhost:5173"
+            )
         );
 
         configuration.setAllowedMethods(

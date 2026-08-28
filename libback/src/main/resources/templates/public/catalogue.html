@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>BiblioHub Catalogue</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/tailwind.css}">
+
+</head>
+
+<body class="min-h-screen bg-slate-50 text-slate-900">
+
+<nav class="border-b border-slate-200 bg-white">
+
+    <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+
+        <a th:href="@{/cantalog}"
+           class="flex items-center gap-3">
+
+            <img th:src="@{/img/logo.png}"
+                 alt="BiblioHub"
+                 class="h-9 w-9">
+
+            <span class="text-lg font-bold">
+                BiblioHub
+            </span>
+
+        </a>
+
+        <a th:href="@{/login}"
+           class="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+            Staff Login
+        </a>
+
+    </div>
+
+</nav>
+
+
+<main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+
+    <!-- Header -->
+
+    <div class="mb-8">
+
+        <p class="text-sm font-semibold uppercase tracking-wider text-indigo-600">
+            Library Catalogue
+        </p>
+
+        <h1 class="mt-2 text-3xl font-bold tracking-tight">
+            Browse our collection
+        </h1>
+
+        <p class="mt-2 text-sm text-slate-500">
+            Search and explore books available in the library.
+        </p>
+
+    </div>
+
+
+    <!-- Search -->
+
+    <form th:action="@{/cantalog}"
+          method="get"
+          class="mb-8">
+
+        <div class="flex flex-col gap-3 sm:flex-row">
+
+            <div class="relative flex-1">
+
+                <input type="search"
+                       name="search"
+                       th:value="${search}"
+                       placeholder="Search by title, author, or ISBN..."
+                       class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
+
+            </div>
+
+            <button type="submit"
+                    class="rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700">
+
+                Search
+
+            </button>
+
+            <a th:if="${search != null && !search.isBlank()}"
+               th:href="@{/cantalog}"
+               class="rounded-xl border border-slate-300 bg-white px-6 py-3 text-center text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+
+                Clear
+
+            </a>
+
+        </div>
+
+    </form>
+
+
+    <!-- Result information -->
+
+    <div class="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+
+        <p class="text-sm text-slate-500">
+
+            <span th:text="${page.totalElements}">
+                0
+            </span>
+
+            books found
+
+        </p>
+
+        <p th:if="${!search.isBlank()}"
+           class="text-sm text-slate-500">
+
+            Searching for:
+            <span class="font-medium text-slate-700"
+                  th:text="${search}">
+                search
+            </span>
+
+        </p>
+
+    </div>
+
+
+    <!-- Books -->
+
+    <div th:if="${!books.isEmpty()}"
+         class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+
+        <article th:each="book : ${books}"
+                 class="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+
+            <!-- Cover -->
+
+            <div class="flex h-44 items-center justify-center bg-indigo-50">
+
+                <svg class="h-16 w-16 text-indigo-200"
+                     fill="none"
+                     viewBox="0 0 24 24"
+                     stroke="currentColor"
+                     stroke-width="1.5">
+
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+
+                </svg>
+
+            </div>
+
+
+            <!-- Content -->
+
+            <div class="flex flex-1 flex-col p-5">
+
+                <p th:if="${book.category != null}"
+                   class="text-xs font-semibold uppercase tracking-wider text-indigo-600"
+                   th:text="${book.category.name}">
+                    Category
+                </p>
+
+                <h2 class="mt-2 line-clamp-2 text-base font-semibold text-slate-900"
+                    th:text="${book.title}">
+                    Book Title
+                </h2>
+
+                <p class="mt-1 text-sm text-slate-500"
+                   th:text="${book.author}">
+                    Author
+                </p>
+
+                <p class="mt-3 font-mono text-xs text-slate-400"
+                   th:text="${book.isbn}">
+                    ISBN
+                </p>
+
+
+                <div class="mt-auto pt-5">
+
+                    <a th:href="@{'/cantalog/' + ${book.isbn}}"
+                       class="inline-flex w-full items-center justify-center rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700">
+
+                        View Book
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </article>
+
+    </div>
+
+
+    <!-- Empty -->
+
+    <div th:if="${books.isEmpty()}"
+         class="rounded-2xl border border-slate-200 bg-white px-6 py-16 text-center">
+
+        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+
+            <svg class="h-6 w-6"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke="currentColor"
+                 stroke-width="2">
+
+                <path stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253"/>
+
+            </svg>
+
+        </div>
+
+        <h2 class="mt-4 text-sm font-semibold">
+            No books found
+        </h2>
+
+        <p class="mt-1 text-sm text-slate-500">
+            Try a different title, author, or ISBN.
+        </p>
+
+    </div>
+
+
+    <!-- Pagination -->
+
+    <div th:if="${page.totalPages > 1}"
+         class="mt-8">
+
+        <div class="flex items-center justify-center gap-2">
+
+            <!-- Previous -->
+
+            <a th:if="${page.hasPrevious()}"
+               th:href="@{/cantalog(
+                    page=${page.number - 1},
+                    search=${search}
+               )}"
+               class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+
+                Previous
+
+            </a>
+
+
+            <!-- Current page -->
+
+            <span class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white">
+
+                <span th:text="${page.number + 1}">
+                    1
+                </span>
+
+                /
+
+                <span th:text="${page.totalPages}">
+                    5
+                </span>
+
+            </span>
+
+
+            <!-- Next -->
+
+            <a th:if="${page.hasNext()}"
+               th:href="@{/cantalog(
+                    page=${page.number + 1},
+                    search=${search}
+               )}"
+               class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+
+                Next
+
+            </a>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<footer class="mt-12 border-t border-slate-200 bg-white">
+
+    <div class="mx-auto max-w-7xl px-4 py-6 text-center text-xs text-slate-400">
+        © BiblioHub Library
+    </div>
+
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/main}">
+
+<head>
+    <title>Members</title>
+</head>
+
+<body>
+    <div layout:fragment="content">
+
+        <div class="mb-6 flex items-center justify-between">
+            <h1 class="text-2xl font-bold">Members</h1>
+            <a th:href="@{/admin/add/member}"
+                class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
+                + Register Member
+            </a>
+        </div>
+
+        <div th:replace="~{fragments/flash-message :: flash}"></div>
+
+        <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+            <table class="min-w-full divide-y divide-slate-200 text-sm">
+                <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+                    <tr>
+                        <th class="px-5 py-3">Member ID</th>
+                        <th class="px-5 py-3">Name</th>
+                        <th class="px-5 py-3">Email</th>
+                        <th class="px-5 py-3">Type</th>
+                        <th class="px-5 py-3">Active Loans</th>
+                        <th class="px-5 py-3 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    <tr th:each="member : ${members}" class="hover:bg-slate-50">
+                        <td class="px-5 py-3 font-mono text-xs" th:text="${member.memberId}"></td>
+                        <td class="px-5 py-3 font-medium" th:text="${member.name}"></td>
+                        <td class="px-5 py-3 text-slate-500" th:text="${member.email}"></td>
+                        <td class="px-5 py-3">
+                            <span
+                                class="inline-block rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-medium text-indigo-700"
+                                th:text="${member.memberType}"></span>
+                        </td>
+                        <td class="px-5 py-3">
+                            <span
+                                class="inline-block rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700"
+                                th:text="${member.activeLoans}">
+                            </span>
+                        </td>
+                        <td class="px-5 py-3 text-right">
+                            <a th:href="@{'/admin/members/edit/' + ${member.memberId}}"
+                                class="text-sm text-indigo-600 hover:underline">Edit</a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(members)}">
+                        <td colspan="5" class="px-5 py-8 text-center text-slate-400">No members registered yet.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</body>
+
+</html>

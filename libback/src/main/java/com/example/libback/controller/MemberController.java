@@ -4,12 +4,14 @@ import com.example.libback.model.Member;
 import com.example.libback.repository.MemberRepository;
 import com.example.libback.repository.LoanRepository;
 import com.example.libback.model.enums.LoanStatus;
+import com.example.libback.service.AuditLogService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -17,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MemberController {
 
+    private final AuditLogService auditLogService;
     private final MemberRepository memberRepository;
     private final LoanRepository loanRepository;
 
@@ -74,9 +77,11 @@ public class MemberController {
         List<Member> members = memberRepository.findAll();
 
         /*
-         * Calculate active loans using LoanRepository.
+         * Calculate the number of currently active loans
+         * for each member.
          *
-         * The old code incorrectly queried HoldRepository.
+         * The count comes from LoanRepository because Loan
+         * is the entity that owns the member relationship.
          */
         for (Member member : members) {
 
@@ -85,17 +90,55 @@ public class MemberController {
                             member.getMemberId(),
                             LoanStatus.ACTIVE);
 
-            /*
-             * Do not attach activeLoans to Member unless
-             * Member has a suitable @Transient field.
-             *
-             * For now this simply verifies the calculation
-             * is based on the new Loan -> Member relationship.
-             */
+            member.setActiveLoans(activeLoans);
         }
 
         model.addAttribute("members", members);
 
         return "members/list";
     }
+
+    @GetMapping("/admin/members/edit/{memberId}")
+    public String showEditMemberForm(
+            @PathVariable("memberId") String memberId,
+            Model model) {
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Member not found: " + memberId));
+
+        model.addAttribute("member", member);
+
+        return "members/edit";
+    }
+
+    @PostMapping("/admin/members/edit/{memberId}")
+    public String updateMember(
+            @PathVariable("memberId") String memberId,
+            @ModelAttribute("member") Member updatedMember,
+            RedirectAttributes redirectAttributes) {
+
+        Member existingMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Member not found: " + memberId));
+
+        existingMember.setName(updatedMember.getName());
+        existingMember.setEmail(updatedMember.getEmail());
+        existingMember.setMemberType(updatedMember.getMemberType());
+
+        memberRepository.save(existingMember);
+
+        auditLogService.logAction(
+                "UPDATE_MEMBER",
+                "MEMBER",
+                existingMember.getMemberId(),
+                "Updated member: " + existingMember.getName());
+
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Member successfully updated.");
+
+        return "redirect:/members";
+    }
+
 }

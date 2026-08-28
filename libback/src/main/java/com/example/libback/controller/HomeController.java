@@ -22,7 +22,7 @@ public class HomeController {
 
     @GetMapping("/")
     public String getHomepage() {
-        return "index"; 
+        return "public/index"; 
     }
 
     @GetMapping("/login")
@@ -30,7 +30,7 @@ public class HomeController {
         return "auth/login";
     }
 
-    @GetMapping("/catalog/search")
+    @GetMapping("/cantalog/search")
     public String handlePublicSearch(@RequestParam(name = "q", required = false, defaultValue = "") String query, 
                                      Model model) {
         

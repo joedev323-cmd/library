@@ -42,6 +42,16 @@ public class Member {
     @OneToMany(mappedBy = "member")
     private Set<Loan> loans = new HashSet<>();
 
+    /*
+     * Calculated value used by the web layer.
+     *
+     * This is not stored in the members table.
+     * It is populated from LoanRepository when
+     * the members page is loaded.
+     */
+    @Transient
+    private long activeLoans;
+
     public Member() {
     }
 
@@ -113,5 +123,13 @@ public class Member {
 
     public void setLoans(Set<Loan> loans) {
         this.loans = loans;
+    }
+
+    public long getActiveLoans() {
+        return activeLoans;
+    }
+
+    public void setActiveLoans(long activeLoans) {
+        this.activeLoans = activeLoans;
     }
 }

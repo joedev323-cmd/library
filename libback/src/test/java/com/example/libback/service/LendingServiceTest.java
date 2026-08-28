@@ -5,6 +5,7 @@ import com.example.libback.model.Book;
 import com.example.libback.model.Category;
 import com.example.libback.model.Loan;
 import com.example.libback.model.Member;
+import com.example.libback.model.User;
 import com.example.libback.model.enums.AvailabilityStatus;
 import com.example.libback.model.enums.LoanStatus;
 import com.example.libback.repository.AccessionRepository;
@@ -21,6 +22,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 class CirculationServiceTest {
@@ -45,6 +47,10 @@ class CirculationServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
+    // =========================================================
+    // CHECKOUT - SUCCESS
+    // =========================================================
+
     @Test
     void testCheckoutItem_Success() {
 
@@ -55,28 +61,48 @@ class CirculationServiceTest {
         String accessionId = "ACC-101";
         String memberId = "MEM-202";
 
+        // ---------------------------------------------------------
+        // Issuing User
+        // ---------------------------------------------------------
+
+        User issuedBy = new User();
+        issuedBy.setUserId(1L);
+        issuedBy.setUsername("librarian1");
+
+        // ---------------------------------------------------------
         // Member
+        // ---------------------------------------------------------
+
         Member member = new Member();
         member.setMemberId(memberId);
         member.setName("Test Member");
         member.setEmail("member@test.com");
         member.setActive(true);
 
+        // ---------------------------------------------------------
         // Category
+        // ---------------------------------------------------------
+
         Category category = new Category();
         category.setCategoryId(1L);
         category.setName("General");
         category.setLoanPeriodDays(7);
         category.setMaxRenewals(2);
 
+        // ---------------------------------------------------------
         // Book
+        // ---------------------------------------------------------
+
         Book book = new Book();
         book.setIsbn("1234567890123");
         book.setTitle("Test Book");
         book.setAuthor("Test Author");
         book.setCategory(category);
 
+        // ---------------------------------------------------------
         // Physical copy
+        // ---------------------------------------------------------
+
         Accession accession = new Accession();
         accession.setAccessionId(accessionId);
         accession.setBook(book);
@@ -84,7 +110,10 @@ class CirculationServiceTest {
                 AvailabilityStatus.AVAILABLE
         );
 
+        // ---------------------------------------------------------
         // Repository responses
+        // ---------------------------------------------------------
+
         when(memberRepository.findById(memberId))
                 .thenReturn(Optional.of(member));
 
@@ -106,7 +135,8 @@ class CirculationServiceTest {
         Loan loan =
                 circulationService.checkoutItem(
                         accessionId,
-                        memberId
+                        memberId,
+                        issuedBy
                 );
 
         // ---------------------------------------------------------
@@ -126,6 +156,11 @@ class CirculationServiceTest {
         );
 
         assertEquals(
+                issuedBy,
+                loan.getIssuedBy()
+        );
+
+        assertEquals(
                 LoanStatus.ACTIVE,
                 loan.getStatus()
         );
@@ -140,9 +175,13 @@ class CirculationServiceTest {
                 accession.getAvailabilityStatus()
         );
 
-        assertNotNull(loan.getCheckoutDate());
+        assertNotNull(
+                loan.getCheckoutDate()
+        );
 
-        assertNotNull(loan.getDueDate());
+        assertNotNull(
+                loan.getDueDate()
+        );
 
         assertTrue(
                 loan.getDueDate()
@@ -175,12 +214,19 @@ class CirculationServiceTest {
 
         verify(auditLogService, times(1))
                 .logAction(
+                        "BOOK_ISSUED",
                         "ACCESSION",
                         accessionId,
-                        "BOOK_ISSUED",
-                        "Book issued to member " + memberId
+                        "Book issued to member "
+                                + memberId
+                                + " by user "
+                                + issuedBy.getUsername()
                 );
     }
+
+    // =========================================================
+    // CHECKOUT - ACCESSION NOT AVAILABLE
+    // =========================================================
 
     @Test
     void testCheckoutItem_ThrowsException_WhenAccessionNotAvailable() {
@@ -191,6 +237,10 @@ class CirculationServiceTest {
 
         String accessionId = "ACC-999";
         String memberId = "MEM-202";
+
+        User issuedBy = new User();
+        issuedBy.setUserId(1L);
+        issuedBy.setUsername("librarian1");
 
         Member member = new Member();
         member.setMemberId(memberId);
@@ -219,7 +269,8 @@ class CirculationServiceTest {
                         IllegalStateException.class,
                         () -> circulationService.checkoutItem(
                                 accessionId,
-                                memberId
+                                memberId,
+                                issuedBy
                         )
                 );
 
@@ -246,21 +297,38 @@ class CirculationServiceTest {
                 );
     }
 
+    // =========================================================
+    // CHECKOUT - MEMBER NOT FOUND
+    // =========================================================
+
     @Test
     void testCheckoutItem_ThrowsException_WhenMemberNotFound() {
+
+        // ---------------------------------------------------------
+        // Arrange
+        // ---------------------------------------------------------
 
         String accessionId = "ACC-101";
         String memberId = "MEM-404";
 
+        User issuedBy = new User();
+        issuedBy.setUserId(1L);
+        issuedBy.setUsername("librarian1");
+
         when(memberRepository.findById(memberId))
                 .thenReturn(Optional.empty());
+
+        // ---------------------------------------------------------
+        // Act + Assert
+        // ---------------------------------------------------------
 
         IllegalArgumentException exception =
                 assertThrows(
                         IllegalArgumentException.class,
                         () -> circulationService.checkoutItem(
                                 accessionId,
-                                memberId
+                                memberId,
+                                issuedBy
                         )
                 );
 
@@ -269,18 +337,41 @@ class CirculationServiceTest {
                 exception.getMessage()
         );
 
+        // Accession should never be accessed
         verify(accessionRepository, never())
                 .findByIdForUpdate(anyString());
 
+        // Loan should never be created
         verify(loanRepository, never())
                 .save(any(Loan.class));
+
+        // Audit should never occur
+        verify(auditLogService, never())
+                .logAction(
+                        anyString(),
+                        anyString(),
+                        anyString(),
+                        anyString()
+                );
     }
+
+    // =========================================================
+    // CHECKOUT - MEMBER INACTIVE
+    // =========================================================
 
     @Test
     void testCheckoutItem_ThrowsException_WhenMemberInactive() {
 
+        // ---------------------------------------------------------
+        // Arrange
+        // ---------------------------------------------------------
+
         String accessionId = "ACC-101";
         String memberId = "MEM-303";
+
+        User issuedBy = new User();
+        issuedBy.setUserId(1L);
+        issuedBy.setUsername("librarian1");
 
         Member member = new Member();
         member.setMemberId(memberId);
@@ -289,12 +380,17 @@ class CirculationServiceTest {
         when(memberRepository.findById(memberId))
                 .thenReturn(Optional.of(member));
 
+        // ---------------------------------------------------------
+        // Act + Assert
+        // ---------------------------------------------------------
+
         IllegalStateException exception =
                 assertThrows(
                         IllegalStateException.class,
                         () -> circulationService.checkoutItem(
                                 accessionId,
-                                memberId
+                                memberId,
+                                issuedBy
                         )
                 );
 
@@ -303,18 +399,41 @@ class CirculationServiceTest {
                 exception.getMessage()
         );
 
+        // Accession should never be accessed
         verify(accessionRepository, never())
                 .findByIdForUpdate(anyString());
 
+        // Loan should never be created
         verify(loanRepository, never())
                 .save(any(Loan.class));
+
+        // Audit should never occur
+        verify(auditLogService, never())
+                .logAction(
+                        anyString(),
+                        anyString(),
+                        anyString(),
+                        anyString()
+                );
     }
+
+    // =========================================================
+    // CHECKOUT - ACCESSION NOT FOUND
+    // =========================================================
 
     @Test
     void testCheckoutItem_ThrowsException_WhenAccessionNotFound() {
 
+        // ---------------------------------------------------------
+        // Arrange
+        // ---------------------------------------------------------
+
         String accessionId = "ACC-404";
         String memberId = "MEM-202";
+
+        User issuedBy = new User();
+        issuedBy.setUserId(1L);
+        issuedBy.setUsername("librarian1");
 
         Member member = new Member();
         member.setMemberId(memberId);
@@ -326,12 +445,17 @@ class CirculationServiceTest {
         when(accessionRepository.findByIdForUpdate(accessionId))
                 .thenReturn(Optional.empty());
 
+        // ---------------------------------------------------------
+        // Act + Assert
+        // ---------------------------------------------------------
+
         IllegalArgumentException exception =
                 assertThrows(
                         IllegalArgumentException.class,
                         () -> circulationService.checkoutItem(
                                 accessionId,
-                                memberId
+                                memberId,
+                                issuedBy
                         )
                 );
 
@@ -340,7 +464,62 @@ class CirculationServiceTest {
                 exception.getMessage()
         );
 
+        // Loan should never be created
         verify(loanRepository, never())
                 .save(any(Loan.class));
+
+        // Inventory should never be updated
+        verify(accessionRepository, never())
+                .save(any(Accession.class));
+
+        // Audit should never occur
+        verify(auditLogService, never())
+                .logAction(
+                        anyString(),
+                        anyString(),
+                        anyString(),
+                        anyString()
+                );
+    }
+
+    // =========================================================
+    // CHECKOUT - ISSUING USER IS NULL
+    // =========================================================
+
+    @Test
+    void testCheckoutItem_ThrowsException_WhenIssuingUserIsNull() {
+
+        // ---------------------------------------------------------
+        // Arrange
+        // ---------------------------------------------------------
+
+        String accessionId = "ACC-101";
+        String memberId = "MEM-202";
+
+        // ---------------------------------------------------------
+        // Act + Assert
+        // ---------------------------------------------------------
+
+        IllegalStateException exception =
+                assertThrows(
+                        IllegalStateException.class,
+                        () -> circulationService.checkoutItem(
+                                accessionId,
+                                memberId,
+                                null
+                        )
+                );
+
+        assertEquals(
+                "No authenticated user was found for this transaction.",
+                exception.getMessage()
+        );
+
+        // Because issuer validation happens first,
+        // no database operations should occur.
+        verifyNoInteractions(memberRepository);
+        verifyNoInteractions(accessionRepository);
+        verifyNoInteractions(loanRepository);
+        verifyNoInteractions(auditLogService);
     }
 }

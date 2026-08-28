@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/main}">
+
+<head>
+    <title>Reports</title>
+</head>
+
+<body>
+
+    <div layout:fragment="content">
+
+        <!-- PAGE HEADER -->
+        <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+
+            <div>
+                <p class="text-sm font-medium text-indigo-600">
+                    Library Analytics
+                </p>
+
+                <h1 class="mt-1 text-2xl font-bold tracking-tight text-slate-900">
+                    Reports
+                </h1>
+
+                <p class="mt-1 text-sm text-slate-500">
+                    Monitor catalogue activity, circulation, availability, and overdue loans.
+                </p>
+            </div>
+
+            <!-- EXPORT -->
+            <a th:href="@{/reports/export-inventory}" th:classappend="${!metrics.inventoryAvailable}
+               ? 'pointer-events-none opacity-50'"
+                class="inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700">
+
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 10v6m0 0l-3-3m3 3l3-3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+
+                </svg>
+
+                Export Inventory CSV
+
+            </a>
+
+        </div>
+
+
+        <!-- METRIC CARDS -->
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+
+            <!-- Catalogue -->
+            <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+
+                <div class="flex items-center justify-between">
+
+                    <p class="text-sm font-medium text-slate-500">
+                        Catalogue Titles
+                    </p>
+
+                    <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M4 5a2 2 0 012-2h12a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V5z" />
+
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h8M8 11h8M8 15h5" />
+
+                        </svg>
+
+                    </div>
+
+                </div>
+
+                <p class="mt-2 text-3xl font-bold text-slate-900" th:text="${metrics.totalBooks}">
+                    0
+                </p>
+
+                <p class="mt-1 text-xs text-slate-400">
+                    <span th:text="${metrics.totalCopies}">0</span>
+                    physical copies ·
+                    <span th:text="${metrics.availableCopies}">0</span>
+                    available
+                </p>
+
+            </div>
+
+
+            <!-- MEMBERS -->
+            <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+
+                <div class="flex items-center justify-between">
+
+                    <p class="text-sm font-medium text-slate-500">
+                        Members
+                    </p>
+
+                    <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-purple-50 text-purple-600">
+
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2" />
+
+                            <circle cx="9" cy="7" r="4" />
+
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
+
+                        </svg>
+
+                    </div>
+
+                </div>
+
+                <p class="mt-2 text-3xl font-bold text-slate-900" th:text="${metrics.totalMembers}">
+                    0
+                </p>
+
+                <p class="mt-1 text-xs text-slate-400">
+                    Registered library members
+                </p>
+
+            </div>
+
+
+            <!-- LOANS -->
+            <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+
+                <div class="flex items-center justify-between">
+
+                    <p class="text-sm font-medium text-slate-500">
+                        Loans
+                    </p>
+
+                    <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h5M20 20v-5h-5" />
+
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M5.5 9A7 7 0 0117 6.5L20 9M18.5 15A7 7 0 017 17.5L4 15" />
+
+                        </svg>
+
+                    </div>
+
+                </div>
+
+                <p class="mt-2 text-3xl font-bold text-slate-900" th:text="${metrics.totalLoans}">
+                    0
+                </p>
+
+                <p class="mt-1 text-xs text-slate-400">
+                    <span th:text="${metrics.activeLoans}">0</span>
+                    active ·
+                    <span th:text="${metrics.returnedLoans}">0</span>
+                    returned
+                </p>
+
+            </div>
+
+
+            <!-- FINES -->
+            <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+
+                <div class="flex items-center justify-between">
+
+                    <p class="text-sm font-medium text-slate-500">
+                        Fines Collected
+                    </p>
+
+                    <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-10v12m9-6a9 9 0 11-18 0 9 9 0 0118 0z" />
+
+                        </svg>
+
+                    </div>
+
+                </div>
+
+                <p class="mt-2 text-3xl font-bold text-emerald-600"
+                    th:text="'KSh ' + ${#numbers.formatDecimal(metrics.finesCollectedMtd != null ? metrics.finesCollectedMtd: 0,1,2)}">
+                    KSh 0.00
+                </p>
+
+                <p class="mt-1 text-xs text-slate-400">
+                    Month to date
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- PERFORMANCE OVERVIEW -->
+        <div class="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+
+            <div class="mb-5">
+
+                <h2 class="font-semibold text-slate-900">
+                    Collection Overview
+                </h2>
+
+                <p class="mt-1 text-sm text-slate-500">
+                    Current availability and circulation performance.
+                </p>
+
+            </div>
+
+
+            <div class="space-y-6">
+
+                <!-- AVAILABILITY -->
+                <div>
+
+                    <div class="mb-2 flex items-center justify-between text-sm">
+
+                        <span class="font-medium text-slate-700">
+                            Collection Availability
+                        </span>
+
+                        <span class="font-semibold text-emerald-600"
+                            th:text="${#numbers.formatDecimal(metrics.availablePercentage, 1, 1)} + '%'">
+                            0%
+                        </span>
+
+                    </div>
+
+                    <div class="h-2 overflow-hidden rounded-full bg-slate-100">
+
+                        <div class="h-full rounded-full bg-emerald-500 transition-all"
+                            th:style="'width:' + ${#numbers.formatDecimal(metrics.availablePercentage, 1, 1)} + '%'">
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ACTIVE LOANS -->
+                <div>
+
+                    <div class="mb-2 flex items-center justify-between text-sm">
+
+                        <span class="font-medium text-slate-700">
+                            Copies On Loan
+                        </span>
+
+                        <span class="font-semibold text-blue-600"
+                            th:text="${#numbers.formatDecimal(metrics.activeLoanPercentage, 1, 1)} + '%'">
+                            0%
+                        </span>
+
+                    </div>
+
+                    <div class="h-2 overflow-hidden rounded-full bg-slate-100">
+
+                        <div class="h-full rounded-full bg-blue-500 transition-all"
+                            th:style="'width:' + ${#numbers.formatDecimal(metrics.activeLoanPercentage, 1, 1)} + '%'">
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- OVERDUE -->
+                <div>
+
+                    <div class="mb-2 flex items-center justify-between text-sm">
+
+                        <span class="font-medium text-slate-700">
+                            Overdue Rate
+                        </span>
+
+                        <span class="font-semibold text-red-600"
+                            th:text="${#numbers.formatDecimal(metrics.overduePercentage, 1, 1)} + '%'">
+                            0%
+                        </span>
+
+                    </div>
+
+                    <div class="h-2 overflow-hidden rounded-full bg-slate-100">
+
+                        <div class="h-full rounded-full bg-red-500 transition-all"
+                            th:style="'width:' + ${#numbers.formatDecimal(metrics.overduePercentage, 1, 1)} + '%'">
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- OVERDUE LOANS -->
+        <div class="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+
+            <!-- Header -->
+            <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+
+                <div>
+
+                    <h2 class="font-semibold text-slate-900">
+                        Overdue Loans
+                    </h2>
+
+                    <p class="mt-1 text-xs text-slate-500">
+                        Loans that require attention.
+                    </p>
+
+                </div>
+
+                <span class="rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-700"
+                    th:text="${#lists.size(overdueLoans)}">
+                    0
+                </span>
+
+            </div>
+
+
+            <!-- Table -->
+            <div class="overflow-x-auto">
+
+                <table class="min-w-full divide-y divide-slate-200 text-sm">
+
+                    <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+
+                        <tr>
+
+                            <th class="px-5 py-3">
+                                Book
+                            </th>
+
+                            <th class="px-5 py-3">
+                                Barcode
+                            </th>
+
+                            <th class="px-5 py-3">
+                                Member
+                            </th>
+
+                            <th class="px-5 py-3">
+                                Due Date
+                            </th>
+
+                            <th class="px-5 py-3">
+                                Days Overdue
+                            </th>
+
+                            <th class="px-5 py-3">
+                                Fine Accrued
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody class="divide-y divide-slate-100">
+
+                        <!-- LOAN -->
+                        <tr th:each="loan : ${overdueLoans}" class="hover:bg-red-50/40">
+
+                            <td class="px-5 py-3 font-medium text-slate-900" th:text="${loan.title}">
+                                Book Title
+                            </td>
+
+                            <td class="px-5 py-3 font-mono text-xs text-slate-500" th:text="${loan.barcode}">
+                                BAR-0001
+                            </td>
+
+                            <td class="px-5 py-3">
+
+                                <p class="font-medium text-slate-700" th:text="${loan.memberName}">
+                                    Member
+                                </p>
+
+                                <p class="text-xs text-slate-400" th:text="${loan.memberId}">
+                                    M-001
+                                </p>
+
+
+                                <p class="text-xs text-slate-400" th:text="${loan.memberEmail}">
+                                    email@example.com
+                                </p>
+
+                            </td>
+
+                            <td class="whitespace-nowrap px-5 py-3 text-slate-600"
+                                th:text="${#temporals.format(loan.dueDate, 'MMM d, yyyy')}">
+                                Jan 1, 2026
+                            </td>
+
+                            <td class="px-5 py-3">
+
+                                <span
+                                    class="inline-block rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-700"
+                                    th:text="${loan.daysOverdue}">
+                                    5
+                                </span>
+
+                            </td>
+
+                            <td class="px-5 py-3 font-medium text-slate-700"
+                                th:text="'KSh ' + ${#numbers.formatDecimal(loan.fineAccrued != null ? loan.fineAccrued : 0,1,2)}">
+                                KSh 0.00
+                            </td>
+
+
+                        </tr>
+
+
+                        <!-- EMPTY STATE -->
+                        <tr th:if="${#lists.isEmpty(overdueLoans)}">
+
+                            <td colspan="6" class="px-5 py-12 text-center">
+
+                                <div
+                                    class="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                        stroke-width="2">
+
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+
+                                    </svg>
+
+                                </div>
+
+                                <p class="mt-3 text-sm font-medium text-slate-700">
+                                    Nothing overdue
+                                </p>
+
+                                <p class="mt-1 text-xs text-slate-400">
+                                    All current loans are within their due dates.
+                                </p>
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

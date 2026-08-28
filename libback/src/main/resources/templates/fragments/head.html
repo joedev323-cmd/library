@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html lang="en"
-      xmlns:th="http://www.thymeleaf.org"
-      th:fragment="head">
+      xmlns:th="http://www.thymeleaf.org">
 
-<head>
-    <meta charset="UTF-8">
+      <head th:fragment="head(title)">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+            <meta charset="UTF-8">
 
-    <title th:text="${pageTitle != null ? pageTitle + ' - BiblioHub' : 'BiblioHub'}">
-        BiblioHub
-    </title>
+            <meta name="viewport"
+                  content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet"
-          th:href="@{/css/tailwind.css}">
-</head>
+            <title th:text="${title}">
+                  BiblioHub
+            </title>
+
+            <link rel="stylesheet"
+                  th:href="@{/css/tailwind.css}">
+
+      </head>
+
+</html>

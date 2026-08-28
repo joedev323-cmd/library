@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<div th:fragment="breadcrumbs(items)"
+     class="mb-6">
+
+    <nav aria-label="Breadcrumb">
+        <ol class="flex flex-wrap items-center gap-2 text-sm">
+
+            <li>
+                <a th:href="@{/}"
+                   class="text-slate-500 transition hover:text-indigo-600">
+                    Home
+                </a>
+            </li>
+
+            <li class="text-slate-300">/</li>
+
+            <li th:each="item, stat : ${items}"
+                class="flex items-center gap-2">
+
+                <a th:if="${!stat.last}"
+                   th:href="${item.url}"
+                   th:text="${item.label}"
+                   class="text-slate-500 transition hover:text-indigo-600">
+                    Catalogue
+                </a>
+
+                <span th:if="${stat.last}"
+                      th:text="${item.label}"
+                      class="font-medium text-slate-700">
+                    Current Page
+                </span>
+
+                <span th:if="${!stat.last}"
+                      class="text-slate-300">
+                    /
+                </span>
+
+            </li>
+
+        </ol>
+    </nav>
+
+</div>
+
+</html>

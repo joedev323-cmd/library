@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+<head><title>Register Member</title></head>
+<body>
+<div layout:fragment="content">
+
+    <h1 class="mb-6 text-2xl font-bold">Register Member</h1>
+
+    <!-- Inline error (rendered on same page, not flash) -->
+    <div th:if="${errorMessage}"
+         class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+         th:text="${errorMessage}"></div>
+
+    <form th:action="@{/admin/add/member}" th:object="${member}" method="post"
+          class="max-w-lg space-y-4 rounded-xl border border-slate-200 bg-white p-6">
+
+        <div>
+            <label class="mb-1 block text-sm font-medium" for="memberId">Member ID</label>
+            <input id="memberId" type="text" th:field="*{memberId}" required placeholder="e.g. M-116"
+                   class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+        </div>
+
+        <div>
+            <label class="mb-1 block text-sm font-medium" for="name">Full Name</label>
+            <input id="name" type="text" th:field="*{name}" required
+                   class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+        </div>
+
+        <div>
+            <label class="mb-1 block text-sm font-medium" for="email">Email</label>
+            <input id="email" type="email" th:field="*{email}" required
+                   class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+        </div>
+
+        <div>
+            <label class="mb-1 block text-sm font-medium" for="memberType">Member Type</label>
+            <select id="memberType" th:field="*{memberType}"
+                    class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                <!-- values must match MemberType enum names -->
+                <option value="STUDENT">Student</option>
+                <option value="STAFF">Staff</option>
+                <option value="FACULTY">Faculty</option>
+                <option value="PUBLIC">Public</option>
+            </select>
+        </div>
+
+        <button type="submit"
+                class="rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white hover:bg-indigo-700">
+            Register
+        </button>
+    </form>
+
+</div>
+</body>
+</html>

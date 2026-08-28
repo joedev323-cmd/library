@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<div th:fragment="pagination(page)"
+     th:if="${page != null and page.totalPages > 1}"
+     class="mt-6 flex flex-col gap-4 border-t border-slate-200 pt-4
+            sm:flex-row sm:items-center sm:justify-between">
+
+    <!-- RESULTS -->
+
+    <p class="text-sm text-slate-500">
+
+        Showing
+
+        <span class="font-medium text-slate-700"
+              th:text="${page.number * page.size + 1}">
+            1
+        </span>
+
+        to
+
+        <span class="font-medium text-slate-700"
+              th:text="${page.number * page.size + page.numberOfElements}">
+            10
+        </span>
+
+        of
+
+        <span class="font-medium text-slate-700"
+              th:text="${page.totalElements}">
+            70
+        </span>
+
+    </p>
+
+
+    <!-- CONTROLS -->
+
+    <div class="flex items-center gap-1">
+
+        <!-- PREVIOUS -->
+
+        <a th:if="${page.hasPrevious()}"
+           th:href="@{${#httpServletRequest.requestURI}(
+                page=${page.number - 1},
+                size=${page.size}
+           )}"
+           class="rounded-lg border border-slate-200 bg-white
+                  px-3 py-2 text-sm font-medium text-slate-600
+                  hover:bg-slate-50">
+
+            Previous
+
+        </a>
+
+
+        <!-- PAGE NUMBERS -->
+
+        <th:block
+                th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}">
+
+            <a th:href="@{${#httpServletRequest.requestURI}(
+                    page=${i},
+                    size=${page.size}
+               )}"
+               th:text="${i + 1}"
+               th:classappend="${i == page.number}
+                    ? ' bg-purple-600 text-white border-purple-600'
+                    : ' bg-white text-slate-600 border-slate-200 hover:bg-slate-50'"
+               class="rounded-lg border px-3 py-2 text-sm font-medium">
+
+                1
+
+            </a>
+
+        </th:block>
+
+
+        <!-- NEXT -->
+
+        <a th:if="${page.hasNext()}"
+           th:href="@{${#httpServletRequest.requestURI}(
+                page=${page.number + 1},
+                size=${page.size}
+           )}"
+           class="rounded-lg border border-slate-200 bg-white
+                  px-3 py-2 text-sm font-medium text-slate-600
+                  hover:bg-slate-50">
+
+            Next
+
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>

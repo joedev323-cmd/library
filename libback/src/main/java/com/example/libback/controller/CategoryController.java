@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
-@RequestMapping("/admin/categories")
+@RequestMapping("/admin/categories")    
 public class CategoryController {
 
         private final CategoryRepository categoryRepository;

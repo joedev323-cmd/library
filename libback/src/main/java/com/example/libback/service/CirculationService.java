@@ -3,6 +3,7 @@ package com.example.libback.service;
 import com.example.libback.model.Accession;
 import com.example.libback.model.Loan;
 import com.example.libback.model.Member;
+import com.example.libback.model.User;
 import com.example.libback.model.enums.AvailabilityStatus;
 import com.example.libback.model.enums.LoanStatus;
 import com.example.libback.repository.AccessionRepository;
@@ -28,8 +29,8 @@ public class CirculationService {
             AccessionRepository accessionRepository,
             MemberRepository memberRepository,
             LoanRepository loanRepository,
-            AuditLogService auditLogService
-    ) {
+            AuditLogService auditLogService) {
+
         this.accessionRepository = accessionRepository;
         this.memberRepository = memberRepository;
         this.loanRepository = loanRepository;
@@ -43,54 +44,76 @@ public class CirculationService {
     @Transactional
     public Loan checkoutItem(
             String accessionId,
-            String memberId
-    ) {
+            String memberId,
+            User issuedBy) {
 
-        // 1. Find member
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "Member not found: " + memberId
-                        )
-                );
+        // ---------------------------------------------------------
+        // 1. Validate issuing user
+        // ---------------------------------------------------------
 
-        // 2. Member must be active
-        if (!member.isActive()) {
+        if (issuedBy == null) {
             throw new IllegalStateException(
-                    "Member account is inactive."
-            );
+                    "No authenticated user was found for this transaction.");
         }
 
-        // 3. Lock physical copy
-        Accession accession =
-                accessionRepository.findByIdForUpdate(accessionId)
-                        .orElseThrow(() ->
-                                new IllegalArgumentException(
-                                        "Accession not found: " + accessionId
-                                )
-                        );
+        // ---------------------------------------------------------
+        // 2. Find member
+        // ---------------------------------------------------------
 
-        // 4. Physical copy must be available
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Member not found: " + memberId));
+
+        // ---------------------------------------------------------
+        // 3. Member must be active
+        // ---------------------------------------------------------
+
+        if (!member.isActive()) {
+            throw new IllegalStateException(
+                    "Member account is inactive.");
+        }
+
+        // ---------------------------------------------------------
+        // 4. Lock physical copy
+        // ---------------------------------------------------------
+
+        Accession accession = accessionRepository
+                .findByIdForUpdate(accessionId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Accession not found: " + accessionId));
+
+        // ---------------------------------------------------------
+        // 5. Physical copy must be available
+        // ---------------------------------------------------------
+
         if (accession.getAvailabilityStatus()
                 != AvailabilityStatus.AVAILABLE) {
 
             throw new IllegalStateException(
                     "This copy is currently "
-                            + accession.getAvailabilityStatus()
-            );
+                            + accession.getAvailabilityStatus());
         }
 
-        // 5. Get loan period from category
+        // ---------------------------------------------------------
+        // 6. Get loan period from category
+        // ---------------------------------------------------------
+
         int loanDays = accession
                 .getBook()
                 .getCategory()
                 .getLoanPeriodDays();
 
-        // 6. Create loan
+        // ---------------------------------------------------------
+        // 7. Create loan
+        // ---------------------------------------------------------
+
         Loan loan = new Loan();
 
         loan.setAccession(accession);
         loan.setMember(member);
+
+        // The authenticated librarian/admin
+        loan.setIssuedBy(issuedBy);
 
         LocalDateTime checkoutDate =
                 LocalDateTime.now();
@@ -98,32 +121,47 @@ public class CirculationService {
         loan.setCheckoutDate(checkoutDate);
 
         loan.setDueDate(
-                checkoutDate.plusDays(loanDays)
-        );
+                checkoutDate.plusDays(loanDays));
 
         loan.setRenewalCount(0);
-        loan.setFineAccrued(BigDecimal.ZERO);
-        loan.setFinePaid(BigDecimal.ZERO);
-        loan.setStatus(LoanStatus.ACTIVE);
 
-        // 7. Mark physical copy as borrowed
+        loan.setFineAccrued(
+                BigDecimal.ZERO);
+
+        loan.setFinePaid(
+                BigDecimal.ZERO);
+
+        loan.setStatus(
+                LoanStatus.ACTIVE);
+
+        // ---------------------------------------------------------
+        // 8. Mark physical copy as borrowed
+        // ---------------------------------------------------------
+
         accession.setAvailabilityStatus(
-                AvailabilityStatus.BORROWED
-        );
+                AvailabilityStatus.BORROWED);
 
         accessionRepository.save(accession);
 
-        // 8. Save loan
+        // ---------------------------------------------------------
+        // 9. Save loan
+        // ---------------------------------------------------------
+
         Loan savedLoan =
                 loanRepository.save(loan);
 
-        // 9. Audit
+        // ---------------------------------------------------------
+        // 10. Audit
+        // ---------------------------------------------------------
+
         auditLogService.logAction(
+                "BOOK_ISSUED",
                 "ACCESSION",
                 accessionId,
-                "BOOK_ISSUED",
-                "Book issued to member " + memberId
-        );
+                "Book issued to member "
+                        + memberId
+                        + " by user "
+                        + issuedBy.getUsername());
 
         return savedLoan;
     }
@@ -135,22 +173,20 @@ public class CirculationService {
     @Transactional
     public void returnItem(
             String accessionId,
-            String condition
-    ) {
+            String condition) {
 
+        // ---------------------------------------------------------
         // 1. Find active loan
-        Loan loan =
-                loanRepository
-                        .findByAccessionAccessionIdAndStatus(
-                                accessionId,
-                                LoanStatus.ACTIVE
-                        )
-                        .orElseThrow(() ->
-                                new IllegalArgumentException(
-                                        "No active loan found for accession: "
-                                                + accessionId
-                                )
-                        );
+        // ---------------------------------------------------------
+
+        Loan loan = loanRepository
+                .findByAccessionAccessionIdAndStatus(
+                        accessionId,
+                        LoanStatus.ACTIVE)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "No active loan found for accession: "
+                                        + accessionId));
 
         LocalDateTime now =
                 LocalDateTime.now();
@@ -158,9 +194,9 @@ public class CirculationService {
         BigDecimal totalFine =
                 BigDecimal.ZERO;
 
-        // =====================================================
+        // =========================================================
         // OVERDUE FINE
-        // =====================================================
+        // =========================================================
 
         if (loan.getDueDate() != null
                 && now.isAfter(loan.getDueDate())) {
@@ -168,59 +204,57 @@ public class CirculationService {
             long daysLate =
                     ChronoUnit.DAYS.between(
                             loan.getDueDate(),
-                            now
-                    );
+                            now);
 
             if (daysLate > 0) {
 
                 // KSH 1 per day late
-                totalFine =
-                        totalFine.add(
-                                BigDecimal.valueOf(daysLate)
-                        );
+                totalFine = totalFine.add(
+                        BigDecimal.valueOf(daysLate));
             }
         }
 
-        // =====================================================
+        // =========================================================
         // DAMAGE FINE
-        // =====================================================
+        // =========================================================
 
         if (condition != null
                 && "Damaged".equalsIgnoreCase(condition)) {
 
             // KSH 5 damage fee
-            totalFine =
-                    totalFine.add(
-                            new BigDecimal("5.00")
-                    );
+            totalFine = totalFine.add(
+                    new BigDecimal("5.00"));
         }
 
-        // =====================================================
+        // =========================================================
         // UPDATE LOAN
-        // =====================================================
+        // =========================================================
 
         loan.setReturnedDate(now);
-        loan.setStatus(LoanStatus.RETURNED);
-        loan.setFineAccrued(totalFine);
+
+        loan.setStatus(
+                LoanStatus.RETURNED);
+
+        loan.setFineAccrued(
+                totalFine);
 
         loanRepository.save(loan);
 
-        // =====================================================
+        // =========================================================
         // UPDATE PHYSICAL COPY
-        // =====================================================
+        // =========================================================
 
         Accession accession =
                 loan.getAccession();
 
         accession.setAvailabilityStatus(
-                AvailabilityStatus.AVAILABLE
-        );
+                AvailabilityStatus.AVAILABLE);
 
         accessionRepository.save(accession);
 
-        // =====================================================
+        // =========================================================
         // AUDIT
-        // =====================================================
+        // =========================================================
 
         auditLogService.logAction(
                 "ACCESSION",
@@ -231,7 +265,6 @@ public class CirculationService {
                         + ". Condition: "
                         + condition
                         + ". Fine: "
-                        + totalFine
-        );
+                        + totalFine);
     }
 }

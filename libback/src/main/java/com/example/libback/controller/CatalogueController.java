@@ -3,11 +3,16 @@ package com.example.libback.controller;
 import com.example.libback.model.Accession;
 import com.example.libback.model.Book;
 import com.example.libback.model.Member;
+import com.example.libback.model.enums.AvailabilityStatus;
+import com.example.libback.model.enums.ConditionStatus;
 import com.example.libback.model.enums.LoanStatus;
+import com.example.libback.model.enums.MemberType;
+import com.example.libback.repository.AccessionRepository;
 import com.example.libback.repository.BookRepository;
 import com.example.libback.repository.CategoryRepository;
 import com.example.libback.repository.LoanRepository;
 import com.example.libback.repository.MemberRepository;
+import com.example.libback.service.AccessionService;
 import com.example.libback.service.AuditLogService;
 import com.example.libback.service.BookService;
 
@@ -15,30 +20,41 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 @Controller
 public class CatalogueController {
 
         private final BookService bookService;
         private final BookRepository bookRepository;
+        private final AccessionRepository accessionRepository;
         private final MemberRepository memberRepository;
         private final AuditLogService auditLogService;
         private final CategoryRepository categoryRepository;
         private final LoanRepository loanRepository;
+        private final AccessionService accessionService;
 
         public CatalogueController(
                         BookService bookService,
                         BookRepository bookRepository,
+                        AccessionRepository accessionRepository,
                         MemberRepository memberRepository,
                         AuditLogService auditLogService,
                         CategoryRepository categoryRepository,
-                        LoanRepository loanRepository) {
+                        LoanRepository loanRepository,
+                        AccessionService accessionService) {
+
                 this.bookService = bookService;
                 this.bookRepository = bookRepository;
+                this.accessionRepository = accessionRepository;
                 this.memberRepository = memberRepository;
                 this.auditLogService = auditLogService;
                 this.categoryRepository = categoryRepository;
                 this.loanRepository = loanRepository;
+                this.accessionService = accessionService;
         }
 
         // =========================================================
@@ -54,7 +70,7 @@ public class CatalogueController {
 
                 return "catalogue/index";
         }
-        
+
         // =========================================================
         // BOOK DETAILS
         // =========================================================
@@ -62,14 +78,25 @@ public class CatalogueController {
         @GetMapping("/catalog/{isbn}")
         public String showBookDetails(
                         @PathVariable("isbn") String isbn,
+                        @RequestParam(defaultValue = "0") int page,
+                        @RequestParam(defaultValue = "10") int size,
                         Model model) {
 
                 String cleanIsbn = cleanIsbn(isbn);
 
-                Book book = bookRepository.findByIsbn(cleanIsbn)
-                                .orElseThrow(() -> new IllegalArgumentException(
-                                                "Book not found with ISBN: "
-                                                                + cleanIsbn));
+                Book book = bookService.getBookByIsbn(
+                                cleanIsbn);
+
+                Pageable pageable = PageRequest.of(
+                                page,
+                                size,
+                                Sort.by(
+                                                Sort.Direction.ASC,
+                                                "copyNumber"));
+
+                Page<Accession> accessions = bookService.getAccessionsForBook(
+                                book.getBookId(),
+                                pageable);
 
                 model.addAttribute(
                                 "book",
@@ -77,13 +104,25 @@ public class CatalogueController {
 
                 model.addAttribute(
                                 "accessions",
-                                book.getAccessions());
+                                accessions);
 
-                return "Catalogue/details";
+                return "catalogue/details";
         }
 
         // =========================================================
         // BATCH ACCESSION GENERATION
+        //
+        // FLOW:
+        //
+        // Book selected
+        // ↓
+        // Book ID obtained
+        // ↓
+        // Generate physical copies
+        // ↓
+        // Accessions created
+        //
+        // NO ACCESSION SELECTION
         // =========================================================
 
         @PostMapping("/catalog/{isbn}/accessions/batch")
@@ -91,13 +130,13 @@ public class CatalogueController {
                         @PathVariable("isbn") String isbn,
                         @RequestParam("prefix") String prefix,
                         @RequestParam("quantity") int quantity,
-                        @RequestParam("shelfLocation") String shelfLocation) {
+                        @RequestParam("shelfLocation") String shelfLocation,
+                        RedirectAttributes redirectAttributes) {
 
-                String cleanIsbn = isbn.replaceAll("[^a-zA-Z0-9]", "");
+                String cleanIsbn = cleanIsbn(isbn);
 
-                Book book = bookRepository.findByIsbn(cleanIsbn)
-                                .orElseThrow(() -> new IllegalArgumentException(
-                                                "Book not found with ISBN: " + cleanIsbn));
+                Book book = bookService.getBookByIsbn(
+                                cleanIsbn);
 
                 bookService.generateBatchAccessions(
                                 book.getBookId(),
@@ -109,12 +148,31 @@ public class CatalogueController {
                                 "BATCH_ADD_ACCESSIONS",
                                 "BOOK",
                                 String.valueOf(book.getBookId()),
-                                "Batch generated "
+                                "Generated "
                                                 + quantity
-                                                + " physical copies with prefix: "
+                                                + " physical "
+                                                + (quantity == 1 ? "copy" : "copies")
+                                                + " for book: "
+                                                + book.getTitle()
+                                                + " using prefix: "
                                                 + prefix);
 
-                return "redirect:/catalog/" + cleanIsbn + "?success";
+                redirectAttributes.addFlashAttribute(
+                                "successMessage",
+                                quantity
+                                                + " physical "
+                                                + (quantity == 1 ? "copy" : "copies")
+                                                + " successfully added.");
+
+                /*
+                 * IMPORTANT:
+                 *
+                 * Return to the SAME book page.
+                 *
+                 * Details URL:
+                 * /catalog/{isbn}
+                 */
+                return "redirect:/catalog/" + cleanIsbn;
         }
 
         // =========================================================
@@ -135,8 +193,8 @@ public class CatalogueController {
                 member.setEmail(email);
 
                 member.setMemberType(
-                                com.example.libback.model.enums.MemberType
-                                                .valueOf(type.toUpperCase()));
+                                MemberType.valueOf(
+                                                type.toUpperCase()));
 
                 memberRepository.save(member);
 
@@ -176,23 +234,18 @@ public class CatalogueController {
         public String processAddBook(
                         @ModelAttribute("book") Book newBook) {
 
-                if (newBook.getIsbn() != null) {
-
-                        newBook.setIsbn(
-                                        cleanIsbn(newBook.getIsbn()));
-                }
-
-                bookService.saveBook(newBook);
+                Book savedBook = bookService.saveBook(
+                                newBook);
 
                 auditLogService.logAction(
                                 "ADD_BOOK",
                                 "BOOK",
-                                newBook.getIsbn(),
+                                savedBook.getIsbn(),
                                 "Added book: "
-                                                + newBook.getTitle());
+                                                + savedBook.getTitle());
 
                 return "redirect:/catalog/"
-                                + newBook.getIsbn();
+                                + savedBook.getIsbn();
         }
 
         // =========================================================
@@ -206,10 +259,8 @@ public class CatalogueController {
 
                 String cleanIsbn = cleanIsbn(isbn);
 
-                Book book = bookRepository.findByIsbn(cleanIsbn)
-                                .orElseThrow(() -> new IllegalArgumentException(
-                                                "No catalog record found for ISBN: "
-                                                                + cleanIsbn));
+                Book book = bookService.getBookByIsbn(
+                                cleanIsbn);
 
                 model.addAttribute(
                                 "book",
@@ -233,10 +284,7 @@ public class CatalogueController {
 
                 String cleanIsbn = cleanIsbn(isbn);
 
-                Book existingBook = bookRepository.findByIsbn(cleanIsbn)
-                                .orElseThrow(() -> new IllegalArgumentException(
-                                                "No catalog record found for ISBN: "
-                                                                + cleanIsbn));
+                Book existingBook = bookService.getBookByIsbn(cleanIsbn);
 
                 existingBook.setTitle(
                                 updatedBook.getTitle());
@@ -272,16 +320,52 @@ public class CatalogueController {
         // =========================================================
         // CATALOGUE REGISTRY
         // =========================================================
-
         @GetMapping("/admin/catalog/registry")
         public String showCatalogRegistry(
+                        @RequestParam(required = false) String search,
+                        @RequestParam(required = false) AvailabilityStatus status,
+                        @RequestParam(required = false) ConditionStatus condition,
+                        @RequestParam(defaultValue = "0") int page,
                         Model model) {
 
-                model.addAttribute(
-                                "books",
-                                bookRepository.findAll());
+                int pageSize = 7;
 
-                return "catalogue/index";
+                var accessionPage = accessionService.searchRegistry(
+                                search,
+                                status,
+                                condition,
+                                page,
+                                pageSize);
+
+                model.addAttribute(
+                                "accessions",
+                                accessionPage.getContent());
+
+                model.addAttribute(
+                                "page",
+                                accessionPage);
+
+                model.addAttribute(
+                                "search",
+                                search);
+
+                model.addAttribute(
+                                "selectedStatus",
+                                status);
+
+                model.addAttribute(
+                                "selectedCondition",
+                                condition);
+
+                model.addAttribute(
+                                "availabilityStatuses",
+                                AvailabilityStatus.values());
+
+                model.addAttribute(
+                                "conditionStatuses",
+                                ConditionStatus.values());
+
+                return "catalogue/registry";
         }
 
         // =========================================================
@@ -295,15 +379,13 @@ public class CatalogueController {
 
                 String cleanIsbn = cleanIsbn(isbn);
 
-                Book book = bookRepository.findByIsbn(cleanIsbn)
-                                .orElseThrow(() -> new IllegalArgumentException(
-                                                "No catalog record found for ISBN: "
-                                                                + cleanIsbn));
+                Book book = bookService.getBookByIsbn(
+                                cleanIsbn);
 
-                // -----------------------------------------------------
-                // Physical copies exist
-                // -----------------------------------------------------
-
+                /*
+                 * A catalogue record cannot be deleted while
+                 * physical copies still exist.
+                 */
                 if (book.getAccessions() != null
                                 && !book.getAccessions().isEmpty()) {
 
@@ -319,21 +401,21 @@ public class CatalogueController {
 
                                 redirectAttributes.addFlashAttribute(
                                                 "errorMessage",
-                                                "Cannot delete this book. One or more physical copies are currently checked out.");
+                                                "Cannot delete this book. "
+                                                                + "One or more physical copies "
+                                                                + "are currently checked out.");
 
                                 return "redirect:/admin/catalog/registry";
                         }
 
                         redirectAttributes.addFlashAttribute(
                                         "errorMessage",
-                                        "Cannot delete this book while physical copies exist. Delete the physical copies first.");
+                                        "Cannot delete this book while physical "
+                                                        + "copies exist. Delete the physical "
+                                                        + "copies first.");
 
                         return "redirect:/admin/catalog/registry";
                 }
-
-                // -----------------------------------------------------
-                // Safe to delete
-                // -----------------------------------------------------
 
                 bookRepository.delete(book);
 
@@ -362,10 +444,9 @@ public class CatalogueController {
 
                 String cleanIsbn = cleanIsbn(isbn);
 
-                // -----------------------------------------------------
-                // Cannot delete an active loan
-                // -----------------------------------------------------
-
+                /*
+                 * Do not allow deletion of a borrowed physical copy.
+                 */
                 boolean isCurrentlyBorrowed = loanRepository
                                 .findByAccessionAccessionIdAndStatus(
                                                 accessionId,
@@ -384,39 +465,29 @@ public class CatalogueController {
                                         + cleanIsbn;
                 }
 
-                // -----------------------------------------------------
-                // Find book
-                // -----------------------------------------------------
+                Book book = bookService.getBookByIsbn(
+                                cleanIsbn);
 
-                Book book = bookRepository.findByIsbn(cleanIsbn)
-                                .orElseThrow(() -> new IllegalArgumentException(
-                                                "Book not found with ISBN: "
-                                                                + cleanIsbn));
-
-                // -----------------------------------------------------
-                // Find accession
-                // -----------------------------------------------------
-
-                Accession accession = book.getAccessions()
-                                .stream()
-                                .filter(a -> a.getAccessionId()
-                                                .equals(accessionId))
-                                .findFirst()
+                Accession accession = accessionRepository.findById(accessionId)
                                 .orElseThrow(() -> new IllegalArgumentException(
                                                 "Accession not found: "
                                                                 + accessionId));
 
-                // -----------------------------------------------------
-                // Remove from parent collection
-                // -----------------------------------------------------
+                /*
+                 * Security/integrity check:
+                 *
+                 * Make sure the accession being deleted
+                 * actually belongs to the selected book.
+                 */
+                if (!accession.getBook()
+                                .getBookId()
+                                .equals(book.getBookId())) {
 
-                book.removeAccession(accession);
+                        throw new IllegalArgumentException(
+                                        "Accession does not belong to this book.");
+                }
 
-                bookRepository.save(book);
-
-                // -----------------------------------------------------
-                // Audit
-                // -----------------------------------------------------
+                accessionRepository.delete(accession);
 
                 auditLogService.logAction(
                                 "DELETE_ACCESSION",
@@ -449,4 +520,70 @@ public class CatalogueController {
                                 "[^a-zA-Z0-9]",
                                 "");
         }
+
+        @GetMapping("/cantalog")
+        public String catalogue(
+                        @RequestParam(required = false) String search,
+                        @RequestParam(defaultValue = "0") int page,
+                        @RequestParam(defaultValue = "12") int size,
+                        Model model) {
+
+                // Prevent invalid page sizes
+                if (size != 12 && size != 24 && size != 48) {
+                        size = 12;
+                }
+
+                // Prevent negative page numbers
+                if (page < 0) {
+                        page = 0;
+                }
+
+                Pageable pageable = PageRequest.of(
+                                page,
+                                size,
+                                Sort.by(
+                                                Sort.Direction.ASC,
+                                                "title"));
+
+                Page<Book> bookPage = bookService.searchBooks(
+                                search,
+                                pageable);
+
+                model.addAttribute("books", bookPage.getContent());
+                model.addAttribute("page", bookPage);
+                model.addAttribute(
+                                "search",
+                                search == null ? "" : search);
+
+                return "public/catalogue";
+        }
+
+        @GetMapping("/cantalog/{isbn}")
+        public String bookDetails(
+                        @PathVariable String isbn,
+                        Model model) {
+
+                try {
+
+                        Book book = bookService.getBookByIsbn(isbn);
+
+                        long availableCount = bookService.getAvailableCount(
+                                        book.getBookId());
+
+                        model.addAttribute(
+                                        "book",
+                                        book);
+
+                        model.addAttribute(
+                                        "availableCount",
+                                        availableCount);
+
+                        return "public/book-detail";
+
+                } catch (IllegalArgumentException e) {
+
+                        return "redirect:/cantalog";
+                }
+        }
+
 }

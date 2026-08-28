@@ -8,17 +8,17 @@ import java.util.List;
 @Service
 public class MemberService {
 
-    private final MemberRepository borrowerRepository;
+    private final MemberRepository memberRepository;
 
-    public MemberService(MemberRepository borrowerRepository) {
-        this.borrowerRepository = borrowerRepository;
+    public MemberService(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
     }
 
     public List<Member> getAllMembers() {
-        return borrowerRepository.findAll();
+        return memberRepository.findAll();
     }
 
     public Member saveMember(Member borrower) {
-        return borrowerRepository.save(borrower);
+        return memberRepository.save(borrower);
     }
 }

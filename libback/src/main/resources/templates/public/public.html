@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Search Results - BiblioHub</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/tailwind.css}">
+
+</head>
+
+<body class="min-h-screen bg-slate-50 text-slate-900">
+
+    <!-- =========================================================
+         NAVBAR
+         ========================================================= -->
+    <header class="border-b border-slate-200 bg-white">
+
+        <div class="mx-auto flex min-h-20 max-w-7xl items-center gap-4 px-4 py-4 sm:px-6 lg:px-8">
+
+            <!-- BRAND -->
+            <a th:href="@{/}"
+               class="flex shrink-0 items-center gap-3">
+
+                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-600 text-white shadow-sm">
+
+                    <svg class="h-5 w-5"
+                         fill="none"
+                         viewBox="0 0 24 24"
+                         stroke="currentColor"
+                         stroke-width="2">
+
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+
+                    </svg>
+
+                </div>
+
+                <span class="text-xl font-semibold tracking-tight">
+                    Biblio<span class="text-purple-600">Hub</span>
+                </span>
+
+            </a>
+
+
+            <!-- SEARCH -->
+            <form th:action="@{/cantalog/search}"
+                  method="get"
+                  class="mx-auto flex min-w-0 flex-1 max-w-2xl">
+
+                <div class="relative min-w-0 flex-1">
+
+                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+
+                        <svg class="h-5 w-5"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke="currentColor"
+                             stroke-width="2">
+
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M21 21l-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0z" />
+
+                        </svg>
+
+                    </div>
+
+                    <input type="search"
+                           name="q"
+                           th:value="${query}"
+                           placeholder="Search by title or author..."
+                           class="w-full rounded-l-xl border border-slate-300 bg-white py-2.5 pl-10 pr-3 text-sm outline-none transition focus:border-purple-500 focus:ring-4 focus:ring-purple-100">
+
+                </div>
+
+                <button type="submit"
+                        class="rounded-r-xl bg-purple-600 px-4 text-sm font-semibold text-white transition hover:bg-purple-700">
+
+                    Search
+
+                </button>
+
+            </form>
+
+
+            <!-- STAFF LOGIN -->
+            <a th:href="@{/login}"
+               class="hidden shrink-0 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-purple-200 hover:bg-purple-50 hover:text-purple-700 sm:block">
+
+                Staff Login
+
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================================================
+         MAIN CONTENT
+         ========================================================= -->
+    <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+
+        <!-- Breadcrumb -->
+        <div class="mb-6">
+
+            <a th:href="@{/}"
+               class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 transition hover:text-purple-600">
+
+                <svg class="h-4 w-4"
+                     fill="none"
+                     viewBox="0 0 24 24"
+                     stroke="currentColor"
+                     stroke-width="2">
+
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15 19l-7-7 7-7" />
+
+                </svg>
+
+                Back to catalogue
+
+            </a>
+
+        </div>
+
+
+        <!-- =====================================================
+             RESULTS HEADER
+             ===================================================== -->
+        <section class="mb-8">
+
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+
+                <div>
+
+                    <p class="text-sm font-semibold text-purple-600">
+                        Public Catalogue
+                    </p>
+
+                    <h1 class="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+                        Search results
+                    </h1>
+
+                    <p class="mt-2 text-sm text-slate-500">
+
+                        <span th:text="${#lists.size(books)}">
+                            0
+                        </span>
+
+                        result<span th:if="${#lists.size(books) != 1}">s</span>
+
+                        for
+
+                        <span class="font-medium text-slate-700"
+                              th:text="'&quot;' + ${query} + '&quot;'">
+                            "search"
+                        </span>
+
+                    </p>
+
+                </div>
+
+
+                <!-- Result count -->
+                <div th:if="${!#lists.isEmpty(books)}"
+                     class="inline-flex w-fit items-center rounded-full bg-purple-50 px-3 py-1.5 text-xs font-semibold text-purple-700">
+
+                    <span th:text="${#lists.size(books)}">
+                        0
+                    </span>
+
+                    <span class="ml-1">
+                        books found
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             RESULTS
+             ===================================================== -->
+        <section class="space-y-4">
+
+            <!-- BOOK CARD -->
+            <article th:each="book : ${books}"
+                     class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-purple-200 hover:shadow-md sm:p-6">
+
+                <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+
+                    <!-- BOOK INFORMATION -->
+                    <div class="min-w-0">
+
+                        <div class="flex items-start gap-4">
+
+                            <!-- Book icon -->
+                            <div class="hidden h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-purple-50 text-purple-600 sm:flex">
+
+                                <svg class="h-6 w-6"
+                                     fill="none"
+                                     viewBox="0 0 24 24"
+                                     stroke="currentColor"
+                                     stroke-width="2">
+
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 5v13" />
+
+                                </svg>
+
+                            </div>
+
+
+                            <div class="min-w-0">
+
+                                <!-- Title -->
+                                <h2 class="text-lg font-semibold text-slate-900 transition group-hover:text-purple-700"
+                                    th:text="${book.title}">
+                                    Book Title
+                                </h2>
+
+
+                                <!-- Author -->
+                                <p class="mt-1 text-sm text-slate-500">
+
+                                    by
+
+                                    <span class="font-medium text-slate-700"
+                                          th:text="${book.author}">
+                                        Author
+                                    </span>
+
+                                </p>
+
+
+                                <!-- Metadata -->
+                                <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-400">
+
+                                    <span th:if="${book.isbn}"
+                                          class="font-mono">
+
+                                        ISBN:
+                                        <span th:text="${book.isbn}">
+                                            0000000000
+                                        </span>
+
+                                    </span>
+
+
+                                    <span th:if="${book.shelfLocation}"
+                                          class="inline-flex items-center gap-1">
+
+                                        <svg class="h-3.5 w-3.5"
+                                             fill="none"
+                                             viewBox="0 0 24 24"
+                                             stroke="currentColor"
+                                             stroke-width="2">
+
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" />
+
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+
+                                        </svg>
+
+                                        <span th:text="${book.shelfLocation}">
+                                            Shelf A-12
+                                        </span>
+
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- AVAILABILITY -->
+                    <div class="shrink-0 lg:min-w-[230px] lg:text-right">
+
+                        <!-- Available -->
+                        <span th:if="${book.availableCount > 0}"
+                              class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
+
+                            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+
+                            <span th:text="${book.availableCount}">
+                                1
+                            </span>
+
+                            of
+
+                            <span th:text="${book.totalCount}">
+                                3
+                            </span>
+
+                            available
+
+                        </span>
+
+
+                        <!-- Unavailable -->
+                        <span th:if="${book.availableCount == 0}"
+                              class="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700">
+
+                            <span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+
+                            Currently unavailable
+
+                        </span>
+
+
+                        <!-- Availability description -->
+                        <p th:if="${book.availableCount > 0}"
+                           class="mt-2 text-xs text-slate-400">
+
+                            Available for borrowing at the desk
+
+                        </p>
+
+                        <p th:if="${book.availableCount == 0}"
+                           class="mt-2 text-xs text-slate-400">
+
+                            All copies are currently on loan
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+
+            <!-- =====================================================
+                 EMPTY STATE
+                 ===================================================== -->
+            <div th:if="${#lists.isEmpty(books)}"
+                 class="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center">
+
+                <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-purple-50 text-purple-600">
+
+                    <svg class="h-7 w-7"
+                         fill="none"
+                         viewBox="0 0 24 24"
+                         stroke="currentColor"
+                         stroke-width="2">
+
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M21 21l-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0z" />
+
+                    </svg>
+
+                </div>
+
+
+                <h2 class="mt-5 text-lg font-semibold text-slate-800">
+                    No books found
+                </h2>
+
+
+                <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
+
+                    We couldn't find any books matching
+
+                    <span class="font-medium text-slate-700"
+                          th:text="'&quot;' + ${query} + '&quot;'">
+                        your search
+                    </span>.
+
+                    Try searching with a different title or author.
+
+                </p>
+
+
+                <a th:href="@{/cantalog}"
+                   class="mt-6 inline-flex items-center gap-2 rounded-xl bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-purple-700">
+
+                    Browse Catalogue
+
+                    <svg class="h-4 w-4"
+                         fill="none"
+                         viewBox="0 0 24 24"
+                         stroke="currentColor"
+                         stroke-width="2">
+
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M9 5l7 7-7 7" />
+
+                    </svg>
+
+                </a>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================================================
+         FOOTER
+         ========================================================= -->
+    <footer class="mt-8 border-t border-slate-200 bg-white">
+
+        <div class="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-6 text-center text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:text-left lg:px-8">
+
+            <span>
+                BiblioHub Library Management
+            </span>
+
+            <span>
+                Public Catalogue
+            </span>
+
+        </div>
+
+    </footer>
+
+</body>
+</html>

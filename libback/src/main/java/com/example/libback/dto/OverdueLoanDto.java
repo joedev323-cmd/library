@@ -7,9 +7,9 @@ public class OverdueLoanDto {
 
     private Long loanId;
 
-    private String borrowerId;
-    private String borrowerName;
-    private String borrowerEmail;
+    private String memberId;
+    private String memberName;
+    private String memberEmail;
 
     private String isbn;
     private String title;
@@ -30,30 +30,6 @@ public class OverdueLoanDto {
 
     public void setLoanId(Long loanId) {
         this.loanId = loanId;
-    }
-
-    public String getBorrowerId() {
-        return borrowerId;
-    }
-
-    public void setBorrowerId(String borrowerId) {
-        this.borrowerId = borrowerId;
-    }
-
-    public String getBorrowerName() {
-        return borrowerName;
-    }
-
-    public void setBorrowerName(String borrowerName) {
-        this.borrowerName = borrowerName;
-    }
-
-    public String getBorrowerEmail() {
-        return borrowerEmail;
-    }
-
-    public void setBorrowerEmail(String borrowerEmail) {
-        this.borrowerEmail = borrowerEmail;
     }
 
     public String getIsbn() {
@@ -102,5 +78,29 @@ public class OverdueLoanDto {
 
     public void setDaysOverdue(long daysOverdue) {
         this.daysOverdue = daysOverdue;
+    }
+
+    public String getMemberId() {
+        return memberId;
+    }
+
+    public void setMemberId(String memberId) {
+        this.memberId = memberId;
+    }
+
+    public String getMemberName() {
+        return memberName;
+    }
+
+    public void setMemberName(String memberName) {
+        this.memberName = memberName;
+    }
+
+    public String getMemberEmail() {
+        return memberEmail;
+    }
+
+    public void setMemberEmail(String memberEmail) {
+        this.memberEmail = memberEmail;
     }
 }

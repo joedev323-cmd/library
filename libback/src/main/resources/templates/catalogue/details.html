@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/main}">
+
+<head>
+    <title th:text="${book.title}">Book Details</title>
+</head>
+
+<body>
+
+    <div layout:fragment="content">
+
+        <!-- =========================================================
+         PAGE HEADER
+         ========================================================= -->
+        <div class="mb-8">
+
+            <!-- Breadcrumb -->
+            <div class="mb-4 flex items-center gap-2 text-sm text-slate-500">
+
+                <a th:href="@{/Catalogue}" class="font-medium text-purple-600 transition hover:text-purple-700">
+                    Catalogue
+                </a>
+
+                <span class="text-slate-300">/</span>
+
+                <span class="truncate" th:text="${book.title}">
+                    Book
+                </span>
+
+            </div>
+
+            <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+
+                <div class="min-w-0">
+
+                    <div class="flex items-center gap-3">
+
+                        <div
+                            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-purple-50 text-purple-600">
+
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+
+                            </svg>
+
+                        </div>
+
+                        <div class="min-w-0">
+
+                            <h1 class="truncate text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl"
+                                th:text="${book.title}">
+                                Book Title
+                            </h1>
+
+                            <p class="mt-1 text-sm text-slate-500">
+                                by
+                                <span class="font-medium text-slate-700" th:text="${book.author}">
+                                    Author
+                                </span>
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <p class="mt-3 font-mono text-xs text-slate-400" th:text="${'ISBN ' + book.isbn}">
+                        ISBN
+                    </p>
+
+                </div>
+
+                <!-- Edit -->
+                <a th:href="@{'/Catalogue/edit/' + ${book.isbn}}"
+                    class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-purple-200 hover:bg-purple-50 hover:text-purple-700">
+
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.5-7.5a2.121 2.121 0 013 3L12 16l-4 1 1-4 8.5-8.5z" />
+
+                    </svg>
+
+                    Edit Metadata
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================================
+         FLASH MESSAGES
+         ========================================================= -->
+        <div th:replace="~{fragments/flash-message :: flash}"></div>
+
+
+        <!-- =========================================================
+         MAIN CONTENT
+         ========================================================= -->
+        <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+
+
+            <!-- =====================================================
+             LEFT COLUMN
+             ===================================================== -->
+            <div class="space-y-6 xl:col-span-1">
+
+
+                <!-- =================================================
+                 BOOK DETAILS
+                 ================================================= -->
+                <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+
+                    <div class="mb-5">
+
+                        <h2 class="text-base font-semibold text-slate-900">
+                            Book Details
+                        </h2>
+
+                        <p class="mt-1 text-sm text-slate-500">
+                            Bibliographic information for this title.
+                        </p>
+
+                    </div>
+
+                    <dl class="divide-y divide-slate-100">
+
+                        <!-- Publisher -->
+                        <div class="flex items-start justify-between gap-4 py-3">
+
+                            <dt class="text-sm text-slate-500">
+                                Publisher
+                            </dt>
+
+                            <dd class="text-right text-sm font-medium text-slate-800" th:text="${book.publisher != null && !book.publisher.isBlank()
+                                ? book.publisher
+                                : '—'}">
+                                —
+                            </dd>
+
+                        </div>
+
+
+                        <!-- Edition -->
+                        <div class="flex items-start justify-between gap-4 py-3">
+
+                            <dt class="text-sm text-slate-500">
+                                Edition
+                            </dt>
+
+                            <dd class="text-right text-sm font-medium text-slate-800" th:text="${book.edition != null && !book.edition.isBlank()
+                                ? book.edition
+                                : '—'}">
+                                —
+                            </dd>
+
+                        </div>
+
+
+                        <!-- Category -->
+                        <div class="flex items-start justify-between gap-4 py-3">
+
+                            <dt class="text-sm text-slate-500">
+                                Category
+                            </dt>
+
+                            <dd class="text-right text-sm font-medium text-slate-800" th:text="${book.category != null
+                                ? book.category.name
+                                : '—'}">
+                                —
+                            </dd>
+
+                        </div>
+
+
+                        <!-- ISBN -->
+                        <div class="flex items-start justify-between gap-4 py-3">
+
+                            <dt class="text-sm text-slate-500">
+                                ISBN
+                            </dt>
+
+                            <dd class="text-right font-mono text-xs font-medium text-slate-700" th:text="${book.isbn}">
+                                —
+                            </dd>
+
+                        </div>
+
+                    </dl>
+
+
+                    <!-- Description -->
+                    <div th:if="${book.description != null && !book.description.isBlank()}"
+                        class="mt-5 border-t border-slate-100 pt-5">
+
+                        <h3 class="mb-2 text-sm font-semibold text-slate-800">
+                            Description
+                        </h3>
+
+                        <p class="text-sm leading-6 text-slate-600" th:text="${book.description}">
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =================================================
+                 ADD PHYSICAL COPIES
+                 ================================================= -->
+                <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+
+                    <div class="mb-5">
+
+                        <div class="flex items-center gap-3">
+
+                            <div
+                                class="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-50 text-purple-600">
+
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                    stroke-width="2">
+
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+
+                                </svg>
+
+                            </div>
+
+                            <div>
+
+                                <h2 class="text-base font-semibold text-slate-900">
+                                    Add Physical Copies
+                                </h2>
+
+                                <p class="mt-0.5 text-sm text-slate-500">
+                                    Add copies to your collection.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <form th:action="@{/catalog/{isbn}/accessions/batch(isbn=${book.isbn})}" method="post"
+                        class="space-y-4">
+
+                        <!-- Prefix -->
+                        <div>
+
+                            <label for="prefix" class="mb-1.5 block text-sm font-medium text-slate-700">
+                                Accession Prefix
+                            </label>
+
+                            <input id="prefix" name="prefix" type="text" required maxlength="20" placeholder="ACC"
+                                class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm uppercase text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-100">
+
+                        </div>
+
+
+                        <!-- Quantity -->
+                        <div>
+
+                            <label for="quantity" class="mb-1.5 block text-sm font-medium text-slate-700">
+                                Number of Copies
+                            </label>
+
+                            <input id="quantity" name="quantity" type="number" min="1" max="1000" value="1" required
+                                class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100">
+
+                        </div>
+
+
+                        <!-- Shelf -->
+                        <div>
+
+                            <label for="shelfLocation" class="mb-1.5 block text-sm font-medium text-slate-700">
+                                Shelf Location
+                            </label>
+
+                            <input id="shelfLocation" name="shelfLocation" type="text" maxlength="50" required
+                                placeholder="A-01"
+                                class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-100">
+
+                        </div>
+
+
+                        <button type="submit"
+                            class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
+
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+
+                            </svg>
+
+                            Generate Copies
+
+                        </button>
+
+                    </form>
+
+                </section>
+
+            </div>
+
+
+            <!-- =====================================================
+             RIGHT COLUMN — PHYSICAL COPIES
+             ===================================================== -->
+            <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm xl:col-span-2">
+
+                <!-- =========================================================
+     HEADER
+     ========================================================= -->
+
+                <div class="border-b border-slate-100 px-6 py-5">
+
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+                        <div>
+
+                            <h2 class="text-base font-semibold text-slate-900">
+                                Physical Copies
+                            </h2>
+
+                            <p class="mt-1 text-sm text-slate-500">
+                                Individual copies registered in the library.
+                            </p>
+
+                        </div>
+
+                        <span
+                            class="inline-flex w-fit items-center rounded-full bg-purple-50 px-3 py-1 text-xs font-semibold text-purple-700">
+
+                            <span th:text="${accessions.totalElements}">
+                                0
+                            </span>
+
+                            <span class="ml-1">
+                                copies
+                            </span>
+
+                        </span>
+
+                    </div>
+
+
+                    <!-- =====================================================
+         SEARCH / FILTER
+         ===================================================== -->
+
+                    <form th:action="@{'/catalog/' + ${book.isbn}}" method="get" class="mt-5">
+
+                        <div class="grid grid-cols-1 gap-3 lg:grid-cols-12">
+
+                            <!-- Search -->
+
+                            <div class="lg:col-span-6">
+
+                                <label for="search" class="sr-only">
+                                    Search copies
+                                </label>
+
+                                <div class="relative">
+
+                                    <div
+                                        class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+
+                                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                            stroke-width="2">
+
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" />
+
+                                        </svg>
+
+                                    </div>
+
+                                    <input id="search" name="search" type="search" th:value="${search}"
+                                        placeholder="Search accession, barcode or shelf..."
+                                        class="w-full rounded-xl border border-slate-300 bg-white py-2.5 pl-10 pr-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-100">
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Availability -->
+
+                            <div class="lg:col-span-2">
+
+                                <label for="status" class="sr-only">
+                                    Availability
+                                </label>
+
+                                <select id="status" name="status"
+                                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100">
+
+                                    <option value="">
+                                        All Statuses
+                                    </option>
+
+                                    <option th:each="status : ${availabilityStatuses}" th:value="${status.name()}"
+                                        th:text="${status}" th:selected="${selectedStatus == status}">
+                                        AVAILABLE
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- Condition -->
+
+                            <div class="lg:col-span-2">
+
+                                <label for="condition" class="sr-only">
+                                    Condition
+                                </label>
+
+                                <select id="condition" name="condition"
+                                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100">
+
+                                    <option value="">
+                                        All Conditions
+                                    </option>
+
+                                    <option th:each="condition : ${conditionStatuses}" th:value="${condition.name()}"
+                                        th:text="${condition}" th:selected="${selectedCondition == condition}">
+                                        GOOD
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- Search Button -->
+
+                            <div class="lg:col-span-2">
+
+                                <button type="submit"
+                                    class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
+
+                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                        stroke-width="2">
+
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" />
+
+                                    </svg>
+
+                                    Search
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Clear -->
+
+                        <div th:if="${search != null || selectedStatus != null || selectedCondition != null}"
+                            class="mt-3">
+
+                            <a th:href="@{'/catalog/' + ${book.isbn}}"
+                                class="text-sm font-medium text-slate-500 transition hover:text-purple-600">
+
+                                Clear filters
+
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+
+                <!-- =================================================
+                 DESKTOP TABLE
+                 ================================================= -->
+                <div class="hidden overflow-x-auto md:block">
+
+                    <table class="w-full text-left">
+
+                        <thead>
+
+                            <tr class="border-b border-slate-100 bg-slate-50/80">
+
+                                <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                                    Accession
+                                </th>
+
+                                <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                                    Barcode
+                                </th>
+
+                                <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                                    Copy
+                                </th>
+
+                                <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                                    Shelf
+                                </th>
+
+                                <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                                    Status
+                                </th>
+
+                                <th
+                                    class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">
+                                    Action
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody class="divide-y divide-slate-100">
+
+                            <tr th:each="acc : ${accessions.content}" class="transition hover:bg-slate-50">
+
+
+                                <!-- Accession -->
+                                <td class="px-6 py-4">
+
+                                    <span class="font-mono text-xs font-medium text-slate-700"
+                                        th:text="${acc.accessionId}">
+                                        ACC-0001
+                                    </span>
+
+                                </td>
+
+
+                                <!-- Barcode -->
+                                <td class="px-6 py-4">
+
+                                    <span class="font-mono text-xs text-slate-500" th:text="${acc.barcode}">
+                                        BAR-ACC-0001
+                                    </span>
+
+                                </td>
+
+
+                                <!-- Copy -->
+                                <td class="px-6 py-4 text-sm text-slate-700" th:text="${acc.copyNumber}">
+                                    1
+                                </td>
+
+
+                                <!-- Shelf -->
+                                <td class="px-6 py-4 text-sm text-slate-600" th:text="${acc.shelfLocation != null
+                                ? acc.shelfLocation
+                                : '—'}">
+                                    A-01
+                                </td>
+
+
+                                <!-- Status -->
+                                <td class="px-6 py-4">
+
+                                    <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold"
+                                        th:text="${acc.availabilityStatus}" th:classappend="${acc.availabilityStatus != null
+                                      && acc.availabilityStatus.name() == 'AVAILABLE'}
+                                      ? 'bg-emerald-50 text-emerald-700'
+                                      : 'bg-red-50 text-red-700'">
+                                        AVAILABLE
+                                    </span>
+
+                                </td>
+
+
+                                <!-- Delete -->
+                                <td class="px-6 py-4 text-right">
+
+                                    <form th:action="@{'/catalog/accession/delete/' + ${acc.accessionId}}" method="post"
+                                        onsubmit="return confirm('Remove this physical copy?');">
+
+                                        <input type="hidden" name="isbn" th:value="${book.isbn}">
+
+                                        <button type="submit"
+                                            class="text-sm font-medium text-red-600 transition hover:text-red-700 hover:underline">
+                                            Delete
+                                        </button>
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
+
+
+                            <!-- Empty -->
+                            <tr th:if="${accessions.empty}">
+
+                                <td colspan="6" class="px-6 py-16 text-center">
+
+                                    <div
+                                        class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+
+                                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                            stroke-width="2">
+
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18 5.754 18 7.5 18s3.332.477 4.5 1.253" />
+
+                                        </svg>
+
+                                    </div>
+
+                                    <h3 class="mt-4 text-sm font-semibold text-slate-800">
+                                        No physical copies
+                                    </h3>
+
+                                    <p class="mt-1 text-sm text-slate-500">
+                                        Generate copies using the form on the left.
+                                    </p>
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+                <!-- =========================================================
+     PAGINATION
+     ========================================================= -->
+
+                <div th:replace="~{fragments/pagination :: pagination(
+        ${accessions},
+        '/catalog/' + ${book.isbn}
+    )}">
+                </div>
+
+
+                <!-- =================================================
+                 MOBILE COPY CARDS
+                 ================================================= -->
+                <div class="divide-y divide-slate-100 md:hidden">
+
+                    <div th:if="${accessions.empty}">
+
+                        <div class="flex items-start justify-between gap-4">
+
+                            <div>
+
+                                <p class="font-mono text-sm font-semibold text-slate-800" th:text="${acc.accessionId}">
+                                    ACC-0001
+                                </p>
+
+                                <p class="mt-1 font-mono text-xs text-slate-400" th:text="${acc.barcode}">
+                                    BAR-ACC-0001
+                                </p>
+
+                            </div>
+
+                            <span class="inline-flex shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold"
+                                th:text="${acc.availabilityStatus}" th:classappend="${acc.availabilityStatus != null
+                                  && acc.availabilityStatus.name() == 'AVAILABLE'}
+                                  ? 'bg-emerald-50 text-emerald-700'
+                                  : 'bg-red-50 text-red-700'">
+                                AVAILABLE
+                            </span>
+
+                        </div>
+
+
+                        <div class="mt-4 grid grid-cols-2 gap-4">
+
+                            <div>
+
+                                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                                    Copy
+                                </p>
+
+                                <p class="mt-1 text-sm text-slate-700" th:text="${acc.copyNumber}">
+                                    1
+                                </p>
+
+                            </div>
+
+
+                            <div>
+
+                                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                                    Shelf
+                                </p>
+
+                                <p class="mt-1 text-sm text-slate-700" th:text="${acc.shelfLocation != null
+                                   ? acc.shelfLocation
+                                   : '—'}">
+                                    A-01
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="mt-4 border-t border-slate-100 pt-3">
+
+                            <form th:action="@{'/catalog/accession/delete/' + ${acc.accessionId}}" method="post"
+                                onsubmit="return confirm('Remove this physical copy?');">
+
+                                <input type="hidden" name="isbn" th:value="${book.isbn}">
+
+                                <button type="submit"
+                                    class="text-sm font-medium text-red-600 hover:text-red-700 hover:underline">
+                                    Delete copy
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Mobile Empty -->
+                    <div th:if="${#lists.isEmpty(accessions)}" class="px-5 py-12 text-center">
+
+                        <div
+                            class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253" />
+
+                            </svg>
+
+                        </div>
+
+                        <p class="mt-4 font-medium text-slate-700">
+                            No physical copies
+                        </p>
+
+                        <p class="mt-1 text-sm text-slate-500">
+                            Generate copies using the form above.
+                        </p>
+
+                    </div>
+
+                </div>
+                <!-- =========================================================
+               PAGINATION
+               ========================================================= -->
+
+                <div th:replace="~{fragments/pagination :: pagination(${accessions},'/catalog/' + ${book.isbn})}">
+                </div>
+
+
+            </section>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

@@ -21,7 +21,7 @@ public class LibbackApplication {
 
     @Bean
     CommandLineRunner initAdmin(UserRepository userRepository, PasswordEncoder passwordEncoder,
-                                @Value("${app.admin.username:admin}") String adminUsername,
+                                @Value("${app.admin.username:adman}") String adminUsername,
                                 @Value("${app.admin.password:admin123}") String adminPassword) {
         return args -> {
             if (userRepository.findByUsername(adminUsername).isEmpty()) {

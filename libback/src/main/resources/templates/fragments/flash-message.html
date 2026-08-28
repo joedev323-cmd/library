@@ -1,0 +1,66 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+<div th:fragment="flash" class="mb-5 space-y-3">
+
+    <!-- SUCCESS MESSAGE -->
+    <div th:if="${successMessage}"
+         class="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 shadow-sm">
+
+        <div class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+            <svg class="h-3.5 w-3.5"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke="currentColor"
+                 stroke-width="2.5">
+                <path stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M5 13l4 4L19 7"/>
+            </svg>
+        </div>
+
+        <div class="min-w-0">
+            <p class="font-medium">
+                Success
+            </p>
+
+            <p class="mt-0.5 text-emerald-700"
+               th:text="${successMessage}">
+                Operation completed successfully.
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- ERROR MESSAGE -->
+    <div th:if="${errorMessage}"
+         class="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 shadow-sm">
+
+        <div class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600">
+            <svg class="h-3.5 w-3.5"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke="currentColor"
+                 stroke-width="2">
+                <path stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </div>
+
+        <div class="min-w-0">
+            <p class="font-medium">
+                Something went wrong
+            </p>
+
+            <p class="mt-0.5 text-red-700"
+               th:text="${errorMessage}">
+                An error occurred while processing your request.
+            </p>
+        </div>
+
+    </div>
+
+</div>
+
+</html>

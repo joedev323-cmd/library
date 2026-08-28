@@ -7,10 +7,12 @@ import java.util.Set;
 
 @Entity
 @Table(
-    name = "books",
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = "isbn")
-    }
+        name = "books",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        columnNames = "isbn"
+                )
+        }
 )
 public class Book {
 
@@ -18,13 +20,23 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long bookId;
 
-    @Column(nullable = false, unique = true, length = 20)
+    @Column(
+            nullable = false,
+            unique = true,
+            length = 20
+    )
     private String isbn;
 
-    @Column(nullable = false, length = 255)
+    @Column(
+            nullable = false,
+            length = 255
+    )
     private String title;
 
-    @Column(nullable = false, length = 255)
+    @Column(
+            nullable = false,
+            length = 255
+    )
     private String author;
 
     @Column(length = 255)
@@ -36,16 +48,29 @@ public class Book {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "category_id", nullable = false)
+    @ManyToOne(
+            fetch = FetchType.LAZY,
+            optional = false
+    )
+    @JoinColumn(
+            name = "category_id",
+            nullable = false
+    )
     private Category category;
 
+    /*
+     * This is a read/navigation relationship.
+     *
+     * Accession owns the relationship.
+     *
+     * There is intentionally NO CascadeType.ALL.
+     */
     @OneToMany(
-        mappedBy = "book",
-        cascade = CascadeType.ALL,
-        orphanRemoval = false
+            mappedBy = "book",
+            fetch = FetchType.LAZY
     )
-    private Set<Accession> accessions = new HashSet<>();
+    private Set<Accession> accessions =
+            new HashSet<>();
 
     public Book() {
     }
@@ -68,15 +93,9 @@ public class Book {
         this.category = category;
     }
 
-    public void addAccession(Accession accession) {
-        accessions.add(accession);
-        accession.setBook(this);
-    }
-
-    public void removeAccession(Accession accession) {
-        accessions.remove(accession);
-        accession.setBook(null);
-    }
+    // =========================================================
+    // GETTERS / SETTERS
+    // =========================================================
 
     public Long getBookId() {
         return bookId;
@@ -146,7 +165,9 @@ public class Book {
         return accessions;
     }
 
-    public void setAccessions(Set<Accession> accessions) {
+    public void setAccessions(
+            Set<Accession> accessions
+    ) {
         this.accessions = accessions;
     }
 }

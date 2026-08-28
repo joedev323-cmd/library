@@ -14,64 +14,73 @@ import java.util.Objects;
 
 @Entity
 @Table(
-    name = "accessions",
-    uniqueConstraints = {
-        @UniqueConstraint(
-            columnNames = {"book_id", "copy_number"}
-        ),
-        @UniqueConstraint(
-            columnNames = "barcode"
-        )
-    },
-    indexes = {
-        @Index(
-            name = "idx_accession_book",
-            columnList = "book_id"
-        ),
-        @Index(
-            name = "idx_accession_status",
-            columnList = "availability_status"
-        ),
-        @Index(
-            name = "idx_accession_barcode",
-            columnList = "barcode"
-        )
-    }
+        name = "accessions",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        columnNames = {
+                                "book_id",
+                                "copy_number"
+                        }
+                ),
+                @UniqueConstraint(
+                        columnNames = "barcode"
+                )
+        },
+        indexes = {
+                @Index(
+                        name = "idx_accession_book",
+                        columnList = "book_id"
+                ),
+                @Index(
+                        name = "idx_accession_status",
+                        columnList = "availability_status"
+                ),
+                @Index(
+                        name = "idx_accession_barcode",
+                        columnList = "barcode"
+                )
+        }
 )
 public class Accession {
 
     @Id
     @NotBlank
     @Column(
-        length = 50,
-        nullable = false,
-        updatable = false
+            length = 50,
+            nullable = false,
+            updatable = false
     )
     private String accessionId;
 
+    /*
+     * Accession owns the Book relationship.
+     *
+     * This means accession.book is what controls
+     * the book_id foreign key.
+     */
     @ManyToOne(
-        fetch = FetchType.LAZY,
-        optional = false
+            fetch = FetchType.LAZY,
+            optional = false
     )
     @JoinColumn(
-        name = "book_id",
-        nullable = false
+            name = "book_id",
+            nullable = false
     )
     private Book book;
 
     @NotNull
     @Positive
     @Column(
-        name = "copy_number",
-        nullable = false
+            name = "copy_number",
+            nullable = false
     )
     private Integer copyNumber;
 
     @NotBlank
     @Column(
-        nullable = false,
-        unique = true,
-        length = 100
+            nullable = false,
+            unique = true,
+            length = 100
     )
     private String barcode;
 
@@ -80,16 +89,16 @@ public class Accession {
 
     @Enumerated(EnumType.STRING)
     @Column(
-        nullable = false,
-        length = 20
+            nullable = false,
+            length = 20
     )
     private ConditionStatus conditionStatus =
             ConditionStatus.GOOD;
 
     @Enumerated(EnumType.STRING)
     @Column(
-        nullable = false,
-        length = 20
+            nullable = false,
+            length = 20
     )
     private AvailabilityStatus availabilityStatus =
             AvailabilityStatus.AVAILABLE;
@@ -101,9 +110,9 @@ public class Accession {
     @NotNull
     @Positive
     @Column(
-        nullable = false,
-        precision = 10,
-        scale = 2
+            nullable = false,
+            precision = 10,
+            scale = 2
     )
     private BigDecimal replacementCost;
 
@@ -130,6 +139,10 @@ public class Accession {
         this.purchaseDate = purchaseDate;
         this.replacementCost = replacementCost;
     }
+
+    // =========================================================
+    // STATUS HELPERS
+    // =========================================================
 
     public boolean isAvailable() {
         return availabilityStatus ==
@@ -161,11 +174,17 @@ public class Accession {
                 AvailabilityStatus.RETIRED;
     }
 
+    // =========================================================
+    // GETTERS / SETTERS
+    // =========================================================
+
     public String getAccessionId() {
         return accessionId;
     }
 
-    public void setAccessionId(String accessionId) {
+    public void setAccessionId(
+            String accessionId
+    ) {
         this.accessionId = accessionId;
     }
 
@@ -181,7 +200,9 @@ public class Accession {
         return copyNumber;
     }
 
-    public void setCopyNumber(Integer copyNumber) {
+    public void setCopyNumber(
+            Integer copyNumber
+    ) {
         this.copyNumber = copyNumber;
     }
 
@@ -189,7 +210,9 @@ public class Accession {
         return barcode;
     }
 
-    public void setBarcode(String barcode) {
+    public void setBarcode(
+            String barcode
+    ) {
         this.barcode = barcode;
     }
 
@@ -197,7 +220,9 @@ public class Accession {
         return shelfLocation;
     }
 
-    public void setShelfLocation(String shelfLocation) {
+    public void setShelfLocation(
+            String shelfLocation
+    ) {
         this.shelfLocation = shelfLocation;
     }
 
@@ -208,7 +233,8 @@ public class Accession {
     public void setConditionStatus(
             ConditionStatus conditionStatus
     ) {
-        this.conditionStatus = conditionStatus;
+        this.conditionStatus =
+                conditionStatus;
     }
 
     public AvailabilityStatus getAvailabilityStatus() {
@@ -218,14 +244,17 @@ public class Accession {
     public void setAvailabilityStatus(
             AvailabilityStatus availabilityStatus
     ) {
-        this.availabilityStatus = availabilityStatus;
+        this.availabilityStatus =
+                availabilityStatus;
     }
 
     public LocalDate getPurchaseDate() {
         return purchaseDate;
     }
 
-    public void setPurchaseDate(LocalDate purchaseDate) {
+    public void setPurchaseDate(
+            LocalDate purchaseDate
+    ) {
         this.purchaseDate = purchaseDate;
     }
 
@@ -236,16 +265,23 @@ public class Accession {
     public void setReplacementCost(
             BigDecimal replacementCost
     ) {
-        this.replacementCost = replacementCost;
+        this.replacementCost =
+                replacementCost;
     }
 
     public String getNotes() {
         return notes;
     }
 
-    public void setNotes(String notes) {
+    public void setNotes(
+            String notes
+    ) {
         this.notes = notes;
     }
+
+    // =========================================================
+    // EQUALITY
+    // =========================================================
 
     @Override
     public boolean equals(Object o) {
@@ -259,8 +295,8 @@ public class Accession {
         }
 
         return Objects.equals(
-            accessionId,
-            accession.accessionId
+                accessionId,
+                accession.accessionId
         );
     }
 
