@@ -8,7 +8,8 @@ public class BookSearchResultDto {
     private long availableCount;
     private long totalCount;
 
-    public BookSearchResultDto(String title, String author, String isbn, String shelfLocation, long availableCount, long totalCount) {
+    public BookSearchResultDto(String title, String author, String isbn, String shelfLocation, long availableCount,
+            long totalCount) {
         this.title = title;
         this.author = author;
         this.isbn = isbn;
@@ -18,21 +19,51 @@ public class BookSearchResultDto {
     }
 
     // Getters and Setters
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
+    public String getTitle() {
+        return title;
+    }
 
-    public String getAuthor() { return author; }
-    public void setAuthor(String author) { this.author = author; }
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-    public String getIsbn() { return isbn; }
-    public void setIsbn(String isbn) { this.isbn = isbn; }
+    public String getAuthor() {
+        return author;
+    }
 
-    public String getShelfLocation() { return shelfLocation; }
-    public void setShelfLocation(String shelfLocation) { this.shelfLocation = shelfLocation; }
+    public void setAuthor(String author) {
+        this.author = author;
+    }
 
-    public long getAvailableCount() { return availableCount; }
-    public void setAvailableCount(long availableCount) { this.availableCount = availableCount; }
+    public String getIsbn() {
+        return isbn;
+    }
 
-    public long getTotalCount() { return totalCount; }
-    public void setTotalCount(long totalCount) { this.totalCount = totalCount; }
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
+
+    public String getShelfLocation() {
+        return shelfLocation;
+    }
+
+    public void setShelfLocation(String shelfLocation) {
+        this.shelfLocation = shelfLocation;
+    }
+
+    public long getAvailableCount() {
+        return availableCount;
+    }
+
+    public void setAvailableCount(long availableCount) {
+        this.availableCount = availableCount;
+    }
+
+    public long getTotalCount() {
+        return totalCount;
+    }
+
+    public void setTotalCount(long totalCount) {
+        this.totalCount = totalCount;
+    }
 }

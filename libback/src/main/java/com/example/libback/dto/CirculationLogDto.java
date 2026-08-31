@@ -13,10 +13,10 @@ public class CirculationLogDto {
     private String action; // e.g., "Issued" or "Returned"
     private LocalDate dueDate;
     private String status; // "On Loan", "In Library", or "Overdue"
-    
+
     // Quick helper logic for Tailwind conditional classes
     public boolean getIsOverdue() {
-        return "Overdue".equalsIgnoreCase(this.status) || 
-               (dueDate != null && dueDate.isBefore(LocalDate.now()) && !"In Library".equalsIgnoreCase(this.status));
+        return "Overdue".equalsIgnoreCase(this.status) ||
+                (dueDate != null && dueDate.isBefore(LocalDate.now()) && !"In Library".equalsIgnoreCase(this.status));
     }
 }

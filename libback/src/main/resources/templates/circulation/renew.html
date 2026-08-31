@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+
+<head>
+    <title>Renew Loan</title>
+</head>
+
+<body>
+
+<div layout:fragment="content">
+
+    <div class="mb-6">
+        <p class="text-sm font-medium text-indigo-600">
+            Library Operations
+        </p>
+
+        <h1 class="mt-1 text-2xl font-bold tracking-tight text-slate-900">
+            Renew Loan
+        </h1>
+
+        <p class="mt-1 text-sm text-slate-500">
+            Extend the borrowing period for an active loan.
+        </p>
+    </div>
+
+    <div th:replace="~{fragments/flash-message :: flash}"></div>
+
+    <div class="max-w-2xl">
+
+        <!-- SEARCH -->
+        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+
+            <h2 class="font-semibold text-slate-900">
+                Find Loan
+            </h2>
+
+            <form method="get"
+                  th:action="@{/circulation/renew}"
+                  class="mt-5 flex gap-3">
+
+                <input type="text"
+                       name="accessionId"
+                       required
+                       autocomplete="off"
+                       placeholder="Scan accession ID"
+                       class="block w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
+
+                <button type="submit"
+                        class="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700">
+                    Find
+                </button>
+
+            </form>
+
+        </div>
+
+        <!-- LOAN DETAILS -->
+        <div th:if="${loan != null}"
+             class="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+
+            <div class="border-b border-slate-100 px-6 py-5">
+
+                <h2 class="font-semibold text-slate-900">
+                    Loan Details
+                </h2>
+
+            </div>
+
+            <div class="space-y-4 px-6 py-6">
+
+                <div>
+                    <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                        Book
+                    </p>
+
+                    <p class="mt-1 font-semibold text-slate-900"
+                       th:text="${loan.accession.book.title}">
+                        Book Title
+                    </p>
+                </div>
+
+                <div>
+                    <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                        Member
+                    </p>
+
+                    <p class="mt-1 text-sm text-slate-700"
+                       th:text="${loan.member.memberId}">
+                        M-001
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+
+                    <div>
+                        <p class="text-xs font-medium text-slate-400">
+                            Current Due Date
+                        </p>
+
+                        <p class="mt-1 font-medium text-slate-900"
+                           th:text="${#temporals.format(loan.dueDate, 'MMM d, yyyy')}">
+                            Sep 15, 2026
+                        </p>
+                    </div>
+
+                    <div>
+                        <p class="text-xs font-medium text-slate-400">
+                            Renewals Used
+                        </p>
+
+                        <p class="mt-1 font-medium text-slate-900">
+                            <span th:text="${loan.renewalCount}">
+                                0
+                            </span>
+                            / 2
+                        </p>
+                    </div>
+
+                </div>
+
+                <div th:if="${loan.status.name() == 'ACTIVE'
+                            and !loan.isOverdue()
+                            and loan.renewalCount < 2}"
+                     class="rounded-lg bg-indigo-50 p-4">
+
+                    <p class="text-sm text-indigo-700">
+                        Renewal will extend the current due date by
+                        <span class="font-semibold"
+                              th:text="${loan.accession.book.category.loanPeriodDays}">
+                            14
+                        </span>
+                        days.
+                    </p>
+
+                </div>
+
+                <div th:if="${loan.status.name() != 'ACTIVE'}"
+                     class="rounded-lg bg-red-50 p-4 text-sm text-red-700">
+
+                    This loan is no longer active.
+
+                </div>
+
+                <div th:if="${loan.isOverdue()}"
+                     class="rounded-lg bg-red-50 p-4 text-sm text-red-700">
+
+                    This loan is overdue and cannot be renewed.
+
+                </div>
+
+                <div th:if="${loan.renewalCount >= 2}"
+                     class="rounded-lg bg-amber-50 p-4 text-sm text-amber-700">
+
+                    Maximum renewals have been reached.
+
+                </div>
+
+                <form th:if="${loan.status.name() == 'ACTIVE'
+                              and !loan.isOverdue()
+                              and loan.renewalCount < 2}"
+                      method="post"
+                      th:action="@{/circulation/renew}">
+
+                    <input type="hidden"
+                           name="accessionId"
+                           th:value="${loan.accession.accessionId}">
+
+                    <button type="submit"
+                            class="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700">
+
+                        Renew Loan
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

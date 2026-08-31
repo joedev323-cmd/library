@@ -7,15 +7,12 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(
-    name = "loans",
-    indexes = {
+@Table(name = "loans", indexes = {
         @Index(name = "idx_loan_status", columnList = "status"),
         @Index(name = "idx_loan_due_date", columnList = "due_date"),
         @Index(name = "idx_loan_member", columnList = "member_id"),
         @Index(name = "idx_loan_accession", columnList = "accession_id")
-    }
-)
+})
 public class Loan {
 
     @Id
@@ -164,4 +161,19 @@ public class Loan {
     public void setStatus(LoanStatus status) {
         this.status = status;
     }
+    public BigDecimal getOutstandingFine() {
+
+    BigDecimal accrued =
+            fineAccrued != null
+                    ? fineAccrued
+                    : BigDecimal.ZERO;
+
+    BigDecimal paid =
+            finePaid != null
+                    ? finePaid
+                    : BigDecimal.ZERO;
+
+    return accrued.subtract(paid).max(BigDecimal.ZERO);
+}
+
 }

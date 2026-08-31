@@ -3,6 +3,8 @@ package com.example.libback.controller;
 import com.example.libback.model.User;
 import com.example.libback.repository.UserRepository;
 import com.example.libback.service.CirculationService;
+import com.example.libback.model.Loan;
+import org.springframework.ui.Model;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,120 +17,179 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 public class CirculationController {
 
-    private final CirculationService circulationService;
-    private final UserRepository userRepository;
+        private final CirculationService circulationService;
+        private final UserRepository userRepository;
 
-    public CirculationController(
-            CirculationService circulationService,
-            UserRepository userRepository) {
+        public CirculationController(
+                        CirculationService circulationService,
+                        UserRepository userRepository) {
 
-        this.circulationService = circulationService;
-        this.userRepository = userRepository;
-    }
-
-    // =========================================================
-    // CIRCULATION PAGE
-    // =========================================================
-
-    @GetMapping("/circulation")
-    public String showCirculationPage() {
-        return "circulation/index";
-    }
-
-    // =========================================================
-    // CHECKOUT
-    // =========================================================
-
-    @PostMapping("/circulation/checkout")
-    public String processCheckout(
-            @RequestParam("accessionId") String accessionId,
-            @RequestParam("memberId") String memberId,
-            RedirectAttributes redirectAttributes) {
-
-        try {
-
-            // Get currently authenticated Spring Security user
-            Authentication authentication =
-                    SecurityContextHolder
-                            .getContext()
-                            .getAuthentication();
-
-            if (authentication == null
-                    || !authentication.isAuthenticated()
-                    || "anonymousUser".equals(authentication.getPrincipal())) {
-
-                throw new IllegalStateException(
-                        "You must be logged in to issue a book.");
-            }
-
-            String username = authentication.getName();
-
-            // Find the corresponding application User
-            User issuedBy = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new IllegalArgumentException(
-                            "Authenticated user not found: " + username));
-
-            // Perform checkout
-            circulationService.checkoutItem(
-                    accessionId,
-                    memberId,
-                    issuedBy);
-
-            redirectAttributes.addFlashAttribute(
-                    "successMessage",
-                    "Book successfully issued to member ["
-                            + memberId + "]!");
-
-        } catch (IllegalArgumentException | IllegalStateException e) {
-
-            redirectAttributes.addFlashAttribute(
-                    "errorMessage",
-                    e.getMessage());
-
-        } catch (Exception e) {
-
-            redirectAttributes.addFlashAttribute(
-                    "errorMessage",
-                    "System processing fault encountered.");
+                this.circulationService = circulationService;
+                this.userRepository = userRepository;
         }
 
-        return "redirect:/circulation";
-    }
+        // =========================================================
+        // CIRCULATION PAGE
+        // =========================================================
 
-    // =========================================================
-    // RETURN
-    // =========================================================
-
-    @PostMapping("/circulation/return")
-    public String processReturn(
-            @RequestParam("accessionId") String accessionId,
-            @RequestParam("condition") String condition,
-            RedirectAttributes redirectAttributes) {
-
-        try {
-
-            circulationService.returnItem(
-                    accessionId,
-                    condition);
-
-            redirectAttributes.addFlashAttribute(
-                    "successMessage",
-                    "Book copy [" + accessionId
-                            + "] processed successfully.");
-
-        } catch (IllegalArgumentException | IllegalStateException e) {
-
-            redirectAttributes.addFlashAttribute(
-                    "errorMessage",
-                    e.getMessage());
-
-        } catch (Exception e) {
-
-            redirectAttributes.addFlashAttribute(
-                    "errorMessage",
-                    "An error occurred while closing transaction records.");
+        @GetMapping("/circulation")
+        public String showCirculationPage() {
+                return "circulation/index";
         }
 
-        return "redirect:/circulation";
-    }
+        // =========================================================
+        // CHECKOUT
+        // =========================================================
+
+        @PostMapping("/circulation/checkout")
+        public String processCheckout(
+                        @RequestParam("accessionId") String accessionId,
+                        @RequestParam("memberId") String memberId,
+                        RedirectAttributes redirectAttributes) {
+
+                try {
+
+                        // Get currently authenticated Spring Security user
+                        Authentication authentication = SecurityContextHolder
+                                        .getContext()
+                                        .getAuthentication();
+
+                        if (authentication == null
+                                        || !authentication.isAuthenticated()
+                                        || "anonymousUser".equals(authentication.getPrincipal())) {
+
+                                throw new IllegalStateException(
+                                                "You must be logged in to issue a book.");
+                        }
+
+                        String username = authentication.getName();
+
+                        // Find the corresponding application User
+                        User issuedBy = userRepository.findByUsername(username)
+                                        .orElseThrow(() -> new IllegalArgumentException(
+                                                        "Authenticated user not found: " + username));
+
+                        // Perform checkout
+                        circulationService.checkoutItem(
+                                        accessionId,
+                                        memberId,
+                                        issuedBy);
+
+                        redirectAttributes.addFlashAttribute(
+                                        "successMessage",
+                                        "Book successfully issued to member ["
+                                                        + memberId + "]!");
+
+                } catch (IllegalArgumentException | IllegalStateException e) {
+
+                        redirectAttributes.addFlashAttribute(
+                                        "errorMessage",
+                                        e.getMessage());
+
+                } catch (Exception e) {
+
+                        redirectAttributes.addFlashAttribute(
+                                        "errorMessage",
+                                        "System processing fault encountered.");
+                }
+
+                return "redirect:/circulation";
+        }
+
+        // =========================================================
+        // RETURN
+        // =========================================================
+
+        @PostMapping("/circulation/return")
+        public String processReturn(
+                        @RequestParam("accessionId") String accessionId,
+                        @RequestParam("condition") String condition,
+                        RedirectAttributes redirectAttributes) {
+
+                try {
+
+                        circulationService.returnItem(
+                                        accessionId,
+                                        condition);
+
+                        redirectAttributes.addFlashAttribute(
+                                        "successMessage",
+                                        "Book copy [" + accessionId
+                                                        + "] processed successfully.");
+
+                } catch (IllegalArgumentException | IllegalStateException e) {
+
+                        redirectAttributes.addFlashAttribute(
+                                        "errorMessage",
+                                        e.getMessage());
+
+                } catch (Exception e) {
+
+                        redirectAttributes.addFlashAttribute(
+                                        "errorMessage",
+                                        "An error occurred while closing transaction records.");
+                }
+
+                return "redirect:/circulation";
+        }
+
+        @GetMapping("/circulation/renew")
+        public String showRenewPage(
+                        @RequestParam(required = false) String accessionId,
+                        Model model,
+                        RedirectAttributes redirectAttributes) {
+
+                if (accessionId != null
+                                && !accessionId.isBlank()) {
+
+                        try {
+
+                                Loan loan = circulationService.findLoanByAccession(
+                                                accessionId);
+
+                                model.addAttribute("loan", loan);
+
+                        } catch (IllegalArgumentException e) {
+
+                                model.addAttribute(
+                                                "errorMessage",
+                                                e.getMessage());
+                        }
+                }
+
+                return "circulation/renew";
+        }
+
+        @PostMapping("/circulation/renew")
+        public String processRenewal(
+                        @RequestParam("accessionId") String accessionId,
+                        RedirectAttributes redirectAttributes) {
+
+                try {
+
+                        Loan loan = circulationService.renewLoan(
+                                        accessionId);
+
+                        redirectAttributes.addFlashAttribute(
+                                        "successMessage",
+                                        "Book renewed successfully. New due date: "
+                                                        + loan.getDueDate());
+
+                } catch (IllegalArgumentException
+                                | IllegalStateException e) {
+
+                        redirectAttributes.addFlashAttribute(
+                                        "errorMessage",
+                                        e.getMessage());
+
+                } catch (Exception e) {
+
+                        redirectAttributes.addFlashAttribute(
+                                        "errorMessage",
+                                        "An error occurred while renewing the loan.");
+                }
+
+                return "redirect:/circulation/renew";
+        }
+
 }
