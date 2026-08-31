@@ -11,16 +11,16 @@ import java.util.List;
 
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
-    List<Payment> findByLoanLoanIdOrderByPaymentDateDesc(Long loanId);
+        List<Payment> findByLoanLoanIdOrderByPaymentDateDesc(Long loanId);
 
-    @Query("""
-            SELECT COALESCE(SUM(p.amount), 0)
-            FROM Payment p
-            WHERE p.paymentDate >= :startDate
-              AND p.paymentDate < :endDate
-            """)
-    BigDecimal sumPaymentsCollectedBetween(
-            @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate);
+        @Query("""
+                        SELECT COALESCE(SUM(p.amount), 0)
+                        FROM Payment p
+                        WHERE p.paymentDate >= :startDate
+                          AND p.paymentDate < :endDate
+                        """)
+        BigDecimal sumPaymentsCollectedBetween(
+                        @Param("startDate") LocalDateTime startDate,
+                        @Param("endDate") LocalDateTime endDate);
 
 }

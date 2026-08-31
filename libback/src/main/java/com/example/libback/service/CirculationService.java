@@ -15,6 +15,9 @@ import com.example.libback.repository.PaymentRepository;
 import com.example.libback.model.Payment;
 import com.example.libback.model.enums.PaymentMethod;
 
+import java.util.List;
+
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -446,6 +449,14 @@ public class CirculationService {
                                 .orElseThrow(() -> new IllegalArgumentException(
                                                 "No loan found for accession: "
                                                                 + accessionId));
+        }
+
+        @Transactional(readOnly = true)
+        public List<Loan> findLoansWithOutstandingFine(
+                        String accessionId) {
+
+                return loanRepository
+                                .findLoansWithOutstandingFineByAccession(accessionId);
         }
 
 }

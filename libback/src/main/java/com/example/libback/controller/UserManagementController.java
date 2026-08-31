@@ -23,8 +23,8 @@ public class UserManagementController {
     private final PasswordEncoder passwordEncoder;
 
     public UserManagementController(UserRepository userRepository,
-                                    AuditLogService auditLogService,
-                                    PasswordEncoder passwordEncoder) {
+            AuditLogService auditLogService,
+            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.auditLogService = auditLogService;
         this.passwordEncoder = passwordEncoder;
@@ -38,10 +38,10 @@ public class UserManagementController {
 
     @PostMapping("/create")
     public String createUser(@RequestParam String name,
-                             @RequestParam String username,
-                             @RequestParam String password,
-                             @RequestParam String role,
-                             RedirectAttributes ra) {
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam String role,
+            RedirectAttributes ra) {
 
         // 1. Validate required fields
         if (name == null || name.isBlank()
