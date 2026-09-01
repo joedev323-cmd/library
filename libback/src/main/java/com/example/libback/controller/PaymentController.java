@@ -18,103 +18,98 @@ import java.math.BigDecimal;
 @RequestMapping("/payments")
 public class PaymentController {
 
-    private final CirculationService circulationService;
-    private final UserRepository userRepository;
+        private final CirculationService circulationService;
+        private final UserRepository userRepository;
 
-    public PaymentController(
-            CirculationService circulationService,
-            UserRepository userRepository) {
+        public PaymentController(
+                        CirculationService circulationService,
+                        UserRepository userRepository) {
 
-        this.circulationService = circulationService;
-        this.userRepository = userRepository;
-    }
-
-    @GetMapping
-    public String showPaymentPage(
-            @RequestParam(required = false) String accessionId,
-            Model model) {
-
-        if (accessionId != null
-                && !accessionId.isBlank()) {
-
-            try {
-
-                Loan loan =
-                        circulationService.findLoanByAccession(
-                                accessionId);
-
-                model.addAttribute("loan", loan);
-
-            } catch (IllegalArgumentException e) {
-
-                model.addAttribute(
-                        "errorMessage",
-                        e.getMessage());
-            }
+                this.circulationService = circulationService;
+                this.userRepository = userRepository;
         }
 
-        return "payments/index";
-    }
+        @GetMapping
+        public String showPaymentPage(
+                        @RequestParam(required = false) String accessionId,
+                        Model model) {
 
-    @PostMapping
-    public String processPayment(
-            @RequestParam("loanId") Long loanId,
-            @RequestParam("amount") BigDecimal amount,
-            @RequestParam(required = false) String receiptNumber,
-            @RequestParam(required = false) String remarks,
-            RedirectAttributes redirectAttributes) {
+                if (accessionId != null
+                                && !accessionId.isBlank()) {
 
-        try {
+                        try {
 
-            Authentication authentication =
-                    SecurityContextHolder
-                            .getContext()
-                            .getAuthentication();
+                                Loan loan = circulationService.findLoanByAccession(
+                                                accessionId);
 
-            if (authentication == null
-                    || !authentication.isAuthenticated()
-                    || "anonymousUser".equals(
-                            authentication.getPrincipal())) {
+                                model.addAttribute("loan", loan);
 
-                throw new IllegalStateException(
-                        "You must be logged in to record a payment.");
-            }
+                        } catch (IllegalArgumentException e) {
 
-            String username =
-                    authentication.getName();
+                                model.addAttribute(
+                                                "errorMessage",
+                                                e.getMessage());
+                        }
+                }
 
-            User receivedBy =
-                    userRepository
-                            .findByUsername(username)
-                            .orElseThrow(() ->
-                                    new IllegalArgumentException(
-                                            "Authenticated user not found."));
-
-            circulationService.processFinePayment(
-                    loanId,
-                    amount,
-                    receiptNumber,
-                    remarks,
-                    receivedBy);
-
-            redirectAttributes.addFlashAttribute(
-                    "successMessage",
-                    "Fine payment recorded successfully.");
-
-        } catch (IllegalArgumentException
-                | IllegalStateException e) {
-
-            redirectAttributes.addFlashAttribute(
-                    "errorMessage",
-                    e.getMessage());
-
-        } catch (Exception e) {
-
-            redirectAttributes.addFlashAttribute(
-                    "errorMessage",
-                    "An error occurred while processing the payment.");
+                return "payments/index";
         }
 
-        return "redirect:/payments";
-    }
+        @PostMapping
+        public String processPayment(
+                        @RequestParam("loanId") Long loanId,
+                        @RequestParam("amount") BigDecimal amount,
+                        @RequestParam(required = false) String receiptNumber,
+                        @RequestParam(required = false) String remarks,
+                        RedirectAttributes redirectAttributes) {
+
+                try {
+
+                        Authentication authentication = SecurityContextHolder
+                                        .getContext()
+                                        .getAuthentication();
+
+                        if (authentication == null
+                                        || !authentication.isAuthenticated()
+                                        || "anonymousUser".equals(
+                                                        authentication.getPrincipal())) {
+
+                                throw new IllegalStateException(
+                                                "You must be logged in to record a payment.");
+                        }
+
+                        String username = authentication.getName();
+
+                        User receivedBy = userRepository
+                                        .findByUsername(username)
+                                        .orElseThrow(() -> new IllegalArgumentException(
+                                                        "Authenticated user not found."));
+
+                        circulationService.processFinePayment(
+                                        loanId,
+                                        amount,
+                                        receiptNumber,
+                                        remarks,
+                                        receivedBy);
+
+                        redirectAttributes.addFlashAttribute(
+                                        "successMessage",
+                                        "Fine payment recorded successfully.");
+
+                } catch (IllegalArgumentException
+                                | IllegalStateException e) {
+
+                        redirectAttributes.addFlashAttribute(
+                                        "errorMessage",
+                                        e.getMessage());
+
+                } catch (Exception e) {
+
+                        redirectAttributes.addFlashAttribute(
+                                        "errorMessage",
+                                        "An error occurred while processing the payment.");
+                }
+
+                return "redirect:/payments";
+        }
 }
