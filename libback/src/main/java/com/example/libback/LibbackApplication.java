@@ -21,7 +21,7 @@ public class LibbackApplication {
 
     @Bean
     CommandLineRunner initAdmin(UserRepository userRepository, PasswordEncoder passwordEncoder,
-                                @Value("${app.admin.username:adman}") String adminUsername,
+                                @Value("${app.admin.username:biblio}") String adminUsername,
                                 @Value("${app.admin.password:admin123}") String adminPassword) {
         return args -> {
             if (userRepository.findByUsername(adminUsername).isEmpty()) {
@@ -32,7 +32,7 @@ public class LibbackApplication {
                 // Uses the global PasswordEncoder bean configured in your SecurityConfig
                 admin.setPassword(passwordEncoder.encode(adminPassword));
                 
-                admin.setRole(UserRole.LIBRARIAN);
+                admin.setRole(UserRole.SUPER_ADMIN);
 
                 userRepository.save(admin);
                 System.out.println(">>> Initial Admin account created! Username: " + adminUsername);

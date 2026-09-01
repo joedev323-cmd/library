@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"
-    xmlns:th="http://www.thymeleaf.org">
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
     <body>
 
@@ -54,16 +55,17 @@
 
                     <p class="text-sm font-semibold text-slate-800"
                         sec:authentication="name">
-                    </p>
-
-                    <p class="text-xs text-slate-500"
-                        sec:authorize="hasRole('LIBRARIAN')">
                         Librarian
                     </p>
 
                     <p class="text-xs text-slate-500"
                         sec:authorize="hasRole('SUPER_ADMIN')">
-                        Administrator
+                        Super Admin
+                    </p>
+
+                    <p class="text-xs text-slate-500"
+                        sec:authorize="hasRole('LIBRARIAN')">
+                        Librarian
                     </p>
 
                 </div>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Create Librarian</title>
+</head>
+
+<body>
+
+<h1>Create Librarian</h1>
+
+<div th:if="${error}"
+     th:text="${error}">
+</div>
+
+<form th:action="@{/admin/users/librarians}"
+      method="post">
+
+    <div>
+        <label for="name">Full Name</label>
+
+        <input
+            id="name"
+            type="text"
+            name="name"
+            required>
+    </div>
+
+    <div>
+        <label for="username">Username</label>
+
+        <input
+            id="username"
+            type="text"
+            name="username"
+            required>
+    </div>
+
+    <div>
+        <label for="password">Password</label>
+
+        <input
+            id="password"
+            type="password"
+            name="password"
+            required>
+    </div>
+
+    <button type="submit">
+        Create Librarian
+    </button>
+
+</form>
+
+</body>
+</html>
