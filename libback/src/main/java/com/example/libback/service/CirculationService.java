@@ -12,9 +12,6 @@ import com.example.libback.repository.AccessionRepository;
 import com.example.libback.repository.LoanRepository;
 import com.example.libback.repository.MemberRepository;
 import com.example.libback.repository.PaymentRepository;
-import com.example.libback.model.Payment;
-import com.example.libback.model.enums.PaymentMethod;
-
 import java.util.List;
 
 

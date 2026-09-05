@@ -1,383 +1,388 @@
 <!DOCTYPE html>
 <html lang="en"
-      xmlns:th="http://www.thymeleaf.org">
+    xmlns:th="http://www.thymeleaf.org">
 
-<head>
+    <head>
 
-    <meta charset="UTF-8">
+        <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+        <meta name="viewport"
+            content="width=device-width, initial-scale=1.0">
 
-    <title>BiblioHub - Library Catalogue</title>
+        <title>BiblioHub - Library Catalogue</title>
 
-    <link rel="stylesheet"
-          th:href="@{/css/tailwind.css}">
+        <link rel="stylesheet"
+            th:href="@{/css/tailwind.css}">
 
-</head>
+    </head>
 
-<body class="min-h-screen bg-slate-50 text-slate-900">
+    <body class="min-h-screen bg-slate-50 text-slate-900">
 
-    <!-- =========================================================
+        <!-- =========================================================
          NAVBAR
          ========================================================= -->
-    <header class="border-b border-slate-200 bg-white">
+        <header class="border-b border-slate-200 bg-white">
 
-        <div class="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+            <div
+                class="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
 
-            <!-- BRAND -->
-            <a th:href="@{/}"
-               class="flex items-center gap-3">
-
-                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-600 text-white shadow-sm">
-
-                    <svg class="h-5 w-5"
-                         fill="none"
-                         viewBox="0 0 24 24"
-                         stroke="currentColor"
-                         stroke-width="2">
-
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-
-                    </svg>
-
-                </div>
-
-                <span class="text-xl font-semibold tracking-tight">
-                    Biblio<span class="text-purple-600">Hub</span>
-                </span>
-
-            </a>
-
-
-            <!-- DESKTOP NAV -->
-            <nav class="hidden items-center gap-6 sm:flex">
-
+                <!-- BRAND -->
                 <a th:href="@{/}"
-                   class="text-sm font-medium text-slate-600 transition hover:text-purple-600">
-                    Home
-                </a>
+                    class="flex items-center gap-3">
 
-                <a th:href="@{/cantalog}"
-                   class="text-sm font-medium text-slate-600 transition hover:text-purple-600">
-                    Catalogue
-                </a>
+                    <div
+                        class="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-600 text-white shadow-sm">
 
-                <a th:href="@{/login}"
-                   class="rounded-xl bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-purple-700">
-                    Staff Login
-                </a>
-
-            </nav>
-
-        </div>
-
-    </header>
-
-
-    <!-- =========================================================
-         HERO
-         ========================================================= -->
-    <main>
-
-        <section class="relative overflow-hidden">
-
-            <!-- Background -->
-            <div class="absolute inset-0 bg-gradient-to-br from-purple-700 via-purple-600 to-indigo-700"></div>
-
-            <!-- Decorative circles -->
-            <div class="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-white/10"></div>
-
-            <div class="absolute -bottom-48 -left-32 h-[28rem] w-[28rem] rounded-full bg-white/10"></div>
-
-
-            <div class="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
-
-                <div class="mx-auto max-w-4xl text-center">
-
-                    <!-- Eyebrow -->
-                    <div class="inline-flex items-center gap-2 rounded-full border border-purple-300/40 bg-white/10 px-3 py-1.5 text-sm font-medium text-purple-100">
-
-                        <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
-
-                        Library Catalogue
+                        <img th:src="@{/img/logo.png}"
+                            alt="BiblioHub"
+                            class="h-8 w-8">
 
                     </div>
 
+                    <span class="text-xl font-semibold tracking-tight">
+                        Biblio<span class="text-purple-600">Hub</span>
+                    </span>
 
-                    <!-- Heading -->
-                    <h1 class="mt-6 text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
+                </a>
 
-                        Discover your next
-                        <span class="text-purple-200">
-                            great read.
-                        </span>
+                <!-- DESKTOP NAV -->
+                <nav class="hidden items-center gap-6 sm:flex">
 
-                    </h1>
+                    <a th:href="@{/}"
+                        class="text-sm font-medium text-slate-600 transition hover:text-purple-600">
+                        Home
+                    </a>
 
+                    <a th:href="@{/cantalog}"
+                        class="text-sm font-medium text-slate-600 transition hover:text-purple-600">
+                        Catalogue
+                    </a>
 
-                    <!-- Description -->
-                    <p class="mx-auto mt-6 max-w-2xl text-base leading-7 text-purple-100 sm:text-lg">
+                    <a th:href="@{/login}"
+                        class="rounded-xl bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-purple-700">
+                        Staff Login
+                    </a>
 
-                        Explore the BiblioHub collection, find books by title or author,
-                        and check their availability before you visit the library.
+                </nav>
 
-                    </p>
+            </div>
 
+        </header>
 
-                    <!-- SEARCH -->
-                    <form th:action="@{/cantalog/search}"
-                          method="get"
-                          class="mx-auto mt-9 flex max-w-2xl flex-col gap-3 sm:flex-row">
+        <!-- =========================================================
+         HERO
+         ========================================================= -->
+        <main>
 
-                        <div class="relative flex-1">
+            <section class="relative overflow-hidden">
 
-                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">
+                <!-- Background -->
+                <div
+                    class="absolute inset-0 bg-gradient-to-br from-purple-700 via-purple-600 to-indigo-700"></div>
 
-                                <svg class="h-5 w-5"
-                                     fill="none"
-                                     viewBox="0 0 24 24"
-                                     stroke="currentColor"
-                                     stroke-width="2">
+                <!-- Decorative circles -->
+                <div
+                    class="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-white/10"></div>
 
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M21 21l-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0z" />
+                <div
+                    class="absolute -bottom-48 -left-32 h-[28rem] w-[28rem] rounded-full bg-white/10"></div>
 
-                                </svg>
+                <div
+                    class="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
 
-                            </div>
+                    <div class="mx-auto max-w-4xl text-center">
 
-                            <input type="search"
-                                   name="q"
-                                   autofocus
-                                   placeholder="Search by title or author..."
-                                   class="w-full rounded-xl border border-white/20 bg-white py-3.5 pl-11 pr-4 text-sm text-slate-900 shadow-lg outline-none placeholder:text-slate-400 focus:border-white focus:ring-4 focus:ring-white/20">
+                        <!-- Eyebrow -->
+                        <div
+                            class="inline-flex items-center gap-2 rounded-full border border-purple-300/40 bg-white/10 px-3 py-1.5 text-sm font-medium text-purple-100">
+
+                            <span
+                                class="h-2 w-2 rounded-full bg-emerald-400"></span>
+
+                            Library Catalogue
 
                         </div>
 
-                        <button type="submit"
+                        <!-- Heading -->
+                        <h1
+                            class="mt-6 text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
+
+                            Discover your next
+                            <span class="text-purple-200">
+                                great read.
+                            </span>
+
+                        </h1>
+
+                        <!-- Description -->
+                        <p
+                            class="mx-auto mt-6 max-w-2xl text-base leading-7 text-purple-100 sm:text-lg">
+
+                            Explore the BiblioHub collection, find books by
+                            title or author,
+                            and check their availability before you visit the
+                            library.
+
+                        </p>
+
+                        <!-- SEARCH -->
+                        <form th:action="@{/cantalog/search}"
+                            method="get"
+                            class="mx-auto mt-9 flex max-w-2xl flex-col gap-3 sm:flex-row">
+
+                            <div class="relative flex-1">
+
+                                <div
+                                    class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">
+
+                                    <svg class="h-5 w-5"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        stroke-width="2">
+
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M21 21l-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0z" />
+
+                                    </svg>
+
+                                </div>
+
+                                <input type="search"
+                                    name="q"
+                                    autofocus
+                                    placeholder="Search by title or author..."
+                                    class="w-full rounded-xl border border-white/20 bg-white py-3.5 pl-11 pr-4 text-sm text-slate-900 shadow-lg outline-none placeholder:text-slate-400 focus:border-white focus:ring-4 focus:ring-white/20">
+
+                            </div>
+
+                            <button type="submit"
                                 class="rounded-xl bg-white px-6 py-3.5 text-sm font-semibold text-purple-700 shadow-lg transition hover:bg-purple-50">
 
-                            Search Catalogue
+                                Search Catalogue
 
-                        </button>
+                            </button>
 
-                    </form>
+                        </form>
 
+                        <!-- Small helper -->
+                        <p class="mt-4 text-xs text-purple-200">
+                            Search by book title, author, or keyword.
+                        </p>
 
-                    <!-- Small helper -->
-                    <p class="mt-4 text-xs text-purple-200">
-                        Search by book title, author, or keyword.
-                    </p>
+                    </div>
 
                 </div>
 
-            </div>
+            </section>
 
-        </section>
-
-
-        <!-- =====================================================
+            <!-- =====================================================
              FEATURES
              ===================================================== -->
-        <section class="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+            <section class="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
 
-            <div class="mb-8 text-center">
+                <div class="mb-8 text-center">
 
-                <h2 class="text-2xl font-bold tracking-tight text-slate-900">
-                    Everything you need to find a book
-                </h2>
+                    <h2
+                        class="text-2xl font-bold tracking-tight text-slate-900">
+                        Everything you need to find a book
+                    </h2>
 
-                <p class="mt-2 text-sm text-slate-500">
-                    Browse the collection and find the information you need quickly.
-                </p>
-
-            </div>
-
-
-            <div class="grid grid-cols-1 gap-5 md:grid-cols-3">
-
-                <!-- SEARCH -->
-                <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-
-                    <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-purple-50 text-purple-600">
-
-                        <svg class="h-5 w-5"
-                             fill="none"
-                             viewBox="0 0 24 24"
-                             stroke="currentColor"
-                             stroke-width="2">
-
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M21 21l-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0z" />
-
-                        </svg>
-
-                    </div>
-
-                    <h3 class="mt-5 text-base font-semibold">
-                        Search the catalogue
-                    </h3>
-
-                    <p class="mt-2 text-sm leading-6 text-slate-500">
-                        Find books quickly using their title, author, ISBN, or other catalogue information.
+                    <p class="mt-2 text-sm text-slate-500">
+                        Browse the collection and find the information you need
+                        quickly.
                     </p>
-
-                </article>
-
-
-                <!-- AVAILABILITY -->
-                <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-
-                    <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-
-                        <svg class="h-5 w-5"
-                             fill="none"
-                             viewBox="0 0 24 24"
-                             stroke="currentColor"
-                             stroke-width="2">
-
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-
-                        </svg>
-
-                    </div>
-
-                    <h3 class="mt-5 text-base font-semibold">
-                        Check availability
-                    </h3>
-
-                    <p class="mt-2 text-sm leading-6 text-slate-500">
-                        See whether a book is currently available or already on loan.
-                    </p>
-
-                </article>
-
-
-                <!-- LOCATION -->
-                <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-
-                    <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-
-                        <svg class="h-5 w-5"
-                             fill="none"
-                             viewBox="0 0 24 24"
-                             stroke="currentColor"
-                             stroke-width="2">
-
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" />
-
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-
-                        </svg>
-
-                    </div>
-
-                    <h3 class="mt-5 text-base font-semibold">
-                        Find your book
-                    </h3>
-
-                    <p class="mt-2 text-sm leading-6 text-slate-500">
-                        View catalogue information and locate books within the library collection.
-                    </p>
-
-                </article>
-
-            </div>
-
-        </section>
-
-
-        <!-- =====================================================
-             STAFF CTA
-             ===================================================== -->
-        <section class="mx-auto max-w-7xl px-4 pb-14 sm:px-6 lg:px-8">
-
-            <div class="overflow-hidden rounded-2xl bg-slate-900">
-
-                <div class="flex flex-col gap-6 px-6 py-8 sm:px-8 lg:flex-row lg:items-center lg:justify-between lg:px-10">
-
-                    <div>
-
-                        <p class="text-sm font-semibold text-purple-400">
-                            Library Staff
-                        </p>
-
-                        <h2 class="mt-2 text-xl font-semibold text-white">
-                            Manage the library collection
-                        </h2>
-
-                        <p class="mt-2 max-w-xl text-sm leading-6 text-slate-400">
-                            Staff can manage books, members, circulation and library reports
-                            from the BiblioHub management system.
-                        </p>
-
-                    </div>
-
-
-                    <a th:href="@{/login}"
-                       class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-purple-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-purple-700">
-
-                        Staff Login
-
-                        <svg class="h-4 w-4"
-                             fill="none"
-                             viewBox="0 0 24 24"
-                             stroke="currentColor"
-                             stroke-width="2">
-
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M9 5l7 7-7 7" />
-
-                        </svg>
-
-                    </a>
 
                 </div>
 
-            </div>
+                <div class="grid grid-cols-1 gap-5 md:grid-cols-3">
 
-        </section>
+                    <!-- SEARCH -->
+                    <article
+                        class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
 
-    </main>
+                        <div
+                            class="flex h-11 w-11 items-center justify-center rounded-xl bg-purple-50 text-purple-600">
 
+                            <svg class="h-5 w-5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2">
 
-    <!-- =========================================================
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M21 21l-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0z" />
+
+                            </svg>
+
+                        </div>
+
+                        <h3 class="mt-5 text-base font-semibold">
+                            Search the catalogue
+                        </h3>
+
+                        <p class="mt-2 text-sm leading-6 text-slate-500">
+                            Find books quickly using their title, author, ISBN,
+                            or other catalogue information.
+                        </p>
+
+                    </article>
+
+                    <!-- AVAILABILITY -->
+                    <article
+                        class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+
+                        <div
+                            class="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+
+                            <svg class="h-5 w-5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2">
+
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+
+                            </svg>
+
+                        </div>
+
+                        <h3 class="mt-5 text-base font-semibold">
+                            Check availability
+                        </h3>
+
+                        <p class="mt-2 text-sm leading-6 text-slate-500">
+                            See whether a book is currently available or already
+                            on loan.
+                        </p>
+
+                    </article>
+
+                    <!-- LOCATION -->
+                    <article
+                        class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+
+                        <div
+                            class="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+
+                            <svg class="h-5 w-5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2">
+
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" />
+
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+
+                            </svg>
+
+                        </div>
+
+                        <h3 class="mt-5 text-base font-semibold">
+                            Find your book
+                        </h3>
+
+                        <p class="mt-2 text-sm leading-6 text-slate-500">
+                            View catalogue information and locate books within
+                            the library collection.
+                        </p>
+
+                    </article>
+
+                </div>
+
+            </section>
+
+            <!-- =====================================================
+             STAFF CTA
+             ===================================================== -->
+            <section class="mx-auto max-w-7xl px-4 pb-14 sm:px-6 lg:px-8">
+
+                <div class="overflow-hidden rounded-2xl bg-slate-900">
+
+                    <div
+                        class="flex flex-col gap-6 px-6 py-8 sm:px-8 lg:flex-row lg:items-center lg:justify-between lg:px-10">
+
+                        <div>
+
+                            <p class="text-sm font-semibold text-purple-400">
+                                Library Staff
+                            </p>
+
+                            <h2 class="mt-2 text-xl font-semibold text-white">
+                                Manage the library collection
+                            </h2>
+
+                            <p
+                                class="mt-2 max-w-xl text-sm leading-6 text-slate-400">
+                                Staff can manage books, members, circulation and
+                                library reports
+                                from the BiblioHub management system.
+                            </p>
+
+                        </div>
+
+                        <a th:href="@{/login}"
+                            class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-purple-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-purple-700">
+
+                            Staff Login
+
+                            <svg class="h-4 w-4"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2">
+
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M9 5l7 7-7 7" />
+
+                            </svg>
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+        <!-- =========================================================
          FOOTER
          ========================================================= -->
-    <footer class="border-t border-slate-200 bg-white">
+        <footer class="border-t border-slate-200 bg-white">
 
-        <div class="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-6 text-center text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:text-left lg:px-8">
+            <div
+                class="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-6 text-center text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:text-left lg:px-8">
 
-            <span>
-                BiblioHub Library Management
-            </span>
+                <span>
+                    BiblioHub Library Management
+                </span>
 
-            <span>
-                Public Catalogue
-            </span>
+                <span>
+                    Public Catalogue
+                </span>
 
-        </div>
+            </div>
 
-    </footer>
+        </footer>
 
-</body>
+    </body>
 </html>

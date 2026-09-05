@@ -102,11 +102,16 @@ public class UserManagementController {
             return "redirect:/admin/users";
         }
 
-        // Safety: don't let the super admin deactivate their own account
         if (user.getRole() == UserRole.SUPER_ADMIN && user.isActive()) {
-            ra.addFlashAttribute("errorMessage",
-                    "Cannot deactivate a super admin account.");
-            return "redirect:/admin/users";
+
+            long activeSuperAdmins = userRepository
+                    .countByRoleAndActive(UserRole.SUPER_ADMIN, true);
+
+            if (activeSuperAdmins <= 1) {
+                ra.addFlashAttribute("errorMessage",
+                        "Cannot deactivate the last active super admin.");
+                return "redirect:/admin/users";
+            }
         }
 
         user.setActive(!user.isActive());

@@ -1,6 +1,8 @@
 package com.example.libback.repository;
 
 import com.example.libback.model.User;
+import com.example.libback.model.enums.UserRole;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
@@ -11,4 +13,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByUsername(String username);
     
+    long countByRoleAndActive(UserRole role, boolean active);
+
 }
