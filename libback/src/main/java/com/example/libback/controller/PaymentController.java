@@ -1,6 +1,5 @@
 package com.example.libback.controller;
-
-import com.example.libback.model.Loan;
+ 
 import com.example.libback.model.User;
 import com.example.libback.service.CirculationService;
 import com.example.libback.repository.UserRepository;
@@ -31,18 +30,18 @@ public class PaymentController {
 
         @GetMapping
         public String showPaymentPage(
-                        @RequestParam(required = false) String accessionId,
+                        @RequestParam(required = false) String memberId,
                         Model model) {
 
-                if (accessionId != null
-                                && !accessionId.isBlank()) {
+                if (memberId != null
+                                && !memberId.isBlank()) {
 
                         try {
 
-                                Loan loan = circulationService.findLoanByAccession(
-                                                accessionId);
+                                var loans = circulationService.findLoansWithOutstandingFine(memberId);
 
-                                model.addAttribute("loan", loan);
+                                model.addAttribute("outstandingLoans", loans);
+                                model.addAttribute("memberId",memberId);
 
                         } catch (IllegalArgumentException e) {
 

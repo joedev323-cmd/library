@@ -1,156 +1,166 @@
 <!doctype html>
-<html
-  lang="en"
-  xmlns:th="http://www.thymeleaf.org"
-  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-  layout:decorate="~{layouts/main}"
->
-  <head>
-    <title>Fine Payments</title>
-  </head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layouts/main}">
 
-  <body>
-    <div layout:fragment="content">
-      <div class="mb-6">
-        <p class="text-sm font-medium text-emerald-600">Library Finance</p>
+<head>
+  <title>Fine Payments</title>
+</head>
 
-        <h1 class="mt-1 text-2xl font-bold tracking-tight text-slate-900">
-          Fine Payments
-        </h1>
+<body>
+  <div layout:fragment="content">
+    <div class="mb-6">
+      <p class="text-sm font-medium text-emerald-600">Library Finance</p>
 
-        <p class="mt-1 text-sm text-slate-500">
-          Record payments received for assessed library fines.
-        </p>
+      <h1 class="mt-1 text-2xl font-bold tracking-tight text-slate-900">
+        Fine Payments
+      </h1>
+
+      <p class="mt-1 text-sm text-slate-500">
+        Record payments received for assessed library fines.
+      </p>
+    </div>
+
+    <div th:replace="~{fragments/flash-message :: flash}"></div>
+
+    <div class="max-w-2xl">
+      <!-- FIND LOAN -->
+      <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 class="font-semibold text-slate-900">Find Member fines</h2>
+
+        <form method="get" th:action="@{/payments}" class="mt-5 flex gap-3">
+          <input type="text" name="memberId" required autocomplete="off" placeholder="Enter member Id"
+            class="block w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100" />
+
+          <button type="submit"
+            class="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700">
+            Find fines
+          </button>
+        </form>
       </div>
 
-      <div th:replace="~{fragments/flash-message :: flash}"></div>
-
-      <div class="max-w-2xl">
-        <!-- FIND LOAN -->
-        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 class="font-semibold text-slate-900">Find Loan</h2>
-
-          <form method="get" th:action="@{/payments}" class="mt-5 flex gap-3">
-            <input
-              type="text"
-              name="accessionId"
-              required
-              autocomplete="off"
-              placeholder="Scan accession ID"
-              class="block w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
-            />
-
-            <button
-              type="submit"
-              class="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700"
-            >
-              Find
-            </button>
-          </form>
-        </div>
-
-        <!-- PAYMENT -->
-        <div
-          th:if="${loan != null}"
-          class="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
-        >
+      <!-- PAYMENT -->
+      <div th:if="${outstandingLoans != null and !outstandingLoans.isEmpty()}" class="mt-6 space-y-6">
+        <div th:each="loan : ${outstandingLoans}"
+          class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"> <!-- HEADER -->
           <div class="border-b border-slate-100 px-6 py-5">
-            <h2 class="font-semibold text-slate-900">Fine Payment</h2>
+            <div class="flex items-center justify-between gap-4">
+              <div>
+                <h2 class="font-semibold text-slate-900"> Fine Payment </h2>
+                <p class="mt-1 text-xs text-slate-500" th:text="'Loan #' + ${loan.loanId}">
+                  Loan #1
+                </p>
+              </div>
+
+              <div class="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
+                Outstanding Fine
+              </div>
+            </div>
           </div>
 
           <div class="space-y-5 px-6 py-6">
+
+            <!-- BOOK -->
             <div>
-              <p
-                class="text-xs font-medium uppercase tracking-wide text-slate-400"
-              >
+              <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
                 Book
               </p>
 
-              <p
-                class="mt-1 font-semibold text-slate-900"
-                th:text="${loan.accession.book.title}"
-              >
+              <p class="mt-1 font-semibold text-slate-900" th:text="${loan.accession.book.title}">
                 Book Title
+              </p>
+
+              <p class="mt-1 text-xs text-slate-500" th:text="'Accession: ' + ${loan.accession.accessionId}">
+                Accession: A001
               </p>
             </div>
 
+            <!-- MEMBER -->
             <div>
-              <p
-                class="text-xs font-medium uppercase tracking-wide text-slate-400"
-              >
+              <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
                 Member
               </p>
 
-              <p
-                class="mt-1 text-sm text-slate-700"
-                th:text="${loan.member.memberId}"
-              >
+              <p class="mt-1 text-sm text-slate-700" th:text="${loan.member.memberId}">
                 M-001
               </p>
             </div>
 
-            <div class="grid grid-cols-3 gap-4">
+            <!-- LOAN DETAILS -->
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div class="rounded-lg bg-slate-50 p-4">
-                <p class="text-xs text-slate-500">Fine Accrued</p>
+                <p class="text-xs text-slate-500">
+                  Returned Date
+                </p>
 
-                <p
-                  class="mt-1 font-bold text-slate-900"
-                  th:text="'KSh ' + ${#numbers.formatDecimal(loan.fineAccrued, 1, 2)}"
-                >
+                <p class="mt-1 text-sm font-semibold text-slate-900" th:text="${loan.returnedDate}">
+                  2026-01-01
+                </p>
+              </div>
+
+              <div class="rounded-lg bg-slate-50 p-4">
+                <p class="text-xs text-slate-500">
+                  Loan Status
+                </p>
+
+                <p class="mt-1 text-sm font-semibold text-slate-900" th:text="${loan.status}">
+                  RETURNED
+                </p>
+              </div>
+            </div>
+
+            <!-- FINE SUMMARY -->
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+
+              <div class="rounded-lg bg-slate-50 p-4">
+                <p class="text-xs text-slate-500">
+                  Fine Accrued
+                </p>
+
+                <p class="mt-1 font-bold text-slate-900"
+                  th:text="'KSh ' + ${#numbers.formatDecimal(loan.fineAccrued, 1, 2)}">
                   KSh 0.00
                 </p>
               </div>
 
               <div class="rounded-lg bg-slate-50 p-4">
-                <p class="text-xs text-slate-500">Already Paid</p>
+                <p class="text-xs text-slate-500">
+                  Already Paid
+                </p>
 
-                <p
-                  class="mt-1 font-bold text-slate-900"
-                  th:text="'KSh ' + ${#numbers.formatDecimal(loan.finePaid, 1, 2)}"
-                >
+                <p class="mt-1 font-bold text-slate-900"
+                  th:text="'KSh ' + ${#numbers.formatDecimal(loan.finePaid, 1, 2)}">
                   KSh 0.00
                 </p>
               </div>
 
               <div class="rounded-lg bg-emerald-50 p-4">
-                <p class="text-xs text-emerald-600">Outstanding</p>
+                <p class="text-xs text-emerald-600">
+                  Outstanding
+                </p>
 
-                <p
-                  class="mt-1 font-bold text-emerald-700"
-                  th:text="'KSh ' + ${#numbers.formatDecimal(loan.outstandingFine, 1, 2)}"
-                >
+                <p class="mt-1 font-bold text-emerald-700"
+                  th:text="'KSh ' + ${#numbers.formatDecimal(loan.outstandingFine, 1, 2)}">
                   KSh 0.00
                 </p>
               </div>
-            </div>
 
-            <!-- NO BALANCE -->
-            <div
-              th:if="${loan.outstandingFine.compareTo(T(java.math.BigDecimal).ZERO) <= 0}"
-              class="rounded-lg bg-emerald-50 p-4 text-sm text-emerald-700"
-            >
-              This fine has been fully settled.
             </div>
 
             <!-- PAYMENT FORM -->
-            <form
-              th:if="${loan.outstandingFine.compareTo(T(java.math.BigDecimal).ZERO) > 0}"
-              method="post"
-              th:action="@{/payments}"
-              class="space-y-5"
-            >
+            <form th:if="${loan.outstandingFine.compareTo(T(java.math.BigDecimal).ZERO) > 0}" method="post"
+              th:action="@{/payments}" class="space-y-5 border-t border-slate-100 pt-5">
+
+              <!-- IMPORTANT: identifies the historical loan -->
               <input type="hidden" name="loanId" th:value="${loan.loanId}" />
 
+              <!-- PAYMENT METHOD -->
               <div>
                 <label class="block text-sm font-semibold text-slate-700">
                   Payment Method
                 </label>
 
-                <select
-                  name="paymentMethod"
-                  disabled
-                  class="mt-2 block w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2.5 text-sm"
-                >
+                <select name="paymentMethod" disabled
+                  class="mt-2 block w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2.5 text-sm">
                   <option selected>Cash</option>
                 </select>
 
@@ -159,82 +169,63 @@
                 </p>
               </div>
 
+              <!-- AMOUNT -->
               <div>
-                <label
-                  for="amount"
-                  class="block text-sm font-semibold text-slate-700"
-                >
+                <label th:for="'amount-' + ${loan.loanId}" class="block text-sm font-semibold text-slate-700">
                   Amount
                 </label>
 
-                <input
-                  id="amount"
-                  name="amount"
-                  type="number"
-                  min="0.01"
-                  step="0.01"
-                  required
-                  th:max="${loan.outstandingFine}"
-                  th:value="${loan.outstandingFine}"
-                  class="mt-2 block w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
-                  disabled
-                />
+                <input th:id="'amount-' + ${loan.loanId}" name="amount" type="number" min="0.01" step="0.01" required
+                  th:max="${loan.outstandingFine}" th:value="${loan.outstandingFine}"
+                  class="mt-2 block w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100" />
 
                 <p class="mt-1 text-xs text-slate-400">
                   Maximum payment:
-                  <span
-                    th:text="'KSh ' + ${#numbers.formatDecimal(loan.outstandingFine, 1, 2)}"
-                  >
+                  <span th:text="'KSh ' + ${#numbers.formatDecimal(loan.outstandingFine, 1, 2)}">
                     KSh 0.00
                   </span>
                 </p>
               </div>
 
+              <!-- RECEIPT -->
               <div>
-                <label
-                  for="receiptNumber"
-                  class="block text-sm font-semibold text-slate-700"
-                >
+                <label th:for="'receiptNumber-' + ${loan.loanId}" class="block text-sm font-semibold text-slate-700">
                   Receipt Number
                 </label>
 
-                <input
-                  id="receiptNumber"
-                  name="receiptNumber"
-                  type="text"
-                  autocomplete="off"
+                <input th:id="'receiptNumber-' + ${loan.loanId}" name="receiptNumber" type="text" autocomplete="off"
                   placeholder="e.g. LIB-000125"
-                  class="mt-2 block w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
-                />
+                  class="mt-2 block w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100" />
               </div>
 
+              <!-- REMARKS -->
               <div>
-                <label
-                  for="remarks"
-                  class="block text-sm font-semibold text-slate-700"
-                >
+                <label th:for="'remarks-' + ${loan.loanId}" class="block text-sm font-semibold text-slate-700">
                   Remarks
                 </label>
 
-                <textarea
-                  id="remarks"
-                  name="remarks"
-                  rows="3"
+                <textarea th:id="'remarks-' + ${loan.loanId}" name="remarks" rows="3"
                   placeholder="Optional payment notes"
-                  class="mt-2 block w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
-                ></textarea>
+                  class="mt-2 block w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm"></textarea>
               </div>
 
-              <button
-                type="submit"
-                class="w-full rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700"
-              >
+              <!-- SUBMIT -->
+              <button type="submit"
+                class="w-full rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700">
                 Record Cash Payment
               </button>
+
             </form>
+
           </div>
+
         </div>
-      </div>
+      </div> <!-- NO OUTSTANDING FINES -->
+      <div th:if="${outstandingLoans != null and outstandingLoans.isEmpty()}"
+        class="mt-6 rounded-xl border border-emerald-200 bg-emerald-50 p-5 text-sm text-emerald-700"> This member has no
+        outstanding fines. </div>
     </div>
-  </body>
+  </div>
+</body>
+
 </html>

@@ -18,6 +18,7 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
     // ---------------------------------------------------------
 
     List<Loan> findByMemberMemberId(String memberId);
+//     List<Loan> loans = circulationService.findLoansWithOutstandingFine(memberId);
 
     // ---------------------------------------------------------
     // GENERAL LOAN STATISTICS
@@ -34,9 +35,14 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
     // ACTIVE LOAN FOR A SPECIFIC PHYSICAL COPY
     // ---------------------------------------------------------
 
-    Optional<Loan> findByAccessionAccessionIdAndStatus(
+    Optional<Loan> findByAccessionAccessionIdAndMemberMemberIdAndStatus(
             String accessionId,
+            String memberId,
             LoanStatus status);
+
+    Optional<Loan>findByAccessionAccessionIdAndStatus(
+        String accessionId,
+        LoanStatus status);
 
     // ---------------------------------------------------------
     // OVERDUE LOANS
@@ -95,18 +101,18 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
             String memberId,
             LoanStatus status);
 
-    Optional<Loan> findByAccessionAccessionId(
-            String accessionId);
+//     Optional<Loan> findByAccessionAccessionId(
+//             String accessionId);
     
     @Query("""
     SELECT l
     FROM Loan l
-    WHERE l.accession.accessionId = :accessionId
+    WHERE l.member.memberId = :memberId
       AND l.fineAccrued > COALESCE(l.finePaid, 0)
     ORDER BY l.returnedDate DESC
     """)
-List<Loan> findLoansWithOutstandingFineByAccession(
-        @Param("accessionId") String accessionId);
+List<Loan> findLoansWithOutstandingFineByMember(
+        @Param("memberId") String memberId);
 
 
 }

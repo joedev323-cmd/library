@@ -206,11 +206,13 @@ public class CirculationService {
                         long daysLate = ChronoUnit.DAYS.between(
                                         loan.getDueDate(),
                                         now);
+                        
+                        BigDecimal fineRate = BigDecimal.valueOf(15);
 
                         if (daysLate > 0) {
 
-                                // KSH 1 per day late
-                                totalFine = totalFine.add(
+                                //  can be changed currently its 15
+                                totalFine = fineRate.multiply(
                                                 BigDecimal.valueOf(daysLate));
                         }
                 }
@@ -442,7 +444,7 @@ public class CirculationService {
                         String accessionId) {
 
                 return loanRepository
-                                .findByAccessionAccessionId(accessionId)
+                                .findByAccessionAccessionIdAndStatus(accessionId,LoanStatus.ACTIVE)
                                 .orElseThrow(() -> new IllegalArgumentException(
                                                 "No loan found for accession: "
                                                                 + accessionId));
@@ -450,10 +452,10 @@ public class CirculationService {
 
         @Transactional(readOnly = true)
         public List<Loan> findLoansWithOutstandingFine(
-                        String accessionId) {
+                        String memberId) {
 
                 return loanRepository
-                                .findLoansWithOutstandingFineByAccession(accessionId);
+                                .findLoansWithOutstandingFineByMember(memberId);
         }
 
 }
