@@ -32,6 +32,7 @@ public class DashboardController {
         if (principal != null) {
             model.addAttribute("username", principal.getName());
         }
+    model.addAttribute("pageTitle","Dashbuord");
 
         // 1. Calculate Real-time Statistics
         long totalBooks = accessionRepository.count();

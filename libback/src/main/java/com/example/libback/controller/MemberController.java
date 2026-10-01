@@ -94,7 +94,8 @@ public class MemberController {
         }
 
         model.addAttribute("members", members);
-
+        model.addAttribute("pageTitle","members page");
+        
         return "members/list";
     }
 

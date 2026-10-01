@@ -2,6 +2,12 @@
     "configurations": [
         {
             "type": "java",
+            "name": "LibbackApplication",
+            "request": "launch",
+            "mainClass": "com.example.libback.LibbackApplication"
+        },
+        {
+            "type": "java",
             "name": "Spring Boot-LibbackApplication<libback>",
             "request": "launch",
             "cwd": "${workspaceFolder}",

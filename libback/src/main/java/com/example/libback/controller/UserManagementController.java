@@ -33,6 +33,7 @@ public class UserManagementController {
     @GetMapping
     public String listUsers(Model model) {
         model.addAttribute("users", userRepository.findAll());
+        model.addAttribute("pageTitle", "add Users page");
         return "admin/users";
     }
 

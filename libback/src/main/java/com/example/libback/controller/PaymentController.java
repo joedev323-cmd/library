@@ -50,7 +50,7 @@ public class PaymentController {
                                                 e.getMessage());
                         }
                 }
-
+                model.addAttribute("pageTitle","Payment page");
                 return "payments/index";
         }
 

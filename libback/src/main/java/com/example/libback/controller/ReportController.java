@@ -33,6 +33,7 @@ public class ReportController {
         model.addAttribute(
                 "overdueLoans",
                 reportService.getOverdueLoans());
+        model.addAttribute("pageTitle","Reports page");
 
         return "reports/index";
     }
