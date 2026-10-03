@@ -18,7 +18,7 @@ public class LibbackApplication {
         SpringApplication.run(LibbackApplication.class, args);
         System.out.println(">>> Application started successfully!");
     }
-
+    
     @Bean
     CommandLineRunner initAdmin(UserRepository userRepository, PasswordEncoder passwordEncoder,
                                 @Value("${app.admin.username:biblio}") String adminUsername,

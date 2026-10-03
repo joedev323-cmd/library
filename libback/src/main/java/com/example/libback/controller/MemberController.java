@@ -26,6 +26,7 @@ public class MemberController {
     @GetMapping("/admin/add/member")
     public String showAddMemberForm(Model model) {
         model.addAttribute("member", new Member());
+        model.addAttribute("pageTitle","members page");
         return "members/add";
     }
 

@@ -67,6 +67,7 @@ public class CatalogueController {
                 model.addAttribute(
                                 "books",
                                 bookRepository.findAll());
+                model.addAttribute("pageTitle","Catalogue Registry");
 
                 return "catalogue/index";
         }
@@ -222,6 +223,7 @@ public class CatalogueController {
                 model.addAttribute(
                                 "categories",
                                 categoryRepository.findAll());
+                model.addAttribute("pageTitle","add Book");
 
                 return "books/add";
         }
@@ -232,7 +234,7 @@ public class CatalogueController {
 
         @PostMapping("/admin/catalog/add")
         public String processAddBook(
-                        @ModelAttribute("book") Book newBook) {
+                        @ModelAttribute("book") Book newBook,Model model) {
 
                 Book savedBook = bookService.saveBook(
                                 newBook);
@@ -243,6 +245,7 @@ public class CatalogueController {
                                 savedBook.getIsbn(),
                                 "Added book: "
                                                 + savedBook.getTitle());
+                model.addAttribute("pageTitle","Add Book");
 
                 return "redirect:/catalog/"
                                 + savedBook.getIsbn();
@@ -364,6 +367,7 @@ public class CatalogueController {
                 model.addAttribute(
                                 "conditionStatuses",
                                 ConditionStatus.values());
+                model.addAttribute("pageTitle","Book registry");
 
                 return "catalogue/registry";
         }

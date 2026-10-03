@@ -18,43 +18,51 @@ public class ReportController {
         this.reportService = reportService;
     }
 
-    /**
-     * Legacy Thymeleaf reports page.
-     *
-     * React uses /api/reports instead.
-     */
     @GetMapping("/reports")
     public String showReportsPage(Model model) {
 
+        var report = reportService.generateReport();
+
         model.addAttribute(
                 "metrics",
-                reportService.generateSystemMetrics());
+                report.getSummary()
+        );
+
+        model.addAttribute(
+                "popularCategories",
+                report.getPopularCategories()
+        );
 
         model.addAttribute(
                 "overdueLoans",
-                reportService.getOverdueLoans());
-        model.addAttribute("pageTitle","Reports page");
+                report.getOverdueLoans()
+        );
+
+        model.addAttribute(
+                "pageTitle",
+                "Management Reports"
+        );
 
         return "reports/index";
     }
 
-    /**
-     * Legacy Thymeleaf inventory export.
-     *
-     * The actual CSV generation is handled by ReportService.
-     */
     @GetMapping("/reports/export-inventory")
     public void exportInventoryManifest(
             HttpServletResponse response) throws IOException {
 
         response.setContentType("text/csv");
+
         response.setHeader(
                 "Content-Disposition",
-                "attachment; filename=inventory_audit_manifest.csv");
+                "attachment; filename=inventory_audit_manifest.csv"
+        );
 
-        String csv = reportService.generateInventoryCsv();
+        String csv =
+                reportService.generateInventoryCsv();
 
-        PrintWriter writer = response.getWriter();
+        PrintWriter writer =
+                response.getWriter();
+
         writer.write(csv);
         writer.flush();
     }

@@ -66,17 +66,29 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 
+    @Query("""
+        SELECT COALESCE(SUM(
+            CASE
+                WHEN l.fineAccrued > COALESCE(l.finePaid, 0)
+                THEN l.fineAccrued - COALESCE(l.finePaid, 0)
+                ELSE 0
+            END
+        ), 0)
+        FROM Loan l
+        """)
+    BigDecimal sumOutstandingFines();
+
+    @Query("""
+        SELECT COUNT(l)
+        FROM Loan l
+        WHERE l.fineAccrued > COALESCE(l.finePaid, 0)
+        """)
+    long countLoansWithOutstandingFines();
+
+
     // ---------------------------------------------------------
     // POPULAR CATEGORIES
     // ---------------------------------------------------------
-    //
-    // New relationship:
-    //
-    // Loan -> Accession -> Book -> Category
-    //
-    // NOT:
-    // Loan -> Accession -> Book -> categories
-    //
 
     @Query("""
             SELECT c.name, COUNT(l)
@@ -111,7 +123,7 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
       AND l.fineAccrued > COALESCE(l.finePaid, 0)
     ORDER BY l.returnedDate DESC
     """)
-List<Loan> findLoansWithOutstandingFineByMember(
+    List<Loan> findLoansWithOutstandingFineByMember(
         @Param("memberId") String memberId);
 
 

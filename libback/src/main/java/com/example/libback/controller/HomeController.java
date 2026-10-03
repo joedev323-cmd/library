@@ -1,9 +1,14 @@
 package com.example.libback.controller;
 
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+
 
 import com.example.libback.dto.BookSearchResultDto;
 import com.example.libback.service.BookService;
@@ -26,9 +31,18 @@ public class HomeController {
     }
 
     @GetMapping("/login")
-    public String showLoginPage() {
-        return "auth/login";
+public String showLoginPage(Authentication authentication) {
+
+    if (authentication != null
+            && authentication.isAuthenticated()
+            && !(authentication instanceof AnonymousAuthenticationToken)) {
+
+        return "redirect:/dashboard";
     }
+
+    return "auth/login";
+}
+
 
     @GetMapping("/cantalog/search")
     public String handlePublicSearch(@RequestParam(name = "q", required = false, defaultValue = "") String query, 

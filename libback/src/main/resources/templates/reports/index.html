@@ -1,457 +1,758 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-    layout:decorate="~{layouts/main}">
+<!DOCTYPE html> <html lang="en" xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/main}"> <head> <title>Operational Reports</title>
+    </head> <body> <div layout:fragment="content" class="space-y-6">
+            <!-- ========================================================= -->
+            <!-- PAGE HEADER -->
+            <!-- ========================================================= -->
 
-<head>
-    <title>Reports</title>
-</head>
+            <div
+                class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
 
-<body>
+                <div>
+                    <div class="flex items-center gap-2">
 
-    <div layout:fragment="content">
+                        <span
+                            class="inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
 
-        <!-- PAGE HEADER -->
-        <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                    </div>
 
-            <div>
-                <p class="text-sm font-medium text-indigo-600">
-                    Library Analytics
-                </p>
-
-                <h1 class="mt-1 text-2xl font-bold tracking-tight text-slate-900">
-                    Reports
-                </h1>
-
-                <p class="mt-1 text-sm text-slate-500">
-                    Monitor catalogue activity, circulation, availability, and overdue loans.
-                </p>
-            </div>
-
-            <!-- EXPORT -->
-            <a th:href="@{/reports/export-inventory}" th:classappend="${!metrics.inventoryAvailable}
-               ? 'pointer-events-none opacity-50'"
-                class="inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700">
-
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M12 10v6m0 0l-3-3m3 3l3-3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-
-                </svg>
-
-                Export Inventory CSV
-
-            </a>
-
-        </div>
-
-
-        <!-- METRIC CARDS -->
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-
-            <!-- Catalogue -->
-            <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-
-                <div class="flex items-center justify-between">
-
-                    <p class="text-sm font-medium text-slate-500">
-                        Catalogue Titles
+                    <p class="mt-2 max-w-3xl text-sm text-slate-500">
+                        A live overview of catalogue inventory, circulation
+                        activity,
+                        member activity, overdue loans and financial
+                        collections.
                     </p>
+                </div>
 
-                    <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+                <div class="flex flex-col gap-2 sm:flex-row">
 
-                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <a th:href="@{/reports/export-inventory}"
+                        class="inline-flex items-center justify-center gap-2 rounded-lg
+                  bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white
+                  shadow-sm transition hover:bg-indigo-700
+                  focus:outline-none focus:ring-4 focus:ring-indigo-100">
 
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M4 5a2 2 0 012-2h12a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V5z" />
+                        <svg class="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2">
 
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h8M8 11h8M8 15h5" />
+                            <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M12 10v6m0 0l-3-3m3 3l3-3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
 
                         </svg>
+
+                        Export Inventory CSV
+
+                    </a>
+
+                </div>
+
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- OPERATIONAL STATUS -->
+            <!-- ========================================================= -->
+
+            <div class="rounded-xl border border-slate-200 bg-white shadow-sm">
+
+                <div
+                    class="flex flex-col gap-3 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+
+                    <div>
+                        <h2 class="font-semibold text-slate-900">
+                            Operational Status
+                        </h2>
+
+                        <p class="mt-1 text-xs text-slate-500">
+                            Current state of the library management system.
+                        </p>
+                    </div>
+
+                    <span
+                        class="inline-flex w-fit items-center gap-2 rounded-full
+                     bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
+
+                        <span
+                            class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+
+                        System Operational
+
+                    </span>
+
+                </div>
+
+                <div
+                    class="grid grid-cols-1 divide-y divide-slate-100 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+
+                    <div class="px-5 py-4">
+
+                        <p
+                            class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                            Catalogue
+                        </p>
+
+                        <p class="mt-1 text-sm font-semibold text-slate-800">
+                            <span th:text="${metrics.totalBooks}">0</span>
+                            titles
+                        </p>
+
+                    </div>
+
+                    <div class="px-5 py-4">
+
+                        <p
+                            class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                            Physical Inventory
+                        </p>
+
+                        <p class="mt-1 text-sm font-semibold text-slate-800"
+                            th:if="${metrics.inventoryAvailable}">
+
+                            <span th:text="${metrics.totalCopies}">0</span>
+                            copies tracked
+
+                        </p>
+
+                        <p class="mt-1 text-sm font-semibold text-slate-500"
+                            th:unless="${metrics.inventoryAvailable}">
+
+                            No physical inventory
+
+                        </p>
+
+                    </div>
+
+                    <div class="px-5 py-4">
+
+                        <p
+                            class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                            Circulation
+                        </p>
+
+                        <p class="mt-1 text-sm font-semibold text-slate-800">
+                            <span th:text="${metrics.activeLoans}">0</span>
+                            active loans
+                        </p>
 
                     </div>
 
                 </div>
 
-                <p class="mt-2 text-3xl font-bold text-slate-900" th:text="${metrics.totalBooks}">
-                    0
-                </p>
-
-                <p class="mt-1 text-xs text-slate-400">
-                    <span th:text="${metrics.totalCopies}">0</span>
-                    physical copies ·
-                    <span th:text="${metrics.availableCopies}">0</span>
-                    available
-                </p>
-
             </div>
 
+            <!-- ========================================================= -->
+            <!-- PRIMARY KPI CARDS -->
+            <!-- ========================================================= -->
 
-            <!-- MEMBERS -->
-            <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
 
-                <div class="flex items-center justify-between">
+                <!-- CATALOGUE -->
 
-                    <p class="text-sm font-medium text-slate-500">
-                        Members
-                    </p>
+                <div
+                    class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
 
-                    <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-purple-50 text-purple-600">
+                    <div class="flex items-start justify-between">
 
-                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <div>
+                            <p class="text-sm font-medium text-slate-500">
+                                Catalogue
+                            </p>
 
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2" />
+                            <p class="mt-2 text-3xl font-bold text-slate-900"
+                                th:text="${metrics.totalBooks}">
+                                0
+                            </p>
+                        </div>
 
-                            <circle cx="9" cy="7" r="4" />
+                        <div
+                            class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
 
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
+                            <svg class="h-5 w-5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2">
 
-                        </svg>
+                                <path stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M4 5a2 2 0 012-2h12a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V5z" />
+
+                                <path stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M8 7h8M8 11h8M8 15h5" />
+
+                            </svg>
+
+                        </div>
+
+                    </div>
+
+                    <div
+                        class="mt-3 flex items-center gap-2 text-xs text-slate-500">
+
+                        <span class="font-semibold text-slate-700"
+                            th:text="${metrics.totalCopies}">
+                            0
+                        </span>
+
+                        physical copies
 
                     </div>
 
                 </div>
 
-                <p class="mt-2 text-3xl font-bold text-slate-900" th:text="${metrics.totalMembers}">
-                    0
-                </p>
+                <!-- MEMBERS -->
 
-                <p class="mt-1 text-xs text-slate-400">
-                    Registered library members
-                </p>
+                <div
+                    class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
 
-            </div>
+                    <div class="flex items-start justify-between">
 
+                        <div>
+                            <p class="text-sm font-medium text-slate-500">
+                                Registered Members
+                            </p>
 
-            <!-- LOANS -->
-            <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                            <p class="mt-2 text-3xl font-bold text-slate-900"
+                                th:text="${metrics.totalMembers}">
+                                0
+                            </p>
+                        </div>
 
-                <div class="flex items-center justify-between">
+                        <div
+                            class="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-50 text-purple-600">
 
-                    <p class="text-sm font-medium text-slate-500">
-                        Loans
-                    </p>
+                            <svg class="h-5 w-5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2">
 
-                    <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+                                <path stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2" />
 
-                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <circle cx="9" cy="7" r="4" />
 
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h5M20 20v-5h-5" />
+                                <path stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
 
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M5.5 9A7 7 0 0117 6.5L20 9M18.5 15A7 7 0 017 17.5L4 15" />
+                            </svg>
 
-                        </svg>
+                        </div>
 
                     </div>
 
+                    <p class="mt-3 text-xs text-slate-400">
+                        Members registered in the system
+                    </p>
+
                 </div>
 
-                <p class="mt-2 text-3xl font-bold text-slate-900" th:text="${metrics.totalLoans}">
-                    0
-                </p>
+                <!-- ACTIVE LOANS -->
 
-                <p class="mt-1 text-xs text-slate-400">
-                    <span th:text="${metrics.activeLoans}">0</span>
-                    active ·
-                    <span th:text="${metrics.returnedLoans}">0</span>
-                    returned
-                </p>
+                <div
+                    class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+
+                    <div class="flex items-start justify-between">
+
+                        <div>
+                            <p class="text-sm font-medium text-slate-500">
+                                Active Circulation
+                            </p>
+
+                            <p class="mt-2 text-3xl font-bold text-blue-600"
+                                th:text="${metrics.activeLoans}">
+                                0
+                            </p>
+                        </div>
+
+                        <div
+                            class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+
+                            <svg class="h-5 w-5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2">
+
+                                <path stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M4 4v5h5M20 20v-5h-5" />
+
+                                <path stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M5.5 9A7 7 0 0117 6.5L20 9M18.5 15A7 7 0 017 17.5L4 15" />
+
+                            </svg>
+
+                        </div>
+
+                    </div>
+
+                    <p class="mt-3 text-xs text-slate-400">
+                        Currently issued books
+                    </p>
+
+                </div>
+
+                <!-- OVERDUE -->
+
+                <div
+                    class="rounded-xl border border-red-100 bg-white p-5 shadow-sm">
+
+                    <div class="flex items-start justify-between">
+
+                        <div>
+                            <p class="text-sm font-medium text-slate-500">
+                                Overdue Loans
+                            </p>
+
+                            <p class="mt-2 text-3xl font-bold text-red-600"
+                                th:text="${metrics.overdueLoans}">
+                                0
+                            </p>
+                        </div>
+
+                        <div
+                            class="flex h-10 w-10 items-center justify-center rounded-lg bg-red-50 text-red-600">
+
+                            <svg class="h-5 w-5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2">
+
+                                <path stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M12 9v4m0 4h.01" />
+
+                                <path stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M10.29 3.86l-8.1 14a2 2 0 001.74 3h16.14a2 2 0 001.74-3l-8.1-14a2 2 0 00-3.42 0z" />
+
+                            </svg>
+
+                        </div>
+
+                    </div>
+
+                    <p class="mt-3 text-xs text-red-500">
+                        Requires operational attention
+                    </p>
+
+                </div>
 
             </div>
 
+            <!-- ========================================================= -->
+            <!-- SECONDARY KPI -->
+            <!-- ========================================================= -->
 
-            <!-- FINES -->
-            <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
 
-                <div class="flex items-center justify-between">
+                <div
+                    class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+
+                    <p class="text-sm font-medium text-slate-500">
+                        Total Loans
+                    </p>
+
+                    <p class="mt-2 text-2xl font-bold text-slate-900"
+                        th:text="${metrics.totalLoans}">
+                        0
+                    </p>
+
+                    <p class="mt-1 text-xs text-slate-400">
+                        All recorded circulation transactions
+                    </p>
+
+                </div>
+
+                <div
+                    class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+
+                    <p class="text-sm font-medium text-slate-500">
+                        Returned Loans
+                    </p>
+
+                    <p class="mt-2 text-2xl font-bold text-emerald-600"
+                        th:text="${metrics.returnedLoans}">
+                        0
+                    </p>
+
+                    <p class="mt-1 text-xs text-slate-400">
+                        Successfully returned transactions
+                    </p>
+
+                </div>
+
+                <div
+                    class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+
+                    <p class="text-sm font-medium text-slate-500">
+                        Available Copies
+                    </p>
+
+                    <p class="mt-2 text-2xl font-bold text-emerald-600"
+                        th:text="${metrics.availableCopies}">
+                        0
+                    </p>
+
+                    <p class="mt-1 text-xs text-slate-400">
+                        Copies currently available
+                    </p>
+
+                </div>
+
+                <div
+                    class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
 
                     <p class="text-sm font-medium text-slate-500">
                         Fines Collected
                     </p>
 
-                    <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+                    <p class="mt-2 text-2xl font-bold text-emerald-600"
+                        th:text="'KSh ' + ${#numbers.formatDecimal(metrics.finesCollectedMtd != null ? metrics.finesCollectedMtd : 0, 1, 2)}">
+                        KSh 0.00
+                    </p>
 
-                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-10v12m9-6a9 9 0 11-18 0 9 9 0 0118 0z" />
-
-                        </svg>
-
-                    </div>
-
-                </div>
-
-                <p class="mt-2 text-3xl font-bold text-emerald-600"
-                    th:text="'KSh ' + ${#numbers.formatDecimal(metrics.finesCollectedMtd != null ? metrics.finesCollectedMtd: 0,1,2)}">
-                    KSh 0.00
-                </p>
-
-                <p class="mt-1 text-xs text-slate-400">
-                    Month to date
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <!-- PERFORMANCE OVERVIEW -->
-        <div class="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-
-            <div class="mb-5">
-
-                <h2 class="font-semibold text-slate-900">
-                    Collection Overview
-                </h2>
-
-                <p class="mt-1 text-sm text-slate-500">
-                    Current availability and circulation performance.
-                </p>
-
-            </div>
-
-
-            <div class="space-y-6">
-
-                <!-- AVAILABILITY -->
-                <div>
-
-                    <div class="mb-2 flex items-center justify-between text-sm">
-
-                        <span class="font-medium text-slate-700">
-                            Collection Availability
-                        </span>
-
-                        <span class="font-semibold text-emerald-600"
-                            th:text="${#numbers.formatDecimal(metrics.availablePercentage, 1, 1)} + '%'">
-                            0%
-                        </span>
-
-                    </div>
-
-                    <div class="h-2 overflow-hidden rounded-full bg-slate-100">
-
-                        <div class="h-full rounded-full bg-emerald-500 transition-all"
-                            th:style="'width:' + ${#numbers.formatDecimal(metrics.availablePercentage, 1, 1)} + '%'">
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- ACTIVE LOANS -->
-                <div>
-
-                    <div class="mb-2 flex items-center justify-between text-sm">
-
-                        <span class="font-medium text-slate-700">
-                            Copies On Loan
-                        </span>
-
-                        <span class="font-semibold text-blue-600"
-                            th:text="${#numbers.formatDecimal(metrics.activeLoanPercentage, 1, 1)} + '%'">
-                            0%
-                        </span>
-
-                    </div>
-
-                    <div class="h-2 overflow-hidden rounded-full bg-slate-100">
-
-                        <div class="h-full rounded-full bg-blue-500 transition-all"
-                            th:style="'width:' + ${#numbers.formatDecimal(metrics.activeLoanPercentage, 1, 1)} + '%'">
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- OVERDUE -->
-                <div>
-
-                    <div class="mb-2 flex items-center justify-between text-sm">
-
-                        <span class="font-medium text-slate-700">
-                            Overdue Rate
-                        </span>
-
-                        <span class="font-semibold text-red-600"
-                            th:text="${#numbers.formatDecimal(metrics.overduePercentage, 1, 1)} + '%'">
-                            0%
-                        </span>
-
-                    </div>
-
-                    <div class="h-2 overflow-hidden rounded-full bg-slate-100">
-
-                        <div class="h-full rounded-full bg-red-500 transition-all"
-                            th:style="'width:' + ${#numbers.formatDecimal(metrics.overduePercentage, 1, 1)} + '%'">
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- OVERDUE LOANS -->
-        <div class="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-
-            <!-- Header -->
-            <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
-
-                <div>
-
-                    <h2 class="font-semibold text-slate-900">
-                        Overdue Loans
-                    </h2>
-
-                    <p class="mt-1 text-xs text-slate-500">
-                        Loans that require attention.
+                    <p class="mt-1 text-xs text-slate-400">
+                        Month to date
                     </p>
 
                 </div>
 
-                <span class="rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-700"
-                    th:text="${#lists.size(overdueLoans)}">
+            </div>
+
+           <!-- ========================================================= -->
+<!-- INVENTORY + CIRCULATION -->
+<!-- ========================================================= -->
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+
+    <!-- INVENTORY HEALTH -->
+
+    <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+
+        <div class="flex items-start justify-between">
+
+            <div>
+
+                <h2 class="text-lg font-semibold text-slate-900">
+                    Inventory Health
+                </h2>
+
+                <p class="mt-1 text-sm text-slate-500">
+                    Current distribution of physical copies.
+                </p>
+
+            </div>
+
+            <span
+                th:if="${metrics.inventoryAvailable}"
+                class="rounded-full bg-emerald-50 px-3 py-1
+                       text-xs font-semibold text-emerald-700">
+                Inventory Active
+            </span>
+
+            <span
+                th:unless="${metrics.inventoryAvailable}"
+                class="rounded-full bg-slate-100 px-3 py-1
+                       text-xs font-semibold text-slate-500">
+                No Inventory
+            </span>
+
+        </div>
+
+        <!-- HAS INVENTORY -->
+
+        <div
+            th:if="${metrics.inventoryAvailable}"
+            class="mt-6 space-y-6">
+
+            <!-- AVAILABLE -->
+
+            <div>
+
+                <div class="mb-2 flex items-center justify-between">
+
+                    <div class="flex items-center gap-2">
+
+                        <span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+
+                        <span class="text-sm font-medium text-slate-700">
+                            Available
+                        </span>
+
+                    </div>
+
+                    <span
+                        class="text-sm font-semibold text-slate-800"
+                        th:text="${#numbers.formatDecimal(
+                            metrics.availablePercentage,
+                            1,
+                            1
+                        ) + '%'}">
+                        0.0%
+                    </span>
+
+                </div>
+
+                <div class="h-2.5 overflow-hidden rounded-full bg-slate-100">
+
+                    <div
+                        class="h-full rounded-full bg-emerald-500"
+                        th:style="'width:' +
+                            ${metrics.availablePercentage} + '%'">
+                    </div>
+
+                </div>
+
+                <p class="mt-1 text-xs text-slate-400">
+
+                    <span th:text="${metrics.availableCopies}">
+                        0
+                    </span>
+
+                    copies currently available
+
+                </p>
+
+            </div>
+
+            <!-- ON LOAN -->
+
+            <div>
+
+                <div class="mb-2 flex items-center justify-between">
+
+                    <div class="flex items-center gap-2">
+
+                        <span class="h-2.5 w-2.5 rounded-full bg-blue-500"></span>
+
+                        <span class="text-sm font-medium text-slate-700">
+                            On Loan
+                        </span>
+
+                    </div>
+
+                    <span
+                        class="text-sm font-semibold text-slate-800"
+                        th:text="${#numbers.formatDecimal(
+                            metrics.activeLoanPercentage,
+                            1,
+                            1
+                        ) + '%'}">
+                        0.0%
+                    </span>
+
+                </div>
+
+                <div class="h-2.5 overflow-hidden rounded-full bg-slate-100">
+
+                    <div
+                        class="h-full rounded-full bg-blue-500"
+                        th:style="'width:' +
+                            ${metrics.activeLoanPercentage} + '%'">
+                    </div>
+
+                </div>
+
+                <p class="mt-1 text-xs text-slate-400">
+
+                    <span th:text="${metrics.activeLoans}">
+                        0
+                    </span>
+
+                    active loans
+
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- NO INVENTORY -->
+
+        <div
+            th:unless="${metrics.inventoryAvailable}"
+            class="mt-6 rounded-lg border border-dashed
+                   border-slate-200 bg-slate-50 p-6 text-center">
+
+            <p class="text-sm font-semibold text-slate-700">
+                No physical inventory
+            </p>
+
+            <p class="mt-1 text-xs text-slate-500">
+                Accession physical copies to begin inventory monitoring.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- CIRCULATION HEALTH -->
+
+    <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+
+        <h2 class="text-lg font-semibold text-slate-900">
+            Circulation Health
+        </h2>
+
+        <p class="mt-1 text-sm text-slate-500">
+            Current status and performance of loan activity.
+        </p>
+
+        <div class="mt-6 grid grid-cols-2 gap-3">
+
+            <!-- ACTIVE -->
+
+            <div class="rounded-lg bg-blue-50 p-4">
+
+                <p class="text-xs font-medium text-blue-600">
+                    Active
+                </p>
+
+                <p
+                    class="mt-1 text-2xl font-bold text-blue-700"
+                    th:text="${metrics.activeLoans}">
                     0
+                </p>
+
+                <p class="mt-1 text-xs text-blue-600">
+                    currently issued
+                </p>
+
+            </div>
+
+            <!-- OVERDUE -->
+
+            <div class="rounded-lg bg-red-50 p-4">
+
+                <p class="text-xs font-medium text-red-600">
+                    Overdue
+                </p>
+
+                <p
+                    class="mt-1 text-2xl font-bold text-red-700"
+                    th:text="${metrics.overdueLoans}">
+                    0
+                </p>
+
+                <p class="mt-1 text-xs text-red-600">
+                    require attention
+                </p>
+
+            </div>
+
+            <!-- RETURNED -->
+
+            <div class="rounded-lg bg-emerald-50 p-4">
+
+                <p class="text-xs font-medium text-emerald-600">
+                    Returned
+                </p>
+
+                <p
+                    class="mt-1 text-2xl font-bold text-emerald-700"
+                    th:text="${metrics.returnedLoans}">
+                    0
+                </p>
+
+                <p class="mt-1 text-xs text-emerald-600">
+                    completed loans
+                </p>
+
+            </div>
+
+            <!-- TOTAL -->
+
+            <div class="rounded-lg bg-slate-50 p-4">
+
+                <p class="text-xs font-medium text-slate-500">
+                    Total
+                </p>
+
+                <p
+                    class="mt-1 text-2xl font-bold text-slate-800"
+                    th:text="${metrics.totalLoans}">
+                    0
+                </p>
+
+                <p class="mt-1 text-xs text-slate-500">
+                    recorded loans
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- RETURN RATE -->
+
+        <div class="mt-5 rounded-lg border border-slate-200 p-4">
+
+            <div class="flex items-center justify-between">
+
+                <div>
+
+                    <p class="text-sm font-medium text-slate-700">
+                        Return rate
+                    </p>
+
+                    <p class="mt-1 text-xs text-slate-400">
+                        Percentage of all recorded loans that have been returned.
+                    </p>
+
+                </div>
+
+                <span
+                    class="text-xl font-bold text-emerald-600"
+                    th:text="${#numbers.formatDecimal(
+                        metrics.returnRate,
+                        1,
+                        1
+                    ) + '%'}">
+                    0.0%
                 </span>
 
             </div>
 
+        </div>
 
-            <!-- Table -->
-            <div class="overflow-x-auto">
+        <!-- OVERDUE RATE -->
 
-                <table class="min-w-full divide-y divide-slate-200 text-sm">
+        <div class="mt-3 rounded-lg border border-slate-200 p-4">
 
-                    <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+            <div class="flex items-center justify-between">
 
-                        <tr>
+                <div>
 
-                            <th class="px-5 py-3">
-                                Book
-                            </th>
+                    <p class="text-sm font-medium text-slate-700">
+                        Current overdue rate
+                    </p>
 
-                            <th class="px-5 py-3">
-                                Barcode
-                            </th>
+                    <p class="mt-1 text-xs text-slate-400">
+                        Percentage of active loans currently overdue.
+                    </p>
 
-                            <th class="px-5 py-3">
-                                Member
-                            </th>
+                </div>
 
-                            <th class="px-5 py-3">
-                                Due Date
-                            </th>
-
-                            <th class="px-5 py-3">
-                                Days Overdue
-                            </th>
-
-                            <th class="px-5 py-3">
-                                Fine Accrued
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody class="divide-y divide-slate-100">
-
-                        <!-- LOAN -->
-                        <tr th:each="loan : ${overdueLoans}" class="hover:bg-red-50/40">
-
-                            <td class="px-5 py-3 font-medium text-slate-900" th:text="${loan.title}">
-                                Book Title
-                            </td>
-
-                            <td class="px-5 py-3 font-mono text-xs text-slate-500" th:text="${loan.barcode}">
-                                BAR-0001
-                            </td>
-
-                            <td class="px-5 py-3">
-
-                                <p class="font-medium text-slate-700" th:text="${loan.memberName}">
-                                    Member
-                                </p>
-
-                                <p class="text-xs text-slate-400" th:text="${loan.memberId}">
-                                    M-001
-                                </p>
-
-
-                                <p class="text-xs text-slate-400" th:text="${loan.memberEmail}">
-                                    email@example.com
-                                </p>
-
-                            </td>
-
-                            <td class="whitespace-nowrap px-5 py-3 text-slate-600"
-                                th:text="${#temporals.format(loan.dueDate, 'MMM d, yyyy')}">
-                                Jan 1, 2026
-                            </td>
-
-                            <td class="px-5 py-3">
-
-                                <span
-                                    class="inline-block rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-700"
-                                    th:text="${loan.daysOverdue}">
-                                    5
-                                </span>
-
-                            </td>
-
-                            <td class="px-5 py-3 font-medium text-slate-700"
-                                th:text="'KSh ' + ${#numbers.formatDecimal(loan.fineAccrued != null ? loan.fineAccrued : 0,1,2)}">
-                                KSh 0.00
-                            </td>
-
-
-                        </tr>
-
-
-                        <!-- EMPTY STATE -->
-                        <tr th:if="${#lists.isEmpty(overdueLoans)}">
-
-                            <td colspan="6" class="px-5 py-12 text-center">
-
-                                <div
-                                    class="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
-
-                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                        stroke-width="2">
-
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-
-                                    </svg>
-
-                                </div>
-
-                                <p class="mt-3 text-sm font-medium text-slate-700">
-                                    Nothing overdue
-                                </p>
-
-                                <p class="mt-1 text-xs text-slate-400">
-                                    All current loans are within their due dates.
-                                </p>
-
-                            </td>
-
-                        </tr>
-
-                    </tbody>
-
-                </table>
+                <span
+                    class="text-xl font-bold text-red-600"
+                    th:text="${#numbers.formatDecimal(
+                        metrics.overdueRate,
+                        1,
+                        1
+                    ) + '%'}">
+                    0.0%
+                </span>
 
             </div>
 
@@ -459,6 +760,693 @@
 
     </div>
 
-</body>
+</div>
 
+ <!-- ========================================================= -->
+<!-- FINANCIAL MANAGEMENT -->
+<!-- ========================================================= -->
+
+<div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+
+        <div>
+
+            <h2 class="text-lg font-semibold text-slate-900">
+                Financial Operations
+            </h2>
+
+            <p class="mt-1 text-sm text-slate-500">
+                Financial activity and outstanding fine exposure.
+            </p>
+
+        </div>
+
+        <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+            Month to Date
+        </span>
+
+    </div>
+
+    <div class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+
+        <!-- COLLECTED -->
+
+        <div class="rounded-lg border border-slate-200 p-5">
+
+            <p class="text-sm text-slate-500">
+                Fines Collected
+            </p>
+
+            <p
+                class="mt-2 text-3xl font-bold text-emerald-600"
+                th:text="'KSh ' + ${#numbers.formatDecimal(
+                    metrics.finesCollectedMtd != null
+                        ? metrics.finesCollectedMtd
+                        : 0,
+                    1,
+                    2
+                )}">
+                KSh 0.00
+            </p>
+
+            <p class="mt-1 text-xs text-slate-400">
+                Payments received this month
+            </p>
+
+        </div>
+
+        <!-- OUTSTANDING -->
+
+        <div class="rounded-lg border border-slate-200 p-5">
+
+            <p class="text-sm text-slate-500">
+                Outstanding Fines
+            </p>
+
+            <p
+                class="mt-2 text-3xl font-bold text-amber-600"
+                th:text="'KSh ' + ${#numbers.formatDecimal(
+                    metrics.outstandingFines != null
+                        ? metrics.outstandingFines
+                        : 0,
+                    1,
+                    2
+                )}">
+                KSh 0.00
+            </p>
+
+            <p class="mt-1 text-xs text-slate-400">
+
+                <span th:text="${metrics.outstandingFineLoans}">
+                    0
+                </span>
+
+                loans with outstanding fines
+
+            </p>
+
+        </div>
+
+        <!-- COLLECTION STATUS -->
+
+        <div class="rounded-lg border border-slate-200 p-5">
+
+            <p class="text-sm text-slate-500">
+                Fine Exposure
+            </p>
+
+            <p
+                class="mt-2 text-3xl font-bold text-slate-800"
+                th:text="${metrics.outstandingFineLoans}">
+                0
+            </p>
+
+            <p class="mt-1 text-xs text-slate-400">
+                Active loans carrying outstanding fines
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+ <!-- ========================================================= -->
+<!-- POPULAR CATEGORIES -->
+<!-- ========================================================= -->
+
+<div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+
+    <div
+    class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+
+    <div class="mb-6">
+
+        <h2 class="text-lg font-semibold text-slate-900">
+            Demand by Catalogue Category
+        </h2>
+
+        <p class="mt-1 text-sm text-slate-500">
+            Categories with the highest number of currently active loans.
+        </p>
+
+    </div>
+
+    <div
+        th:if="${#lists.isEmpty(popularCategories)}"
+        class="rounded-lg border border-dashed
+               border-slate-200 bg-slate-50 p-8 text-center">
+
+        <p class="text-sm font-medium text-slate-700">
+            No active category demand
+        </p>
+
+        <p class="mt-1 text-xs text-slate-400">
+            Category activity will appear once loans have been recorded.
+        </p>
+
+    </div>
+
+    <div
+        th:unless="${#lists.isEmpty(popularCategories)}"
+        class="space-y-5">
+
+        <div
+            th:each="category, stat : ${popularCategories}">
+
+            <div class="mb-2 flex items-center justify-between">
+
+                <div class="flex items-center gap-3">
+
+                    <span
+                        class="flex h-7 w-7 items-center justify-center
+                               rounded-full bg-indigo-50
+                               text-xs font-bold text-indigo-600"
+                        th:text="${stat.count}">
+                        1
+                    </span>
+
+                    <span
+                        class="text-sm font-medium text-slate-700"
+                        th:text="${category.category}">
+                        Category
+                    </span>
+
+                </div>
+
+                <span
+                    class="text-sm font-semibold text-slate-600">
+
+                    <span th:text="${category.activeLoans}">
+                        0
+                    </span>
+
+                    active loans
+
+                </span>
+
+            </div>
+
+            <div class="h-2 overflow-hidden rounded-full bg-slate-100">
+
+                <div
+                    class="h-full rounded-full bg-indigo-500"
+                    th:style="'width:' +
+                        ${category.activeLoans >= 10
+                            ? 100
+                            : category.activeLoans * 10} + '%'">
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+            <!-- ========================================================= -->
+            <!-- OVERDUE MANAGEMENT -->
+            <!-- ========================================================= -->
+
+            <div
+                class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+
+                <div
+                    class="flex flex-col gap-3 border-b border-slate-200 px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
+
+                    <div>
+
+                        <h2 class="text-lg font-semibold text-slate-900">
+                            Overdue Loan Management
+                        </h2>
+
+                        <p class="mt-1 text-sm text-slate-500">
+                            The oldest currently overdue loans requiring
+                            follow-up.
+                        </p>
+
+                    </div>
+
+                    <span class="inline-flex w-fit items-center rounded-full
+                     bg-red-100 px-3 py-1.5 text-xs font-semibold text-red-700">
+
+                        <span th:text="${metrics.overdueLoans}">
+                            0
+                        </span>
+
+                        overdue
+
+                    </span>
+
+                </div>
+
+                <div th:if="${#lists.isEmpty(overdueLoans)}"
+                    class="px-5 py-12 text-center">
+
+                    <div
+                        class="mx-auto flex h-12 w-12 items-center justify-center
+                    rounded-full bg-emerald-50 text-emerald-600">
+
+                        <svg class="h-6 w-6"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2">
+
+                            <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M5 13l4 4L19 7" />
+
+                        </svg>
+
+                    </div>
+
+                    <p class="mt-3 text-sm font-semibold text-slate-700">
+                        No overdue loans
+                    </p>
+
+                    <p class="mt-1 text-xs text-slate-400">
+                        There are currently no active loans beyond their due
+                        dates.
+                    </p>
+
+                </div>
+
+                <div th:unless="${#lists.isEmpty(overdueLoans)}"
+                    class="overflow-x-auto">
+
+                    <table class="min-w-full divide-y divide-slate-200">
+
+                        <thead class="bg-slate-50">
+
+                            <tr
+                                class="text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+
+                                <th class="px-5 py-3">
+                                    Member
+                                </th>
+
+                                <th class="px-5 py-3">
+                                    Book
+                                </th>
+
+                                <th class="px-5 py-3">
+                                    Barcode
+                                </th>
+
+                                <th class="px-5 py-3">
+                                    Due Date
+                                </th>
+
+                                <th class="px-5 py-3">
+                                    Overdue
+                                </th>
+
+                                <th class="px-5 py-3">
+                                    Fine
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody class="divide-y divide-slate-100">
+
+                            <tr th:each="loan : ${overdueLoans}"
+                                class="transition hover:bg-red-50/40">
+
+                                <!-- MEMBER -->
+
+                                <td class="px-5 py-4">
+
+                                    <p class="font-medium text-slate-800"
+                                        th:text="${loan.memberName}">
+                                        Member
+                                    </p>
+
+                                    <p
+                                        class="mt-0.5 font-mono text-xs text-slate-400"
+                                        th:text="${loan.memberId}">
+                                        M-001
+                                    </p>
+
+                                    <p class="mt-0.5 text-xs text-slate-400"
+                                        th:text="${loan.memberEmail}">
+                                        email
+                                    </p>
+
+                                </td>
+
+                                <!-- BOOK -->
+
+                                <td class="px-5 py-4">
+
+                                    <p
+                                        class="max-w-xs font-medium text-slate-800"
+                                        th:text="${loan.title}">
+                                        Book
+                                    </p>
+
+                                    <p
+                                        class="mt-0.5 font-mono text-xs text-slate-400"
+                                        th:text="${loan.isbn}">
+                                        ISBN
+                                    </p>
+
+                                </td>
+
+                                <!-- BARCODE -->
+
+                                <td class="px-5 py-4">
+
+                                    <span
+                                        class="rounded-md bg-slate-100 px-2 py-1 font-mono text-xs text-slate-600"
+                                        th:text="${loan.barcode}">
+                                        BARCODE
+                                    </span>
+
+                                </td>
+
+                                <!-- DUE DATE -->
+
+                                <td
+                                    class="whitespace-nowrap px-5 py-4 text-sm text-slate-600"
+                                    th:text="${#temporals.format(loan.dueDate, 'MMM d, yyyy')}">
+                                    Jan 1, 2026
+                                </td>
+
+                                <!-- DAYS -->
+
+                                <td class="px-5 py-4">
+
+                                    <span class="inline-flex rounded-full
+                                 bg-red-100 px-2.5 py-1
+                                 text-xs font-semibold text-red-700">
+
+                                        <span th:text="${loan.daysOverdue}">
+                                            0
+                                        </span>
+
+                                        <span class="ml-1">
+                                            day<span
+                                                th:if="${loan.daysOverdue != 1}">s</span>
+                                        </span>
+
+                                    </span>
+
+                                </td>
+
+                                <!-- FINE -->
+
+                                <td class="whitespace-nowrap px-5 py-4">
+
+                                    <span class="font-semibold text-red-600"
+                                        th:text="'KSh ' + ${#numbers.formatDecimal(
+                              loan.fineAccrued != null
+                                  ? loan.fineAccrued
+                                  : 0,
+                              1,
+                              2)}">
+
+                                        KSh 0.00
+
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- MANAGEMENT NOTES -->
+            <!-- ========================================================= -->
+
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+
+                <!-- WHAT NEEDS ATTENTION -->
+
+                <div
+                    class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+
+                    <div class="flex items-center gap-3">
+
+                        <div
+                            class="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+
+                            <svg class="h-5 w-5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2">
+
+                                <path stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M12 9v4m0 4h.01" />
+
+                                <path stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M10.29 3.86l-8.1 14a2 2 0 001.74 3h16.14a2 2 0 001.74-3l-8.1-14a2 2 0 00-3.42 0z" />
+
+                            </svg>
+
+                        </div>
+
+                        <div>
+
+                            <h2 class="font-semibold text-slate-900">
+                                Operational Attention
+                            </h2>
+
+                            <p class="text-xs text-slate-500">
+                                Areas requiring staff review.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="mt-5 space-y-3">
+
+                        <div
+                            class="flex items-center justify-between rounded-lg bg-red-50 p-3">
+
+                            <span class="text-sm text-red-700">
+                                Overdue loans
+                            </span>
+
+                            <span class="font-bold text-red-700"
+                                th:text="${metrics.overdueLoans}">
+                                0
+                            </span>
+
+                        </div>
+
+                        <div
+                            class="flex items-center justify-between rounded-lg bg-blue-50 p-3">
+
+                            <span class="text-sm text-blue-700">
+                                Active loans
+                            </span>
+
+                            <span class="font-bold text-blue-700"
+                                th:text="${metrics.activeLoans}">
+                                0
+                            </span>
+
+                        </div>
+
+                        <div
+                            class="flex items-center justify-between rounded-lg bg-emerald-50 p-3">
+
+                            <span class="text-sm text-emerald-700">
+                                Available copies
+                            </span>
+
+                            <span class="font-bold text-emerald-700"
+                                th:text="${metrics.availableCopies}">
+                                0
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- INVENTORY SNAPSHOT -->
+
+                <div
+                    class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+
+                    <div class="flex items-center gap-3">
+
+                        <div
+                            class="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+
+                            <svg class="h-5 w-5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2">
+
+                                <path stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M3 7l9-4 9 4-9 4-9-4z" />
+
+                                <path stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M3 7v10l9 4 9-4V7" />
+
+                                <path stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M12 11v10" />
+
+                            </svg>
+
+                        </div>
+
+                        <div>
+
+                            <h2 class="font-semibold text-slate-900">
+                                Inventory Snapshot
+                            </h2>
+
+                            <p class="text-xs text-slate-500">
+                                Physical collection overview.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="mt-5 grid grid-cols-2 gap-3">
+
+                        <div class="rounded-lg bg-slate-50 p-4">
+
+                            <p class="text-xs text-slate-500">
+                                Titles
+                            </p>
+
+                            <p class="mt-1 text-xl font-bold text-slate-800"
+                                th:text="${metrics.totalBooks}">
+                                0
+                            </p>
+
+                        </div>
+
+                        <div class="rounded-lg bg-slate-50 p-4">
+
+                            <p class="text-xs text-slate-500">
+                                Copies
+                            </p>
+
+                            <p class="mt-1 text-xl font-bold text-slate-800"
+                                th:text="${metrics.totalCopies}">
+                                0
+                            </p>
+
+                        </div>
+
+                        <div class="rounded-lg bg-emerald-50 p-4">
+
+                            <p class="text-xs text-emerald-600">
+                                Available
+                            </p>
+
+                            <p class="mt-1 text-xl font-bold text-emerald-700"
+                                th:text="${metrics.availableCopies}">
+                                0
+                            </p>
+
+                        </div>
+
+                        <div class="rounded-lg bg-blue-50 p-4">
+
+                            <p class="text-xs text-blue-600">
+                                Issued
+                            </p>
+
+                            <p class="mt-1 text-xl font-bold text-blue-700"
+                                th:text="${metrics.activeLoans}">
+                                0
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- EXPORT -->
+            <!-- ========================================================= -->
+
+            <div class="flex flex-col gap-3 rounded-xl border border-slate-200
+            bg-slate-50 p-5 sm:flex-row sm:items-center sm:justify-between">
+
+                <div>
+
+                    <h2 class="font-semibold text-slate-800">
+                        Export Operational Data
+                    </h2>
+
+                    <p class="mt-1 text-xs text-slate-500">
+                        Download the current physical inventory audit manifest.
+                    </p>
+
+                </div>
+
+                <a th:href="@{/reports/export-inventory}"
+                    th:classappend="${!metrics.inventoryAvailable}
+           ? 'pointer-events-none opacity-50'"
+                    class="inline-flex items-center justify-center gap-2 rounded-lg
+              border border-slate-200 bg-white px-4 py-2.5
+              text-sm font-semibold text-slate-700 shadow-sm
+              transition hover:border-indigo-200 hover:bg-indigo-50
+              hover:text-indigo-600">
+
+                    <svg class="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2">
+
+                        <path stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M12 10v6m0 0l-3-3m3 3l3-3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+
+                    </svg>
+
+                    Download Inventory Audit
+
+                </a>
+
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- REPORT FOOTER -->
+            <!-- ========================================================= -->
+
+            <div class="pb-6 text-center">
+
+                <p class="text-xs text-slate-400">
+                    Report generated from current library operational data.
+                </p>
+
+            </div>
+
+        </div>
+    </body>
 </html>

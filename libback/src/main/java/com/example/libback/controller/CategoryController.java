@@ -38,6 +38,8 @@ public class CategoryController {
                 model.addAttribute(
                                 "newCategory",
                                 new Category());
+                
+                model.addAttribute("pageTitle","Categories");
 
                 return "categories/list";
         }

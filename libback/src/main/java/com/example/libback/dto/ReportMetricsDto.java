@@ -1,30 +1,54 @@
-package com.example.libback.dto;
+ package com.example.libback.dto;
 
 import java.math.BigDecimal;
 
 public class ReportMetricsDto {
 
+    // ============================
+    // CATALOGUE
+    // ============================
+
     private long totalBooks;
     private long totalCopies;
     private long totalMembers;
+
+    // ============================
+    // CIRCULATION
+    // ============================
 
     private long totalLoans;
     private long activeLoans;
     private long overdueLoans;
     private long returnedLoans;
 
-    private long availableCopies;
+    private double returnRate;
+    private double overdueRate;
 
-    private BigDecimal finesCollectedMtd;
+    // ============================
+    // INVENTORY
+    // ============================
+
+    private long availableCopies;
 
     private boolean inventoryAvailable;
 
     private double availablePercentage;
     private double activeLoanPercentage;
-    private double overduePercentage;
+
+    // ============================
+    // FINANCIAL
+    // ============================
+
+    private BigDecimal finesCollectedMtd;
+    private BigDecimal outstandingFines;
+    private long outstandingFineLoans;
 
     public ReportMetricsDto() {
     }
+
+    // ============================
+    // CATALOGUE
+    // ============================
 
     public long getTotalBooks() {
         return totalBooks;
@@ -49,6 +73,10 @@ public class ReportMetricsDto {
     public void setTotalMembers(long totalMembers) {
         this.totalMembers = totalMembers;
     }
+
+    // ============================
+    // CIRCULATION
+    // ============================
 
     public long getTotalLoans() {
         return totalLoans;
@@ -82,20 +110,32 @@ public class ReportMetricsDto {
         this.returnedLoans = returnedLoans;
     }
 
+    public double getReturnRate() {
+        return returnRate;
+    }
+
+    public void setReturnRate(double returnRate) {
+        this.returnRate = returnRate;
+    }
+
+    public double getOverdueRate() {
+        return overdueRate;
+    }
+
+    public void setOverdueRate(double overdueRate) {
+        this.overdueRate = overdueRate;
+    }
+
+    // ============================
+    // INVENTORY
+    // ============================
+
     public long getAvailableCopies() {
         return availableCopies;
     }
 
     public void setAvailableCopies(long availableCopies) {
         this.availableCopies = availableCopies;
-    }
-
-    public BigDecimal getFinesCollectedMtd() {
-        return finesCollectedMtd;
-    }
-
-    public void setFinesCollectedMtd(BigDecimal finesCollectedMtd) {
-        this.finesCollectedMtd = finesCollectedMtd;
     }
 
     public boolean isInventoryAvailable() {
@@ -122,11 +162,31 @@ public class ReportMetricsDto {
         this.activeLoanPercentage = activeLoanPercentage;
     }
 
-    public double getOverduePercentage() {
-        return overduePercentage;
+    // ============================
+    // FINANCIAL
+    // ============================
+
+    public BigDecimal getFinesCollectedMtd() {
+        return finesCollectedMtd;
     }
 
-    public void setOverduePercentage(double overduePercentage) {
-        this.overduePercentage = overduePercentage;
+    public void setFinesCollectedMtd(BigDecimal finesCollectedMtd) {
+        this.finesCollectedMtd = finesCollectedMtd;
+    }
+
+    public BigDecimal getOutstandingFines() {
+        return outstandingFines;
+    }
+
+    public void setOutstandingFines(BigDecimal outstandingFines) {
+        this.outstandingFines = outstandingFines;
+    }
+
+    public long getOutstandingFineLoans() {
+        return outstandingFineLoans;
+    }
+
+    public void setOutstandingFineLoans(long outstandingFineLoans) {
+        this.outstandingFineLoans = outstandingFineLoans;
     }
 }

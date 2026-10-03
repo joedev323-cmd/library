@@ -33,7 +33,9 @@ public class CirculationController {
         // =========================================================
 
         @GetMapping("/circulation")
-        public String showCirculationPage() {
+        public String showCirculationPage(Model model) {
+
+                model.addAttribute("pageTitle","Circulation Desk");
                 return "circulation/index";
         }
 
@@ -156,7 +158,7 @@ public class CirculationController {
                                                 e.getMessage());
                         }
                 }
-
+                model.addAttribute("pageTitle","Renew Loan");
                 return "circulation/renew";
         }
 

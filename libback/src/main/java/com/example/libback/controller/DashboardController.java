@@ -43,7 +43,7 @@ public class DashboardController {
         DashboardStats stats = new DashboardStats(totalBooks, booksOut, overdueCount, activeMembers);
         model.addAttribute("stats", stats);
 
-        // 2. Build Real-time Circulation Logs
+
         // 2. Build Real-time Circulation Logs
         List<CirculationLogDto> logs = new ArrayList<>();
 
