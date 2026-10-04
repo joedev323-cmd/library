@@ -1,334 +1,299 @@
 <!doctype html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-  layout:decorate="~{layouts/main}">
+<html
+  lang="en"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layouts/main}"
+>
+  <head>
+    <title>Fine Payments</title>
+  </head>
 
-<head>
-  <title>Fine Payments</title>
-</head>
+  <body>
+    <div layout:fragment="content">
+      <div class="mb-6">
+        <p class="text-sm font-medium text-emerald-600">Library Finance</p>
 
-<body>
-  <div layout:fragment="content">
-
-    <div class="mb-6">
-      <p class="text-sm font-medium text-emerald-600">
-        Library Finance
-      </p>
-
-      <p class="mt-1 text-sm text-slate-500">
-        Record payments received for assessed library fines.
-      </p>
-    </div>
-
-    <div th:replace="~{fragments/flash-message :: flash}"></div>
-
-    <div class="max-w-2xl">
-
-      <!-- FIND LOAN -->
-      <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-
-        <h2 class="font-semibold text-slate-900">
-          Find Member Fines
-        </h2>
-
-        <form method="get"
-              th:action="@{/payments}"
-              class="mt-5 flex gap-3">
-
-          <input type="text"
-                 name="memberId"
-                 required
-                 autocomplete="off"
-                 placeholder="Enter member ID"
-                 class="block w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100" />
-
-          <button type="submit"
-                  class="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700">
-            Find fines
-          </button>
-
-        </form>
-
+        <p class="mt-1 text-sm text-slate-500">
+          Record payments received for assessed library fines.
+        </p>
       </div>
 
-
-      <!-- OUTSTANDING FINES -->
-      <div th:if="${outstandingLoans != null and !outstandingLoans.isEmpty()}"
-           class="mt-6 space-y-6">
-
-        <div th:each="loan : ${outstandingLoans}"
-             class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-
-          <!-- HEADER -->
-          <div class="border-b border-slate-100 px-6 py-5">
-
-            <div class="flex items-center justify-between gap-4">
-
-              <div>
-
-                <h2 class="font-semibold text-slate-900">
-                  Fine Payment
-                </h2>
-
-                <p class="mt-1 text-xs text-slate-500"
-                   th:text="'Loan #' + ${loan.loanId}">
-                  Loan #1
-                </p>
-
-              </div>
-
-              <div class="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
-                Outstanding Fine
-              </div>
-
-            </div>
-
-          </div>
-
-
-          <div class="space-y-5 px-6 py-6">
-
-            <!-- BOOK -->
-            <div>
-
-              <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
-                Book
-              </p>
-
-              <p class="mt-1 font-semibold text-slate-900"
-                 th:text="${loan.accession.book.title}">
-                Book Title
-              </p>
-
-              <p class="mt-1 text-xs text-slate-500"
-                 th:text="'Accession: ' + ${loan.accession.accessionId}">
-                Accession: A001
-              </p>
-
-            </div>
-
-
-            <!-- MEMBER -->
-            <div>
-
-              <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
-                Member
-              </p>
-
-              <p class="mt-1 text-sm text-slate-700"
-                 th:text="${loan.member.memberId}">
-                M-001
-              </p>
-
-            </div>
-
-
-            <!-- LOAN DETAILS -->
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-
-              <div class="rounded-lg bg-slate-50 p-4">
-
-                <p class="text-xs text-slate-500">
-                  Returned Date
-                </p>
-
-                <p class="mt-1 text-sm font-semibold text-slate-900"
-                   th:text="${loan.returnedDate}">
-                  2026-01-01
-                </p>
-
-              </div>
-
-
-              <div class="rounded-lg bg-slate-50 p-4">
-
-                <p class="text-xs text-slate-500">
-                  Loan Status
-                </p>
-
-                <p class="mt-1 text-sm font-semibold text-slate-900"
-                   th:text="${loan.status}">
-                  RETURNED
-                </p>
-
-              </div>
-
-            </div>
-
-
-            <!-- FINE SUMMARY -->
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-
-              <div class="rounded-lg bg-slate-50 p-4">
-
-                <p class="text-xs text-slate-500">
-                  Fine Accrued
-                </p>
-
-                <p class="mt-1 font-bold text-slate-900"
-                   th:text="'KSh ' + ${#numbers.formatDecimal(loan.fineAccrued, 1, 2)}">
-                  KSh 0.00
-                </p>
-
-              </div>
-
-
-              <div class="rounded-lg bg-slate-50 p-4">
-
-                <p class="text-xs text-slate-500">
-                  Already Paid
-                </p>
-
-                <p class="mt-1 font-bold text-slate-900"
-                   th:text="'KSh ' + ${#numbers.formatDecimal(loan.finePaid, 1, 2)}">
-                  KSh 0.00
-                </p>
-
-              </div>
-
-
-              <div class="rounded-lg bg-emerald-50 p-4">
-
-                <p class="text-xs text-emerald-600">
-                  Outstanding
-                </p>
-
-                <p class="mt-1 font-bold text-emerald-700"
-                   th:text="'KSh ' + ${#numbers.formatDecimal(loan.outstandingFine, 1, 2)}">
-                  KSh 0.00
-                </p>
-
-              </div>
-
-            </div>
-
-
-            <!-- PAYMENT FORM -->
-            <form th:if="${loan.outstandingFine.compareTo(T(java.math.BigDecimal).ZERO) > 0}"
-                  method="post"
-                  th:action="@{/payments}"
-                  class="space-y-5 border-t border-slate-100 pt-5">
-
-              <!-- IDENTIFIES THE HISTORICAL LOAN -->
-              <input type="hidden"
-                     name="loanId"
-                     th:value="${loan.loanId}" />
-
-
-              <!-- PAYMENT METHOD -->
-              <div>
-
-                <label class="block text-sm font-semibold text-slate-700">
-                  Payment Method
-                </label>
-
-                <select name="paymentMethod"
-                        disabled
-                        class="mt-2 block w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2.5 text-sm">
-
-                  <option selected>
-                    Cash
-                  </option>
-
-                </select>
-
-                <p class="mt-1 text-xs text-slate-400">
-                  Cash payments are currently supported.
-                </p>
-
-              </div>
-
-
-              <!-- AMOUNT -->
-              <div>
-
-                <label th:for="'amount-' + ${loan.loanId}"
-                       class="block text-sm font-semibold text-slate-700">
-                  Amount
-                </label>
-
-                <input th:id="'amount-' + ${loan.loanId}"
-                       name="amount"
-                       type="number"
-                       min="0.01"
-                       step="0.01"
-                       required
-                       th:max="${loan.outstandingFine}"
-                       th:value="${loan.outstandingFine}"
-                       class="mt-2 block w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100" />
-
-                <p class="mt-1 text-xs text-slate-400">
-                  Maximum payment:
-
-                  <span th:text="'KSh ' + ${#numbers.formatDecimal(loan.outstandingFine, 1, 2)}">
-                    KSh 0.00
-                  </span>
-                </p>
-
-              </div>
-
-
-              <!-- RECEIPT NUMBER -->
-              <div class="rounded-lg border border-blue-100 bg-blue-50 p-4">
-
-                <p class="text-xs font-medium uppercase tracking-wide text-blue-600">
-                  Receipt Number
-                </p>
-
-                <p class="mt-1 text-sm text-blue-700">
-                  A receipt number will be generated automatically when
-                  the payment is recorded.
-                </p>
-
-                <p class="mt-2 font-mono text-sm font-semibold text-blue-800">
-                  Example: RCP-000001
-                </p>
-
-              </div>
-
-
-              <!-- REMARKS -->
-              <div>
-
-                <label th:for="'remarks-' + ${loan.loanId}"
-                       class="block text-sm font-semibold text-slate-700">
-                  Remarks
-                </label>
-
-                <textarea th:id="'remarks-' + ${loan.loanId}"
-                          name="remarks"
-                          rows="3"
-                          placeholder="Optional payment notes"
-                          class="mt-2 block w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm"></textarea>
-
-              </div>
-
-
-              <!-- SUBMIT -->
-              <button type="submit"
-                      class="w-full rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700">
-                Record Cash Payment
-              </button>
-
-            </form>
-
-          </div>
-
+      <div th:replace="~{fragments/flash-message :: flash}"></div>
+
+      <div class="max-w-2xl">
+        <!-- FIND LOAN -->
+        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 class="font-semibold text-slate-900">Find Member Fines</h2>
+
+          <form method="get" th:action="@{/payments}" class="mt-5 flex gap-3">
+            <input
+              type="text"
+              name="memberId"
+              required
+              autocomplete="off"
+              placeholder="Enter member ID"
+              class="block w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+            />
+
+            <button
+              type="submit"
+              class="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700"
+            >
+              Find fines
+            </button>
+          </form>
         </div>
 
+        <!-- OUTSTANDING FINES -->
+        <div
+          th:if="${outstandingLoans != null and !outstandingLoans.isEmpty()}"
+          class="mt-6 space-y-6"
+        >
+          <div
+            th:each="loan : ${outstandingLoans}"
+            class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
+          >
+            <!-- HEADER -->
+            <div class="border-b border-slate-100 px-6 py-5">
+              <div class="flex items-center justify-between gap-4">
+                <div>
+                  <h2 class="font-semibold text-slate-900">Fine Payment</h2>
+
+                  <p
+                    class="mt-1 text-xs text-slate-500"
+                    th:text="'Loan #' + ${loan.loanId}"
+                  >
+                    Loan #1
+                  </p>
+                </div>
+
+                <div
+                  class="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700"
+                >
+                  Outstanding Fine
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-5 px-6 py-6">
+              <!-- BOOK -->
+              <div>
+                <p
+                  class="text-xs font-medium uppercase tracking-wide text-slate-400"
+                >
+                  Book
+                </p>
+
+                <p
+                  class="mt-1 font-semibold text-slate-900"
+                  th:text="${loan.accession.book.title}"
+                >
+                  Book Title
+                </p>
+
+                <p
+                  class="mt-1 text-xs text-slate-500"
+                  th:text="'Accession: ' + ${loan.accession.accessionId}"
+                >
+                  Accession: A001
+                </p>
+              </div>
+
+              <!-- MEMBER -->
+              <div>
+                <p
+                  class="text-xs font-medium uppercase tracking-wide text-slate-400"
+                >
+                  Member
+                </p>
+
+                <p
+                  class="mt-1 text-sm text-slate-700"
+                  th:text="${loan.member.memberId}"
+                >
+                  M-001
+                </p>
+              </div>
+
+              <!-- LOAN DETAILS -->
+              <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div class="rounded-lg bg-slate-50 p-4">
+                  <p class="text-xs text-slate-500">Returned Date</p>
+
+                  <p
+                    class="mt-1 text-sm font-semibold text-slate-900"
+                    th:text="${loan.returnedDate}"
+                  >
+                    2026-01-01
+                  </p>
+                </div>
+
+                <div class="rounded-lg bg-slate-50 p-4">
+                  <p class="text-xs text-slate-500">Loan Status</p>
+
+                  <p
+                    class="mt-1 text-sm font-semibold text-slate-900"
+                    th:text="${loan.status}"
+                  >
+                    RETURNED
+                  </p>
+                </div>
+              </div>
+
+              <!-- FINE SUMMARY -->
+              <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <div class="rounded-lg bg-slate-50 p-4">
+                  <p class="text-xs text-slate-500">Fine Accrued</p>
+
+                  <p
+                    class="mt-1 font-bold text-slate-900"
+                    th:text="'KSh ' + ${#numbers.formatDecimal(loan.fineAccrued, 1, 2)}"
+                  >
+                    KSh 0.00
+                  </p>
+                </div>
+
+                <div class="rounded-lg bg-slate-50 p-4">
+                  <p class="text-xs text-slate-500">Already Paid</p>
+
+                  <p
+                    class="mt-1 font-bold text-slate-900"
+                    th:text="'KSh ' + ${#numbers.formatDecimal(loan.finePaid, 1, 2)}"
+                  >
+                    KSh 0.00
+                  </p>
+                </div>
+
+                <div class="rounded-lg bg-emerald-50 p-4">
+                  <p class="text-xs text-emerald-600">Outstanding</p>
+
+                  <p
+                    class="mt-1 font-bold text-emerald-700"
+                    th:text="'KSh ' + ${#numbers.formatDecimal(loan.outstandingFine, 1, 2)}"
+                  >
+                    KSh 0.00
+                  </p>
+                </div>
+              </div>
+
+              <!-- PAYMENT FORM -->
+              <form
+                th:if="${loan.outstandingFine.compareTo(T(java.math.BigDecimal).ZERO) > 0}"
+                method="post"
+                th:action="@{/payments}"
+                class="space-y-5 border-t border-slate-100 pt-5"
+              >
+                <!-- IDENTIFIES THE HISTORICAL LOAN -->
+                <input type="hidden" name="loanId" th:value="${loan.loanId}" />
+
+                <!-- PAYMENT METHOD -->
+                <div>
+                  <label class="block text-sm font-semibold text-slate-700">
+                    Payment Method
+                  </label>
+
+                  <select
+                    name="paymentMethod"
+                    disabled
+                    class="mt-2 block w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2.5 text-sm"
+                  >
+                    <option selected>Cash</option>
+                  </select>
+
+                  <p class="mt-1 text-xs text-slate-400">
+                    Cash payments are currently supported.
+                  </p>
+                </div>
+
+                <!-- AMOUNT -->
+                <div>
+                  <label
+                    th:for="'amount-' + ${loan.loanId}"
+                    class="block text-sm font-semibold text-slate-700"
+                  >
+                    Amount
+                  </label>
+
+                  <input
+                    th:id="'amount-' + ${loan.loanId}"
+                    name="amount"
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    required
+                    th:max="${loan.outstandingFine}"
+                    th:value="${loan.outstandingFine}"
+                    class="mt-2 block w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                  />
+
+                  <p class="mt-1 text-xs text-slate-400">
+                    Maximum payment:
+
+                    <span
+                      th:text="'KSh ' + ${#numbers.formatDecimal(loan.outstandingFine, 1, 2)}"
+                    >
+                      KSh 0.00
+                    </span>
+                  </p>
+                </div>
+
+                <!-- RECEIPT NUMBER -->
+                <div class="rounded-lg border border-blue-100 bg-blue-50 p-4">
+                  <p
+                    class="text-xs font-medium uppercase tracking-wide text-blue-600"
+                  >
+                    Receipt Number
+                  </p>
+
+                  <p class="mt-1 text-sm text-blue-700">
+                    A receipt number will be generated automatically when the
+                    payment is recorded.
+                  </p>
+
+                  <p class="mt-2 font-mono text-sm font-semibold text-blue-800">
+                    Example: RCP-000001
+                  </p>
+                </div>
+
+                <!-- REMARKS -->
+                <div>
+                  <label
+                    th:for="'remarks-' + ${loan.loanId}"
+                    class="block text-sm font-semibold text-slate-700"
+                  >
+                    Remarks
+                  </label>
+
+                  <textarea
+                    th:id="'remarks-' + ${loan.loanId}"
+                    name="remarks"
+                    rows="3"
+                    placeholder="Optional payment notes"
+                    class="mt-2 block w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm"
+                  ></textarea>
+                </div>
+
+                <!-- SUBMIT -->
+                <button
+                  type="submit"
+                  class="w-full rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700"
+                >
+                  Record Cash Payment
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- NO OUTSTANDING FINES -->
+        <div
+          th:if="${outstandingLoans != null and outstandingLoans.isEmpty()}"
+          class="mt-6 rounded-xl border border-emerald-200 bg-emerald-50 p-5 text-sm text-emerald-700"
+        >
+          This member has no outstanding fines.
+        </div>
       </div>
-
-
-      <!-- NO OUTSTANDING FINES -->
-      <div th:if="${outstandingLoans != null and outstandingLoans.isEmpty()}"
-           class="mt-6 rounded-xl border border-emerald-200 bg-emerald-50 p-5 text-sm text-emerald-700">
-
-        This member has no outstanding fines.
-
-      </div>
-
     </div>
-
-  </div>
-</body>
-
+  </body>
 </html>

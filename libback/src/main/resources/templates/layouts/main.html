@@ -1,70 +1,49 @@
- <!DOCTYPE html>
-<html lang="en"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<!doctype html>
+<html
+    lang="en"
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+    <head>
+        <meta charset="UTF-8" />
 
-<head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <meta charset="UTF-8">
+        <title
+            layout:title-pattern="$CONTENT_TITLE - BiblioHub">BiblioHub</title>
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" th:href="@{/css/tailwind.css}" />
+    </head>
 
-    <title layout:title-pattern="$CONTENT_TITLE - BiblioHub">
-        BiblioHub
-    </title>
+    <body class="min-h-screen bg-slate-50 text-slate-900">
+        <div class="flex min-h-screen">
+            <!-- DESKTOP SIDEBAR -->
+            <aside class="hidden lg:block">
+                <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+            </aside>
 
-    <link rel="stylesheet"
-          th:href="@{/css/tailwind.css}">
+            <!-- MAIN APPLICATION -->
+            <div class="flex min-w-0 flex-1 flex-col">
+                <!-- MOBILE NAVIGATION -->
+                <div th:replace="~{fragments/mobile-nav :: mobile-nav}"></div>
 
-</head>
+                <!-- DESKTOP NAVBAR -->
+                <header
+                    class="hidden lg:flex border-b border-slate-200 bg-white px-6 py-4">
+                    <div class="w-full">
+                        <div th:replace="~{fragments/navbar :: navbar}"></div>
+                    </div>
+                </header>
 
-<body class="min-h-screen bg-slate-50 text-slate-900">
+                <!-- PAGE CONTENT -->
+                <main class="flex-1 px-4 py-6 sm:px-6 lg:px-8">
+                    <div class="mx-auto max-w-7xl">
+                        <div layout:fragment="content">Page content</div>
+                    </div>
+                </main>
 
-<div class="flex min-h-screen">
-
-    <!-- DESKTOP SIDEBAR -->
-    <aside class="hidden lg:block">
-        <div th:replace="~{fragments/sidebar :: sidebar}">
-        </div>
-    </aside>
-
-    <!-- MAIN APPLICATION -->
-    <div class="flex min-w-0 flex-1 flex-col">
-
-        <!-- MOBILE NAVIGATION -->
-        <div th:replace="~{fragments/mobile-nav :: mobile-nav}">
-        </div>
-
-        <!-- DESKTOP NAVBAR -->
-        <header class="hidden lg:flex border-b border-slate-200 bg-white px-6 py-4">
-            <div class="w-full">
-                <div th:replace="~{fragments/navbar :: navbar}">
-                </div>
+                <!-- FOOTER -->
+                <div th:replace="~{fragments/footer :: footer}"></div>
             </div>
-        </header>
-
-        <!-- PAGE CONTENT -->
-        <main class="flex-1 px-4 py-6 sm:px-6 lg:px-8">
-
-            <div class="mx-auto max-w-7xl">
-
-                <div layout:fragment="content">
-                    Page content
-                </div>
-
-            </div>
-
-        </main>
-
-        <!-- FOOTER -->
-        <div th:replace="~{fragments/footer :: footer}">
         </div>
-
-    </div>
-
-</div>
-
-</body>
-
+    </body>
 </html>
