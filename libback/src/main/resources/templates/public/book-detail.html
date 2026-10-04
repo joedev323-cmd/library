@@ -21,24 +21,33 @@
 
     <nav class="border-b border-slate-200 bg-white">
 
-        <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+       <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
 
-            <a th:href="@{/catalog}" class="flex items-center gap-3">
+    <!-- BRAND -->
+    <a th:href="@{/catalog}"
+       class="flex items-center gap-3">
 
-                <img th:src="@{/img/logo.png}" alt="BiblioHub" class="h-9 w-9">
+        <img th:src="@{/img/logo.png}"
+             alt="BiblioHub logo"
+             class="h-9 w-9 object-contain sm:h-10 sm:w-10">
 
-                <span class="text-lg font-bold">
-                    BiblioHub
-                </span>
+        <span class="text-lg font-bold tracking-tight text-slate-900 sm:text-xl">
+            Biblio<span class="text-purple-600">Hub</span>
+        </span>
 
-            </a>
+    </a>
 
-            <a th:href="@{/login}"
-                class="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
-                Staff Login
-            </a>
+    <!-- STAFF LOGIN -->
+    <a th:href="@{/login}"
+       class="rounded-lg border border-slate-200 px-3 py-2
+              text-sm font-medium text-slate-700
+              transition hover:border-purple-200
+              hover:bg-purple-50 hover:text-purple-700
+              focus:outline-none focus:ring-4 focus:ring-purple-100">
+        Staff Login
+    </a>
 
-        </div>
+</div>
 
     </nav>
 

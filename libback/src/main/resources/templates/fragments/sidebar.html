@@ -5,27 +5,26 @@
 
         <div th:fragment="sidebar" class="flex h-full flex-col">
 
-            <!-- BRAND -->
-            <div class="flex h-20 items-center border-b border-slate-100 px-6">
+<!-- BRAND -->
+<div class="flex h-20 items-center border-b border-slate-100 px-6">
 
-                <a th:href="@{/dashboard}" class="flex items-center gap-3">
+    <a th:href="@{/dashboard}"
+       class="flex items-center gap-3">
 
-                    <span class="flex h-10 w-10 items-center justify-center
-                        rounded-xl bg-purple-600 text-white shadow-sm">
+        <!-- LOGO -->
+        <img th:src="@{/img/logo.png}"
+             alt="BiblioHub"
+             class="h-10 w-10 object-contain">
 
-                        <img th:src="@{/img/logo.png}"
-                            alt="BiblioHub"
-                            class="h-8 w-8">
+        <!-- BRAND NAME -->
+        <span class="text-xl font-semibold tracking-tight text-slate-900">
+            Biblio<span class="text-purple-600">Hub</span>
+        </span>
 
-                    </span>
+    </a>
 
-                    <span class="text-xl font-semibold tracking-tight">
-                        Biblio<span class="text-purple-600">Hub</span>
-                    </span>
+</div>
 
-                </a>
-
-            </div>
 
             <!-- NAVIGATION -->
             <nav class="flex-1 px-4 py-6 overflow-y-auto">

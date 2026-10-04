@@ -341,103 +341,121 @@ public class CirculationService {
                 return savedLoan;
         }
 
-        @Transactional
-        public Payment processFinePayment(
-                        Long loanId,
-                        BigDecimal amount,
-                        String receiptNumber,
-                        String remarks,
-                        User receivedBy) {
+       @Transactional
+public Payment processFinePayment(
+                Long loanId,
+                BigDecimal amount,
+                String receiptNumber,
+                String remarks,
+                User receivedBy) {
 
-                if (receivedBy == null) {
-                        throw new IllegalStateException(
-                                        "No authenticated user was found.");
-                }
-
-                if (amount == null
-                                || amount.compareTo(BigDecimal.ZERO) <= 0) {
-
-                        throw new IllegalArgumentException(
-                                        "Payment amount must be greater than zero.");
-                }
-
-                Loan loan = loanRepository
-                                .findById(loanId)
-                                .orElseThrow(() -> new IllegalArgumentException(
-                                                "Loan not found: " + loanId));
-
-                // ---------------------------------------------------------
-                // Fine must already have been assessed
-                // ---------------------------------------------------------
-
-                if (loan.getFineAccrued() == null
-                                || loan.getFineAccrued()
-                                                .compareTo(BigDecimal.ZERO) <= 0) {
-
-                        throw new IllegalStateException(
-                                        "This loan has no assessed fine.");
-                }
-
-                BigDecimal outstanding = loan.getOutstandingFine();
-
-                if (outstanding.compareTo(BigDecimal.ZERO) <= 0) {
-                        throw new IllegalStateException(
-                                        "This fine has already been fully paid.");
-                }
-
-                // ---------------------------------------------------------
-                // Prevent overpayment
-                // ---------------------------------------------------------
-
-                if (amount.compareTo(outstanding) > 0) {
-                        throw new IllegalArgumentException(
-                                        "Payment exceeds the outstanding fine of KSh "
-                                                        + outstanding);
-                }
-
-                // ---------------------------------------------------------
-                // Create payment transaction
-                // ---------------------------------------------------------
-
-                Payment payment = new Payment();
-
-                payment.setLoan(loan);
-                payment.setAmount(amount);
-                payment.setPaymentMethod(PaymentMethod.CASH);
-                payment.setReceivedBy(receivedBy);
-                payment.setReceiptNumber(receiptNumber);
-                payment.setRemarks(remarks);
-
-                Payment savedPayment = paymentRepository.save(payment);
-
-                // ---------------------------------------------------------
-                // Update loan financial summary
-                // ---------------------------------------------------------
-
-                BigDecimal currentPaid = loan.getFinePaid() != null
-                                ? loan.getFinePaid()
-                                : BigDecimal.ZERO;
-
-                loan.setFinePaid(
-                                currentPaid.add(amount));
-
-                loanRepository.save(loan);
-
-                // ---------------------------------------------------------
-                // Audit
-                // ---------------------------------------------------------
-
-                auditLogService.logAction(
-                                "FINE_PAYMENT",
-                                "LOAN",
-                                String.valueOf(loan.getLoanId()),
-                                "Fine payment of KSh "
-                                                + amount
-                                                + " received. Receipt: "
-                                                + receiptNumber);
-
-                return savedPayment;
+        if (receivedBy == null) {
+                throw new IllegalStateException(
+                                "No authenticated user was found.");
         }
+
+        if (amount == null
+                        || amount.compareTo(BigDecimal.ZERO) <= 0) {
+
+                throw new IllegalArgumentException(
+                                "Payment amount must be greater than zero.");
+        }
+
+        Loan loan = loanRepository
+                        .findById(loanId)
+                        .orElseThrow(() -> new IllegalArgumentException(
+                                        "Loan not found: " + loanId));
+
+        // ---------------------------------------------------------
+        // Fine must already have been assessed
+        // ---------------------------------------------------------
+
+        if (loan.getFineAccrued() == null
+                        || loan.getFineAccrued()
+                                        .compareTo(BigDecimal.ZERO) <= 0) {
+
+                throw new IllegalStateException(
+                                "This loan has no assessed fine.");
+        }
+
+        BigDecimal outstanding = loan.getOutstandingFine();
+
+        if (outstanding.compareTo(BigDecimal.ZERO) <= 0) {
+                throw new IllegalStateException(
+                                "This fine has already been fully paid.");
+        }
+
+        // ---------------------------------------------------------
+        // Prevent overpayment
+        // ---------------------------------------------------------
+
+        if (amount.compareTo(outstanding) > 0) {
+                throw new IllegalArgumentException(
+                                "Payment exceeds the outstanding fine of KSh "
+                                                + outstanding);
+        }
+
+        // ---------------------------------------------------------
+        // Create payment
+        // ---------------------------------------------------------
+
+        Payment payment = new Payment();
+
+        payment.setLoan(loan);
+        payment.setAmount(amount);
+        payment.setPaymentMethod(PaymentMethod.CASH);
+        payment.setReceivedBy(receivedBy);
+        payment.setRemarks(remarks);
+
+        // ---------------------------------------------------------
+        // Save first so paymentId is generated
+        // ---------------------------------------------------------
+
+        Payment savedPayment = paymentRepository.save(payment);
+
+        // ---------------------------------------------------------
+        // Generate automatic receipt number
+        // ---------------------------------------------------------
+
+        if (receiptNumber == null || receiptNumber.isBlank()) {
+
+                receiptNumber = String.format(
+                                "RCP-%06d",
+                                savedPayment.getPaymentId());
+        }
+
+        savedPayment.setReceiptNumber(receiptNumber);
+
+        savedPayment = paymentRepository.save(savedPayment);
+
+        // ---------------------------------------------------------
+        // Update loan financial summary
+        // ---------------------------------------------------------
+
+        BigDecimal currentPaid = loan.getFinePaid() != null
+                        ? loan.getFinePaid()
+                        : BigDecimal.ZERO;
+
+        loan.setFinePaid(
+                        currentPaid.add(amount));
+
+        loanRepository.save(loan);
+
+        // ---------------------------------------------------------
+        // Audit
+        // ---------------------------------------------------------
+
+        auditLogService.logAction(
+                        "FINE_PAYMENT",
+                        "LOAN",
+                        String.valueOf(loan.getLoanId()),
+                        "Fine payment of KSh "
+                                        + amount
+                                        + " received. Receipt: "
+                                        + receiptNumber);
+
+        return savedPayment;
+}
 
         @Transactional(readOnly = true)
         public Loan findLoanByAccession(
