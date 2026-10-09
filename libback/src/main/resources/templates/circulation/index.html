@@ -1,249 +1,190 @@
 <!doctype html>
-<html
-    lang="en"
+<html lang="en"
     xmlns:th="http://www.thymeleaf.org"
     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
     layout:decorate="~{layouts/main}">
+
     <head>
         <title>Circulation Desk</title>
     </head>
 
     <body>
-        <div layout:fragment="content">
-            <!-- PAGE HEADER -->
-            <div class="mb-6">
-                <div>
-                    <p class="mt-1 text-sm text-slate-500">
-                        Issue books to members and process returned items.
-                    </p>
-                </div>
-            </div>
+        <div layout:fragment="content" class="space-y-6">
 
             <!-- FLASH MESSAGES -->
             <div th:replace="~{fragments/flash-message :: flash}"></div>
 
-            <!-- CIRCULATION ACTIONS -->
-            <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                <!-- =====================================================
-             ISSUE BOOK
-        ====================================================== -->
+            <!-- QUICK ACTIONS -->
+            <section>
+                <div class="mb-4">
+                    <h2 class="text-lg font-semibold text-slate-900">
+                        Choose an operation
+                    </h2>
+                    <p class="mt-1 text-sm text-slate-500">
+                        Open a dedicated workspace for the task you need to
+                        perform.
+                    </p>
+                </div>
+
                 <div
-                    class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                    <!-- Card Header -->
-                    <div class="border-b border-slate-100 px-6 py-5">
-                        <div class="flex items-start gap-3">
-                            <div
-                                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600">
-                                <svg
-                                    class="h-5 w-5"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                    stroke-width="2">
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M12 4v16m8-8H4" />
-                                </svg>
-                            </div>
+                    class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
 
-                            <div>
-                                <h2
-                                    class="text-base font-semibold text-slate-900">
-                                    Issue Book
-                                </h2>
+                    <!-- BORROW -->
+                    <a th:href="@{/circulation/borrow}"
+                        class="group flex flex-col rounded-2xl border border-slate-200
+                      bg-white p-6 shadow-sm transition duration-200
+                      hover:-translate-y-0.5 hover:border-indigo-300
+                      hover:shadow-md focus:outline-none focus:ring-4
+                      focus:ring-indigo-100">
 
-                                <p class="mt-1 text-sm text-slate-500">
-                                    Check out a book to a library member.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Form -->
-                    <form
-                        th:action="@{/circulation/checkout}"
-                        method="post"
-                        class="space-y-5 px-6 py-6">
-                        <!-- Accession ID -->
-                        <div>
-                            <label
-                                for="checkout-accession"
-                                class="block text-sm font-semibold text-slate-700">
-                                Accession ID
-                            </label>
-
-                            <input
-                                id="checkout-accession"
-                                name="accessionId"
-                                type="text"
-                                required
-                                autocomplete="off"
-                                placeholder="e.g. ACC-000123"
-                                class="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100" />
-
-                            <p class="mt-1.5 text-xs text-slate-400">
-                                Scan or enter the physical copy's accession ID.
-                            </p>
-                        </div>
-
-                        <!-- Member ID -->
-                        <div>
-                            <label
-                                for="checkout-member"
-                                class="block text-sm font-semibold text-slate-700">
-                                Member ID
-                            </label>
-
-                            <input
-                                id="checkout-member"
-                                name="memberId"
-                                type="text"
-                                required
-                                autocomplete="off"
-                                placeholder="e.g. M-115"
-                                class="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100" />
-
-                            <p class="mt-1.5 text-xs text-slate-400">
-                                Enter or scan the borrowing member's ID.
-                            </p>
-                        </div>
-
-                        <!-- Submit -->
-                        <button
-                            type="submit"
-                            class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                            <svg
-                                class="h-4 w-4"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                stroke-width="2">
-                                <path
-                                    stroke-linecap="round"
+                        <div class="flex h-12 w-12 items-center justify-center
+                            rounded-xl bg-indigo-50 text-indigo-600
+                            transition group-hover:bg-indigo-100">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round"
                                     stroke-linejoin="round"
                                     d="M12 4v16m8-8H4" />
                             </svg>
-
-                            Issue Book
-                        </button>
-                    </form>
-                </div>
-
-                <!-- =====================================================
-             RETURN BOOK
-        ====================================================== -->
-                <div
-                    class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                    <!-- Card Header -->
-                    <div class="border-b border-slate-100 px-6 py-5">
-                        <div class="flex items-start gap-3">
-                            <div
-                                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600">
-                                <svg
-                                    class="h-5 w-5"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                    stroke-width="2">
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.291 9 11.622C17.176 19.291 21 14.591 21 9c0-1.042-.133-2.052-.382-3.016z" />
-                                </svg>
-                            </div>
-
-                            <div>
-                                <h2
-                                    class="text-base font-semibold text-slate-900">
-                                    Return Book
-                                </h2>
-
-                                <p class="mt-1 text-sm text-slate-500">
-                                    Process a returned physical copy.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Form -->
-                    <form
-                        th:action="@{/circulation/return}"
-                        method="post"
-                        class="space-y-5 px-6 py-6">
-                        <!-- Accession ID -->
-                        <div>
-                            <label
-                                for="return-accession"
-                                class="block text-sm font-semibold text-slate-700">
-                                Accession ID
-                            </label>
-
-                            <input
-                                id="return-accession"
-                                name="accessionId"
-                                type="text"
-                                required
-                                autocomplete="off"
-                                placeholder="e.g. ACC-000123"
-                                class="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100" />
-
-                            <p class="mt-1.5 text-xs text-slate-400">
-                                Scan or enter the returned copy's accession ID.
-                            </p>
                         </div>
 
-                        <!-- Condition -->
-                        <div>
-                            <label
-                                for="condition"
-                                class="block text-sm font-semibold text-slate-700">
-                                Condition on Return
-                            </label>
+                        <h3 class="mt-5 text-base font-semibold text-slate-900">
+                            Issue a Book
+                        </h3>
 
-                            <select
-                                id="condition"
-                                name="condition"
-                                required
-                                class="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
-                                <option value>Select condition</option>
+                        <p class="mt-2 flex-1 text-sm leading-6 text-slate-500">
+                            Issue a physical book to a registered member using
+                            the accession ID and member ID.
+                        </p>
 
-                                <option value="GOOD">Good</option>
-
-                                <option value="FAIR">Fair</option>
-
-                                <option value="POOR">Poor</option>
-
-                                <option value="DAMAGED">Damaged</option>
-                            </select>
-
-                            <p class="mt-1.5 text-xs text-slate-400">
-                                Record the condition of the book when it is
-                                returned.
-                            </p>
+                        <div class="mt-5 flex items-center justify-between
+                            border-t border-slate-100 pt-4">
+                            <span class="text-sm font-semibold text-indigo-600">
+                                Open checkout
+                            </span>
+                            <span class="text-lg text-indigo-600 transition
+                                 group-hover:translate-x-1"
+                                aria-hidden="true">&rarr;</span>
                         </div>
+                    </a>
 
-                        <!-- Submit -->
-                        <button
-                            type="submit"
-                            class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
-                            <svg
-                                class="h-4 w-4"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                stroke-width="2">
-                                <path
-                                    stroke-linecap="round"
+                    <!-- RETURN -->
+                    <a th:href="@{/circulation/return}"
+                        class="group flex flex-col rounded-2xl border border-slate-200
+                      bg-white p-6 shadow-sm transition duration-200
+                      hover:-translate-y-0.5 hover:border-emerald-300
+                      hover:shadow-md focus:outline-none focus:ring-4
+                      focus:ring-emerald-100">
+
+                        <div class="flex h-12 w-12 items-center justify-center
+                            rounded-xl bg-emerald-50 text-emerald-600
+                            transition group-hover:bg-emerald-100">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round"
                                     stroke-linejoin="round"
                                     d="M9 12l2 2 4-4" />
+                                <path stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11z" />
                             </svg>
+                        </div>
 
-                            Process Return
-                        </button>
-                    </form>
+                        <h3 class="mt-5 text-base font-semibold text-slate-900">
+                            Return a Book
+                        </h3>
+
+                        <p class="mt-2 flex-1 text-sm leading-6 text-slate-500">
+                            Record a returned copy, inspect its condition and
+                            handle any applicable fines or damage charges.
+                        </p>
+
+                        <div class="mt-5 flex items-center justify-between
+                            border-t border-slate-100 pt-4">
+                            <span
+                                class="text-sm font-semibold text-emerald-600">
+                                Open returns
+                            </span>
+                            <span class="text-lg text-emerald-600 transition
+                                 group-hover:translate-x-1"
+                                aria-hidden="true">&rarr;</span>
+                        </div>
+                    </a>
+
+                    <!-- RENEW -->
+                    <a th:href="@{/circulation/renew}"
+                        class="group flex flex-col rounded-2xl border border-slate-200
+                      bg-white p-6 shadow-sm transition duration-200
+                      hover:-translate-y-0.5 hover:border-amber-300
+                      hover:shadow-md focus:outline-none focus:ring-4
+                      focus:ring-amber-100">
+
+                        <div class="flex h-12 w-12 items-center justify-center
+                            rounded-xl bg-amber-50 text-amber-600
+                            transition group-hover:bg-amber-100">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M20 7v5h-5" />
+                                <path stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M4 17v-5h5" />
+                                <path stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M5.6 9a7 7 0 0111.8-2L20 12M4 12l2.6 5a7 7 0 0011.8-2" />
+                            </svg>
+                        </div>
+
+                        <h3 class="mt-5 text-base font-semibold text-slate-900">
+                            Renew a Loan
+                        </h3>
+
+                        <p class="mt-2 flex-1 text-sm leading-6 text-slate-500">
+                            Find an existing loan by accession ID and request
+                            an extension according to library renewal rules.
+                        </p>
+
+                        <div class="mt-5 flex items-center justify-between
+                            border-t border-slate-100 pt-4">
+                            <span class="text-sm font-semibold text-amber-600">
+                                Open renewals
+                            </span>
+                            <span class="text-lg text-amber-600 transition
+                                 group-hover:translate-x-1"
+                                aria-hidden="true">&rarr;</span>
+                        </div>
+                    </a>
+
                 </div>
-            </div>
+            </section>
+
+            <!-- WORKFLOW NOTE -->
+            <section class="rounded-xl border border-slate-200 bg-slate-50 p-5">
+                <div class="flex items-start gap-3">
+                    <div
+                        class="flex h-9 w-9 shrink-0 items-center justify-center
+                        rounded-lg bg-white text-slate-600 shadow-sm">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="1.8">
+                            <circle cx="12" cy="12" r="9" />
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M12 11v5m0-8h.01" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-sm font-semibold text-slate-800">
+                            Before processing a transaction
+                        </h2>
+                        <p class="mt-1 text-sm leading-6 text-slate-500">
+                            Confirm the physical copy's accession ID and the
+                            relevant member or loan details before submitting
+                            a circulation operation.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
         </div>
     </body>
 </html>
