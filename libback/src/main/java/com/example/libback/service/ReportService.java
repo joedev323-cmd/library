@@ -26,401 +26,360 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class ReportService {
 
-    private final LoanRepository loanRepository;
-    private final AccessionRepository accessionRepository;
-    private final MemberRepository borrowerRepository;
-    private final BookRepository itemRepository;
+        private final LoanRepository loanRepository;
+        private final AccessionRepository accessionRepository;
+        private final MemberRepository borrowerRepository;
+        private final BookRepository itemRepository;
 
-    public ReportService(
-            LoanRepository loanRepository,
-            AccessionRepository accessionRepository,
-            MemberRepository borrowerRepository,
-            BookRepository itemRepository) {
+        public ReportService(
+                        LoanRepository loanRepository,
+                        AccessionRepository accessionRepository,
+                        MemberRepository borrowerRepository,
+                        BookRepository itemRepository) {
 
-        this.loanRepository = loanRepository;
-        this.accessionRepository = accessionRepository;
-        this.borrowerRepository = borrowerRepository;
-        this.itemRepository = itemRepository;
-    }
-
-    /**
-     * Main report.
-     */
-    public ReportsResponseDto generateReport() {
-
-        ReportMetricsDto summary = generateSystemMetrics();
-
-        List<CategoryDemandDto> popularCategories =
-                generatePopularCategories();
-
-        List<OverdueLoanDto> overdueLoans =
-                generateOverdueLoans();
-
-        return new ReportsResponseDto(
-                summary,
-                popularCategories,
-                overdueLoans
-        );
-    }
-
-    /**
-     * Generates the main operational metrics.
-     */
-    public ReportMetricsDto generateSystemMetrics() {
-
-        ReportMetricsDto metrics = new ReportMetricsDto();
-
-        LocalDateTime now = LocalDateTime.now();
-
-        /*
-         * ============================
-         * CATALOGUE
-         * ============================
-         */
-
-        long totalBooks = itemRepository.count();
-
-        long totalCopies = accessionRepository.count();
-
-        /*
-         * ============================
-         * MEMBERS
-         * ============================
-         */
-
-        long totalMembers = borrowerRepository.count();
-
-        /*
-         * ============================
-         * CIRCULATION
-         * ============================
-         */
-
-        long totalLoans = loanRepository.count();
-
-        long activeLoans =
-                loanRepository.countByStatus(LoanStatus.ACTIVE);
-
-        long overdueLoans =
-                loanRepository.countByStatusAndDueDateBefore(
-                        LoanStatus.ACTIVE,
-                        now
-                );
-
-        long returnedLoans =
-                loanRepository.countByStatus(LoanStatus.RETURNED);
-
-        /*
-         * ============================
-         * CIRCULATION PERFORMANCE
-         * ============================
-         */
-
-        double returnRate =
-                totalLoans > 0
-                        ? ((double) returnedLoans / totalLoans) * 100
-                        : 0;
-
-        double overdueRate =
-                activeLoans > 0
-                        ? ((double) overdueLoans / activeLoans) * 100
-                        : 0;
-
-        metrics.setReturnRate(
-                roundPercentage(returnRate)
-        );
-
-        metrics.setOverdueRate(
-                roundPercentage(overdueRate)
-        );
-
-        /*
-         * ============================
-         * INVENTORY
-         * ============================
-         */
-
-        long availableCopies =
-                accessionRepository.countByAvailabilityStatus(
-                        AvailabilityStatus.AVAILABLE
-                );
-
-        metrics.setInventoryAvailable(totalCopies > 0);
-
-        if (totalCopies > 0) {
-
-            double availablePercentage =
-                    ((double) availableCopies / totalCopies) * 100;
-
-            double activeLoanPercentage =
-                    ((double) activeLoans / totalCopies) * 100;
-
-            metrics.setAvailablePercentage(
-                    roundPercentage(availablePercentage)
-            );
-
-            metrics.setActiveLoanPercentage(
-                    roundPercentage(activeLoanPercentage)
-            );
-
-        } else {
-
-            metrics.setAvailablePercentage(0);
-            metrics.setActiveLoanPercentage(0);
+                this.loanRepository = loanRepository;
+                this.accessionRepository = accessionRepository;
+                this.borrowerRepository = borrowerRepository;
+                this.itemRepository = itemRepository;
         }
 
-        /*
-         * ============================
-         * FINANCIAL
-         * ============================
+        /**
+         * Main report.
          */
+        public ReportsResponseDto generateReport() {
 
-        LocalDateTime monthStart =
-                LocalDate.now()
-                        .withDayOfMonth(1)
-                        .atStartOfDay();
+                ReportMetricsDto summary = generateSystemMetrics();
 
-        /*
-         * IMPORTANT:
-         *
-         * MTD means month start -> NOW,
-         * not month start -> next month.
-         */
-        BigDecimal finesCollected =
-                loanRepository.sumFinesCollectedBetween(
-                        monthStart,
-                        now
-                );
+                List<CategoryDemandDto> popularCategories = generatePopularCategories();
 
-        if (finesCollected == null) {
-            finesCollected = BigDecimal.ZERO;
+                List<OverdueLoanDto> overdueLoans = generateOverdueLoans();
+
+                return new ReportsResponseDto(
+                                summary,
+                                popularCategories,
+                                overdueLoans);
         }
 
-        BigDecimal outstandingFines =
-                loanRepository.sumOutstandingFines();
-
-        if (outstandingFines == null) {
-            outstandingFines = BigDecimal.ZERO;
-        }
-
-        long outstandingFineLoans =
-                loanRepository.countLoansWithOutstandingFines();
-
-        /*
-         * ============================
-         * POPULATE DTO
-         * ============================
+        /**
+         * Generates the main operational metrics.
          */
+        public ReportMetricsDto generateSystemMetrics() {
 
-        metrics.setTotalBooks(totalBooks);
-        metrics.setTotalCopies(totalCopies);
-        metrics.setTotalMembers(totalMembers);
+                ReportMetricsDto metrics = new ReportMetricsDto();
 
-        metrics.setTotalLoans(totalLoans);
-        metrics.setActiveLoans(activeLoans);
-        metrics.setOverdueLoans(overdueLoans);
-        metrics.setReturnedLoans(returnedLoans);
+                LocalDateTime now = LocalDateTime.now();
 
-        metrics.setAvailableCopies(availableCopies);
+                /*
+                 * ============================
+                 * CATALOGUE
+                 * ============================
+                 */
 
-        metrics.setFinesCollectedMtd(finesCollected);
-        metrics.setOutstandingFines(outstandingFines);
-        metrics.setOutstandingFineLoans(outstandingFineLoans);
+                long totalBooks = itemRepository.count();
 
-        return metrics;
-    }
+                long totalCopies = accessionRepository.count();
 
-    /**
-     * Categories with the highest number of active loans.
-     */
-    public List<CategoryDemandDto> generatePopularCategories() {
+                /*
+                 * ============================
+                 * MEMBERS
+                 * ============================
+                 */
 
-        return loanRepository
-                .findPopularCategories()
-                .stream()
-                .limit(5)
-                .map(row -> {
+                long totalMembers = borrowerRepository.count();
 
-                    String category = (String) row[0];
+                /*
+                 * ============================
+                 * CIRCULATION
+                 * ============================
+                 */
 
-                    long activeLoans =
-                            ((Number) row[1]).longValue();
+                long totalLoans = loanRepository.count();
 
-                    return new CategoryDemandDto(
-                            category,
-                            activeLoans
-                    );
-                })
-                .toList();
-    }
+                long activeLoans = loanRepository.countByStatus(LoanStatus.ACTIVE);
 
-    /**
-     * Five oldest currently overdue loans.
-     */
-    private List<OverdueLoanDto> generateOverdueLoans() {
-
-        LocalDateTime now = LocalDateTime.now();
-
-        List<Loan> loans =
-                loanRepository
-                        .findTop5ByStatusAndDueDateBeforeOrderByDueDateAsc(
+                long overdueLoans = loanRepository.countByStatusAndDueDateBefore(
                                 LoanStatus.ACTIVE,
-                                now
-                        );
+                                now);
 
-        return loans
-                .stream()
-                .map(this::toOverdueLoanDto)
-                .toList();
-    }
+                long returnedLoans = loanRepository.countByStatus(LoanStatus.RETURNED);
 
-    /**
-     * Converts Loan into report DTO.
-     */
-    private OverdueLoanDto toOverdueLoanDto(Loan loan) {
+                /*
+                 * ============================
+                 * CIRCULATION PERFORMANCE
+                 * ============================
+                 */
 
-        OverdueLoanDto dto = new OverdueLoanDto();
+                double returnRate = totalLoans > 0
+                                ? ((double) returnedLoans / totalLoans) * 100
+                                : 0;
 
-        /*
-         * LOAN
-         */
+                double overdueRate = activeLoans > 0
+                                ? ((double) overdueLoans / activeLoans) * 100
+                                : 0;
 
-        dto.setLoanId(
-                loan.getLoanId()
-        );
+                metrics.setReturnRate(
+                                roundPercentage(returnRate));
 
-        /*
-         * MEMBER
-         */
+                metrics.setOverdueRate(
+                                roundPercentage(overdueRate));
 
-        dto.setMemberId(
-                loan.getMember().getMemberId()
-        );
+                /*
+                 * ============================
+                 * INVENTORY
+                 * ============================
+                 */
 
-        dto.setMemberName(
-                loan.getMember().getName()
-        );
+                long availableCopies = accessionRepository.countByAvailabilityStatus(
+                                AvailabilityStatus.AVAILABLE);
 
-        dto.setMemberEmail(
-                loan.getMember().getEmail()
-        );
+                metrics.setInventoryAvailable(totalCopies > 0);
 
-        /*
-         * BOOK
-         */
+                if (totalCopies > 0) {
 
-        dto.setIsbn(
-                loan.getAccession()
-                        .getBook()
-                        .getIsbn()
-        );
+                        double availablePercentage = ((double) availableCopies / totalCopies) * 100;
 
-        dto.setTitle(
-                loan.getAccession()
-                        .getBook()
-                        .getTitle()
-        );
+                        double activeLoanPercentage = ((double) activeLoans / totalCopies) * 100;
 
-        dto.setBarcode(
-                loan.getAccession()
-                        .getBarcode()
-        );
+                        metrics.setAvailablePercentage(
+                                        roundPercentage(availablePercentage));
 
-        /*
-         * DATES / FINE
-         */
+                        metrics.setActiveLoanPercentage(
+                                        roundPercentage(activeLoanPercentage));
 
-        dto.setDueDate(
-                loan.getDueDate()
-        );
+                } else {
 
-        dto.setFineAccrued(
-                loan.getFineAccrued()
-        );
+                        metrics.setAvailablePercentage(0);
+                        metrics.setActiveLoanPercentage(0);
+                }
 
-        long daysOverdue =
-                ChronoUnit.DAYS.between(
-                        loan.getDueDate(),
-                        LocalDateTime.now()
-                );
+                /*
+                 * ============================
+                 * FINANCIAL
+                 * ============================
+                 */
 
-        dto.setDaysOverdue(
-                Math.max(daysOverdue, 0)
-        );
+                LocalDateTime monthStart = LocalDate.now()
+                                .withDayOfMonth(1)
+                                .atStartOfDay();
 
-        return dto;
-    }
+                /*
+                 * IMPORTANT:
+                 *
+                 * MTD means month start -> NOW,
+                 * not month start -> next month.
+                 */
+                BigDecimal finesCollected = loanRepository.sumFinesCollectedBetween(
+                                monthStart,
+                                now);
 
-    private double roundPercentage(double value) {
+                if (finesCollected == null) {
+                        finesCollected = BigDecimal.ZERO;
+                }
 
-        return Math.round(value * 10.0) / 10.0;
-    }
+                BigDecimal outstandingFines = loanRepository.sumOutstandingFines();
 
-    /**
-     * Generates the physical inventory CSV.
-     */
-    public String generateInventoryCsv() {
+                if (outstandingFines == null) {
+                        outstandingFines = BigDecimal.ZERO;
+                }
 
-        List<Accession> allCopies =
-                accessionRepository.findAll();
+                long outstandingFineLoans = loanRepository.countLoansWithOutstandingFines();
 
-        StringBuilder csv = new StringBuilder();
+                /*
+                 * ============================
+                 * POPULATE DTO
+                 * ============================
+                 */
 
-        csv.append(
-                "Accession ID,Barcode,ISBN,Title,Shelf Location,Availability Status"
-        );
+                metrics.setTotalBooks(totalBooks);
+                metrics.setTotalCopies(totalCopies);
+                metrics.setTotalMembers(totalMembers);
 
-        csv.append("\n");
+                metrics.setTotalLoans(totalLoans);
+                metrics.setActiveLoans(activeLoans);
+                metrics.setOverdueLoans(overdueLoans);
+                metrics.setReturnedLoans(returnedLoans);
 
-        for (Accession copy : allCopies) {
+                metrics.setAvailableCopies(availableCopies);
 
-            String isbn = "";
-            String title = "";
+                metrics.setFinesCollectedMtd(finesCollected);
+                metrics.setOutstandingFines(outstandingFines);
+                metrics.setOutstandingFineLoans(outstandingFineLoans);
 
-            if (copy.getBook() != null) {
-
-                isbn = copy.getBook().getIsbn();
-                title = copy.getBook().getTitle();
-            }
-
-            String availability = "";
-
-            if (copy.getAvailabilityStatus() != null) {
-
-                availability =
-                        copy.getAvailabilityStatus().name();
-            }
-
-            csv.append("\"")
-                    .append(escapeCsv(copy.getAccessionId()))
-                    .append("\",\"")
-                    .append(escapeCsv(copy.getBarcode()))
-                    .append("\",\"")
-                    .append(escapeCsv(isbn))
-                    .append("\",\"")
-                    .append(escapeCsv(title))
-                    .append("\",\"")
-                    .append(escapeCsv(copy.getShelfLocation()))
-                    .append("\",\"")
-                    .append(escapeCsv(availability))
-                    .append("\"")
-                    .append("\n");
+                return metrics;
         }
 
-        return csv.toString();
-    }
+        /**
+         * Categories with the highest number of active loans.
+         */
+        public List<CategoryDemandDto> generatePopularCategories() {
 
-    private String escapeCsv(String value) {
+                return loanRepository
+                                .findPopularCategories()
+                                .stream()
+                                .limit(5)
+                                .map(row -> {
 
-        if (value == null) {
-            return "";
+                                        String category = (String) row[0];
+
+                                        long activeLoans = ((Number) row[1]).longValue();
+
+                                        return new CategoryDemandDto(
+                                                        category,
+                                                        activeLoans);
+                                })
+                                .toList();
         }
 
-        return value.replace("\"", "\"\"");
-    }
+        /**
+         * Five oldest currently overdue loans.
+         */
+        private List<OverdueLoanDto> generateOverdueLoans() {
 
-    public List<OverdueLoanDto> getOverdueLoans() {
+                LocalDateTime now = LocalDateTime.now();
 
-        return generateOverdueLoans();
-    }
+                List<Loan> loans = loanRepository
+                                .findTop5ByStatusAndDueDateBeforeOrderByDueDateAsc(
+                                                LoanStatus.ACTIVE,
+                                                now);
+
+                return loans
+                                .stream()
+                                .map(this::toOverdueLoanDto)
+                                .toList();
+        }
+
+        /**
+         * Converts Loan into report DTO.
+         */
+        private OverdueLoanDto toOverdueLoanDto(Loan loan) {
+
+                OverdueLoanDto dto = new OverdueLoanDto();
+
+                /*
+                 * LOAN
+                 */
+
+                dto.setLoanId(
+                                loan.getLoanId());
+
+                /*
+                 * MEMBER
+                 */
+
+                dto.setMemberId(
+                                loan.getMember().getMemberId());
+
+                dto.setMemberName(
+                                loan.getMember().getName());
+
+                dto.setMemberEmail(
+                                loan.getMember().getEmail());
+
+                /*
+                 * BOOK
+                 */     
+
+                dto.setIsbn(
+                                loan.getAccession()
+                                                .getBook()
+                                                .getIsbn());
+
+                dto.setTitle(
+                                loan.getAccession()
+                                                .getBook()
+                                                .getTitle());
+
+                dto.setBarcode(
+                                loan.getAccession()
+                                                .getBarcode());
+
+                /*
+                 * DATES / FINE
+                 */
+
+                dto.setDueDate(
+                                loan.getDueDate());
+
+                dto.setFineAccrued(
+                                loan.getFineAccrued());
+
+                long daysOverdue = ChronoUnit.DAYS.between(
+                                loan.getDueDate(),
+                                LocalDateTime.now());
+
+                dto.setDaysOverdue(
+                                Math.max(daysOverdue, 0));
+
+                return dto;
+        }
+
+        private double roundPercentage(double value) {
+
+                return Math.round(value * 10.0) / 10.0;
+        }
+
+        /**
+         * Generates the physical inventory CSV.
+         */
+        public String generateInventoryCsv() {
+
+                List<Accession> allCopies = accessionRepository.findAll();
+
+                StringBuilder csv = new StringBuilder();
+
+                csv.append(
+                                "Accession ID,Barcode,ISBN,Title,Shelf Location,Availability Status");
+
+                csv.append("\n");
+
+                for (Accession copy : allCopies) {
+
+                        String isbn = "";
+                        String title = "";
+
+                        if (copy.getBook() != null) {
+
+                                isbn = copy.getBook().getIsbn();
+                                title = copy.getBook().getTitle();
+                        }
+
+                        String availability = "";
+
+                        if (copy.getAvailabilityStatus() != null) {
+
+                                availability = copy.getAvailabilityStatus().name();
+                        }
+
+                        csv.append("\"")
+                                        .append(escapeCsv(copy.getAccessionId()))
+                                        .append("\",\"")
+                                        .append(escapeCsv(copy.getBarcode()))
+                                        .append("\",\"")
+                                        .append(escapeCsv(isbn))
+                                        .append("\",\"")
+                                        .append(escapeCsv(title))
+                                        .append("\",\"")
+                                        .append(escapeCsv(copy.getShelfLocation()))
+                                        .append("\",\"")
+                                        .append(escapeCsv(availability))
+                                        .append("\"")
+                                        .append("\n");
+                }
+
+                return csv.toString();
+        }
+
+        private String escapeCsv(String value) {
+
+                if (value == null) {
+                        return "";
+                }
+
+                return value.replace("\"", "\"\"");
+        }
+
+        public List<OverdueLoanDto> getOverdueLoans() {
+
+                return generateOverdueLoans();
+        }
 }

@@ -26,188 +26,162 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(
-            HttpSecurity http
-    ) throws Exception {
+            HttpSecurity http) throws Exception {
 
         http
 
-            // =====================================================
-            // CORS
-            // =====================================================
-            .cors(cors ->
-                cors.configurationSource(corsConfigurationSource())
-            )
+                // =====================================================
+                // CORS
+                // =====================================================
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-            // =====================================================
-            // CSRF
-            // =====================================================
-            .csrf(csrf ->
-                csrf.ignoringRequestMatchers(
-                    "/api/**",
-                    "/h2/**"
-                )
-            )
+                // =====================================================
+                // CSRF
+                // =====================================================
+                .csrf(csrf -> csrf.ignoringRequestMatchers(
+                        "/api/**",
+                        "/h2/**"))
 
-            // =====================================================
-            // AUTHORIZATION
-            // =====================================================
-            .authorizeHttpRequests(auth -> auth
+                // =====================================================
+                // AUTHORIZATION
+                // =====================================================
+                .authorizeHttpRequests(auth -> auth
 
-                // -------------------------------------------------
-                // PUBLIC PAGES
-                // -------------------------------------------------
+                        // -------------------------------------------------
+                        // PUBLIC PAGES
+                        // -------------------------------------------------
 
-                .requestMatchers(
-                    "/",
-                    "/index",
-                    "/login"
-                ).permitAll()
+                        .requestMatchers(
+                                "/",
+                                "/index",
+                                "/login")
+                        .permitAll()
 
-                // Static resources
-                .requestMatchers(
-                    "/css/**",
-                    "/js/**",
-                    "/img/**",
-                    "/favicon.ico"
-                ).permitAll()
+                        // Static resources
+                        .requestMatchers(
+                                "/css/**",
+                                "/js/**",
+                                "/img/**",
+                                "/favicon.ico")
+                        .permitAll()
 
+                        // -------------------------------------------------
+                        // PUBLIC CATALOGUE
+                        // -------------------------------------------------
 
-                // -------------------------------------------------
-                // PUBLIC CATALOGUE
-                // -------------------------------------------------
+                        // Public catalogue pages
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/cantalog/**")
+                        .permitAll()
 
-                // Public catalogue pages
-                .requestMatchers(
-                    HttpMethod.GET,
-                    "/cantalog/**"
-                ).permitAll()
+                        // Public catalogue API
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/catalogue/**")
+                        .permitAll()
 
-                // Public catalogue API
-                .requestMatchers(
-                    HttpMethod.GET,
-                    "/api/catalogue/**"
-                ).permitAll()
+                        // -------------------------------------------------
+                        // H2 CONSOLE
+                        // -------------------------------------------------
 
+                        .requestMatchers(
+                                "/h2/**")
+                        .permitAll()
 
-                // -------------------------------------------------
+                        // -------------------------------------------------
+                        // PUBLIC API
+                        // -------------------------------------------------
+
+                        /*
+                         * If your entire API is intentionally public,
+                         * keep this.
+                         *
+                         * Otherwise remove "/api/**" from the PUBLIC
+                         * section and secure individual API endpoints below.
+                         */
+                        .requestMatchers(
+                                "/api/**")
+                        .permitAll()
+
+                        // -------------------------------------------------
+                        // SUPERADMIN ONLY
+                        // -------------------------------------------------
+
+                        .requestMatchers(
+                                "/api/users/**",
+                                "/admin/users/**")
+                        .hasRole("SUPER_ADMIN")
+
+                        // -------------------------------------------------
+                        // LIBRARIAN + SUPERADMIN
+                        // -------------------------------------------------
+
+                        .requestMatchers(
+                                "/api/books/**",
+                                "/api/categories/**",
+                                "/api/accessions/**",
+                                "/api/members/**",
+                                "/api/loans/**",
+                                "/api/reports/**")
+                        .hasAnyRole(
+                                "SUPER_ADMIN",
+                                "LIBRARIAN")
+
+                        .requestMatchers(
+                                "/admin/catalog/**",
+                                "/admin/books/**",
+                                "/admin/categories/**",
+                                "/admin/accessions/**",
+                                "/admin/members/**",
+                                "/admin/circulation/**",
+                                "/admin/reports/**")
+                        .hasAnyRole(
+                                "SUPER_ADMIN",
+                                "LIBRARIAN")
+
+                        // -------------------------------------------------
+                        // STAFF PAGES
+                        // -------------------------------------------------
+
+                        .requestMatchers(
+                                "/dashboard",
+                                "/circulation",
+                                "/reports")
+                        .hasAnyRole(
+                                "SUPER_ADMIN",
+                                "LIBRARIAN")
+
+                        // -------------------------------------------------
+                        // EVERYTHING ELSE
+                        // -------------------------------------------------
+
+                        .anyRequest().authenticated())
+
+                // =====================================================
+                // FORM LOGIN
+                // =====================================================
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
+                        .defaultSuccessUrl("/dashboard", true)
+                        .permitAll())
+
+                // =====================================================
+                // LOGOUT
+                // =====================================================
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/index")
+                        .permitAll())
+
+                // =====================================================
                 // H2 CONSOLE
-                // -------------------------------------------------
-
-                .requestMatchers(
-                    "/h2/**"
-                ).permitAll()
-
-
-                // -------------------------------------------------
-                // PUBLIC API
-                // -------------------------------------------------
-
-                /*
-                 * If your entire API is intentionally public,
-                 * keep this.
-                 *
-                 * Otherwise remove "/api/**" from the PUBLIC
-                 * section and secure individual API endpoints below.
-                 */
-                .requestMatchers(
-                    "/api/**"
-                ).permitAll()
-
-
-                // -------------------------------------------------
-                // SUPERADMIN ONLY
-                // -------------------------------------------------
-
-                .requestMatchers(
-                    "/api/users/**",
-                    "/admin/users/**"
-                ).hasRole("SUPER_ADMIN")
-
-
-                // -------------------------------------------------
-                // LIBRARIAN + SUPERADMIN
-                // -------------------------------------------------
-
-                .requestMatchers(
-                    "/api/books/**",
-                    "/api/categories/**",
-                    "/api/accessions/**",
-                    "/api/members/**",
-                    "/api/loans/**",
-                    "/api/reports/**"
-                ).hasAnyRole(
-                    "SUPER_ADMIN",
-                    "LIBRARIAN"
-                )
-
-                .requestMatchers(
-                    "/admin/catalog/**",
-                    "/admin/books/**",
-                    "/admin/categories/**",
-                    "/admin/accessions/**",
-                    "/admin/members/**",
-                    "/admin/circulation/**",
-                    "/admin/reports/**"
-                ).hasAnyRole(
-                    "SUPER_ADMIN",
-                    "LIBRARIAN"
-                )
-
-
-                // -------------------------------------------------
-                // STAFF PAGES
-                // -------------------------------------------------
-
-                .requestMatchers(
-                    "/dashboard",
-                    "/circulation",
-                    "/reports"
-                ).hasAnyRole(
-                    "SUPER_ADMIN",
-                    "LIBRARIAN"
-                )
-
-
-                // -------------------------------------------------
-                // EVERYTHING ELSE
-                // -------------------------------------------------
-
-                .anyRequest().authenticated()
-            )
-
-            // =====================================================
-            // FORM LOGIN
-            // =====================================================
-            .formLogin(form ->
-                form
-                    .loginPage("/login")
-                    .loginProcessingUrl("/login")
-                    .defaultSuccessUrl("/dashboard", true)
-                    .permitAll()
-            )
-
-            // =====================================================
-            // LOGOUT
-            // =====================================================
-            .logout(logout ->
-                logout
-                    .logoutUrl("/logout")
-                    .logoutSuccessUrl("/index")
-                    .permitAll()
-            )
-
-            // =====================================================
-            // H2 CONSOLE
-            // =====================================================
-            .headers(headers ->
-                headers.frameOptions(frame ->
-                    frame.sameOrigin()
-                )
-            );
+                // =====================================================
+                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
 
         return http.build();
     }
-
 
     // =============================================================
     // CORS CONFIGURATION
@@ -216,39 +190,31 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
-        CorsConfiguration configuration =
-                new CorsConfiguration();
+        CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(
-            List.of(
-                "http://localhost:5173"
-            )
-        );
+                List.of(
+                        "http://localhost:5173"));
 
         configuration.setAllowedMethods(
-            List.of(
-                "GET",
-                "POST",
-                "PUT",
-                "PATCH",
-                "DELETE",
-                "OPTIONS"
-            )
-        );
+                List.of(
+                        "GET",
+                        "POST",
+                        "PUT",
+                        "PATCH",
+                        "DELETE",
+                        "OPTIONS"));
 
         configuration.setAllowedHeaders(
-            List.of("*")
-        );
+                List.of("*"));
 
         configuration.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
         source.registerCorsConfiguration(
-            "/**",
-            configuration
-        );
+                "/**",
+                configuration);
 
         return source;
     }

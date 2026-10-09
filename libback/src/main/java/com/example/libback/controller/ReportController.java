@@ -12,58 +12,51 @@ import java.io.PrintWriter;
 @Controller
 public class ReportController {
 
-    private final ReportService reportService;
+        private final ReportService reportService;
 
-    public ReportController(ReportService reportService) {
-        this.reportService = reportService;
-    }
+        public ReportController(ReportService reportService) {
+                this.reportService = reportService;
+        }
 
-    @GetMapping("/reports")
-    public String showReportsPage(Model model) {
+        @GetMapping("/reports")
+        public String showReportsPage(Model model) {
 
-        var report = reportService.generateReport();
+                var report = reportService.generateReport();
 
-        model.addAttribute(
-                "metrics",
-                report.getSummary()
-        );
+                model.addAttribute(
+                                "metrics",
+                                report.getSummary());
 
-        model.addAttribute(
-                "popularCategories",
-                report.getPopularCategories()
-        );
+                model.addAttribute(
+                                "popularCategories",
+                                report.getPopularCategories());
 
-        model.addAttribute(
-                "overdueLoans",
-                report.getOverdueLoans()
-        );
+                model.addAttribute(
+                                "overdueLoans",
+                                report.getOverdueLoans());
 
-        model.addAttribute(
-                "pageTitle",
-                "Management Reports"
-        );
+                model.addAttribute(
+                                "pageTitle",
+                                "Management Reports");
 
-        return "reports/index";
-    }
+                return "reports/index";
+        }
 
-    @GetMapping("/reports/export-inventory")
-    public void exportInventoryManifest(
-            HttpServletResponse response) throws IOException {
+        @GetMapping("/reports/export-inventory")
+        public void exportInventoryManifest(
+                        HttpServletResponse response) throws IOException {
 
-        response.setContentType("text/csv");
+                response.setContentType("text/csv");
 
-        response.setHeader(
-                "Content-Disposition",
-                "attachment; filename=inventory_audit_manifest.csv"
-        );
+                response.setHeader(
+                                "Content-Disposition",
+                                "attachment; filename=inventory_audit_manifest.csv");
 
-        String csv =
-                reportService.generateInventoryCsv();
+                String csv = reportService.generateInventoryCsv();
 
-        PrintWriter writer =
-                response.getWriter();
+                PrintWriter writer = response.getWriter();
 
-        writer.write(csv);
-        writer.flush();
-    }
+                writer.write(csv);
+                writer.flush();
+        }
 }

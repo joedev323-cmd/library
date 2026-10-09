@@ -34,11 +34,39 @@ public class CirculationController {
 
         @GetMapping("/circulation")
         public String showCirculationPage(Model model) {
-
-                model.addAttribute("pageTitle","Circulation Desk");
+                model.addAttribute("pageTitle", "Circulation Desk");
                 return "circulation/index";
         }
 
+        @GetMapping("/circulation/borrow")
+        public String showBorrowPage(Model model) {
+                model.addAttribute("pageTitle", "Issue Desk");
+                return "circulation/borrow";
+        }
+
+        @GetMapping("/circulation/return")
+        public String showReturnPage(Model model) {
+                model.addAttribute("pageTitle", "Return Desk");
+                return "circulation/return";
+        }
+
+        @GetMapping("/circulation/renew")
+        public String showRenewPage(
+                        @RequestParam(required = false) String accessionId,
+                        Model model) {
+
+                if (accessionId != null && !accessionId.isBlank()) {
+                        try {
+                                Loan loan = circulationService.findLoanByAccession(accessionId);
+                                model.addAttribute("loan", loan);
+                        } catch (IllegalArgumentException e) {
+                                model.addAttribute("errorMessage", e.getMessage());
+                        }
+                }
+
+                model.addAttribute("pageTitle", "Renew Loan");
+                return "circulation/renew";
+        }
         // =========================================================
         // CHECKOUT
         // =========================================================
@@ -135,32 +163,7 @@ public class CirculationController {
                 return "redirect:/circulation";
         }
 
-        @GetMapping("/circulation/renew")
-        public String showRenewPage(
-                        @RequestParam(required = false) String accessionId,
-                        Model model,
-                        RedirectAttributes redirectAttributes) {
-
-                if (accessionId != null
-                                && !accessionId.isBlank()) {
-
-                        try {
-
-                                Loan loan = circulationService.findLoanByAccession(
-                                                accessionId);
-
-                                model.addAttribute("loan", loan);
-
-                        } catch (IllegalArgumentException e) {
-
-                                model.addAttribute(
-                                                "errorMessage",
-                                                e.getMessage());
-                        }
-                }
-                model.addAttribute("pageTitle","Renew Loan");
-                return "circulation/renew";
-        }
+       
 
         @PostMapping("/circulation/renew")
         public String processRenewal(
