@@ -1,0 +1,298 @@
+
+<!doctype html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+
+<head>
+    <title th:text="${holidayId == '' ? 'Add Holiday' : 'Edit Holiday'}">Holiday Form</title>
+</head>
+
+<body>
+<section layout:fragment="content" class="mx-auto max-w-3xl space-y-6">
+
+    <!-- Heading -->
+    <div>
+        <a th:href="@{/holidays}"
+           class="inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-indigo-600">
+            <span aria-hidden="true">←</span>
+            Back to holidays
+        </a>
+
+        <p id="pageDescription" class="mt-1 text-sm text-slate-500">
+            Record a date when the library will be closed.
+        </p>
+    </div>
+
+    <!-- Alert -->
+    <div id="formAlert"
+         role="alert"
+         aria-live="polite"
+         class="hidden rounded-lg border px-4 py-3 text-sm">
+    </div>
+
+    <!-- Form card -->
+    <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div class="border-b border-slate-200 px-6 py-5">
+            <h2 class="font-semibold text-slate-900">Holiday details</h2>
+            <p class="mt-1 text-sm text-slate-500">
+                Enter the holiday name, date and optional description.
+            </p>
+        </div>
+
+        <form id="holidayForm"
+              th:attr="data-holiday-id=${holidayId}"
+              class="space-y-6 p-6">
+
+            <div>
+                <label for="name" class="mb-2 block text-sm font-medium text-slate-700">
+                    Holiday name <span class="text-red-500">*</span>
+                </label>
+                <input id="name"
+                       name="name"
+                       type="text"
+                       maxlength="150"
+                       required
+                       autocomplete="off"
+                       placeholder="e.g. Christmas Day"
+                       class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"/>
+                <p class="mt-1.5 text-xs text-slate-500">Maximum 150 characters.</p>
+            </div>
+
+            <div>
+                <label for="holidayDate" class="mb-2 block text-sm font-medium text-slate-700">
+                    Holiday date <span class="text-red-500">*</span>
+                </label>
+                <input id="holidayDate"
+                       name="holidayDate"
+                       type="date"
+                       required
+                       class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"/>
+                <p class="mt-1.5 text-xs text-slate-500">
+                    Select the date the library will observe the holiday.
+                </p>
+            </div>
+
+            <div>
+                <div class="mb-2 flex items-center justify-between gap-3">
+                    <label for="description" class="block text-sm font-medium text-slate-700">
+                        Description
+                    </label>
+                    <span id="descriptionCount" class="text-xs text-slate-400">0/500</span>
+                </div>
+                <textarea id="description"
+                          name="description"
+                          maxlength="500"
+                          rows="4"
+                          placeholder="Optional details about the holiday or closure..."
+                          class="w-full resize-y rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"></textarea>
+                <p class="mt-1.5 text-xs text-slate-500">Optional, maximum 500 characters.</p>
+            </div>
+
+            <div class="flex flex-col-reverse gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:justify-end">
+                <a th:href="@{/holidays}"
+                   class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                    Cancel
+                </a>
+
+                <button id="saveButton"
+                        type="submit"
+                        class="inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60">
+                    <span id="saveButtonText">Save Holiday</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        (() => {
+            const API = '/api/admin/holidays';
+            const form = document.getElementById('holidayForm');
+            const rawHolidayId = form.dataset.holidayId?.trim() || '';
+
+            const isEditing =
+                rawHolidayId !== '' &&
+                /^\d+$/.test(rawHolidayId);
+
+            const holidayId = isEditing ? rawHolidayId : '';
+
+            const nameInput = document.getElementById('name');
+            const dateInput = document.getElementById('holidayDate');
+            const descriptionInput = document.getElementById('description');
+            const descriptionCount = document.getElementById('descriptionCount');
+            const alertBox = document.getElementById('formAlert');
+            const saveButton = document.getElementById('saveButton');
+            const saveButtonText = document.getElementById('saveButtonText');
+
+            function csrfHeaders() {
+                const token = document.querySelector('meta[name="_csrf"]')?.content;
+                const header = document.querySelector('meta[name="_csrf_header"]')?.content;
+                return token && header ? { [header]: token } : {};
+            }
+
+            function showAlert(message, type = 'error') {
+                alertBox.textContent = message;
+                alertBox.className = 'rounded-lg border px-4 py-3 text-sm ' +
+                    (type === 'success'
+                        ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                        : 'border-red-200 bg-red-50 text-red-800');
+            }
+
+
+            async function request(url, options = {}) {
+                const response = await fetch(url, {
+                    credentials: 'same-origin',
+                    ...options,
+                    headers: {
+                        ...(options.body
+                            ? { 'Content-Type': 'application/json' }
+                            : {}),
+                        ...csrfHeaders(),
+                        ...(options.headers || {})
+                    }
+                });
+
+                const responseText = await response.text();
+
+                let data = null;
+
+                try {
+                    data = responseText ? JSON.parse(responseText) : null;
+                } catch (_) {
+                    data = responseText;
+                }
+
+                if (!response.ok) {
+                    console.error('Holiday API error:', {
+                        status: response.status,
+                        response: data,
+                        requestBody: options.body
+                            ? JSON.parse(options.body)
+                            : null
+                    });
+
+                    let message = `Request failed (${response.status}).`;
+
+                    if (typeof data === 'string' && data.trim()) {
+                        message = data;
+                    } else if (data) {
+                        message =
+                            data.detail ||
+                            data.message ||
+                            data.title ||
+                            data.error ||
+                            message;
+
+                        if (data.errors) {
+                            const errors = Array.isArray(data.errors)
+                                ? data.errors.map(e =>
+                                    typeof e === 'string'
+                                        ? e
+                                        : `${e.field || ''}: ${e.defaultMessage || e.message || ''}`
+                                ).join('; ')
+                                : JSON.stringify(data.errors);
+
+                            message += ` Details: ${errors}`;
+                        }
+                    }
+
+                    throw new Error(message);
+                }
+
+                if (response.status === 204) return null;
+                return data;
+            }
+
+
+            function updateDescriptionCount() {
+                descriptionCount.textContent = `${descriptionInput.value.length}/500`;
+            }
+
+            function setSaving(saving) {
+                saveButton.disabled = saving;
+                saveButtonText.textContent = saving
+                    ? 'Saving...'
+                    : (isEditing ? 'Save Changes' : 'Save Holiday');
+            }
+
+            async function loadHoliday() {
+                if (!isEditing) return;
+
+                document.getElementById('pageTitle').textContent = 'Edit Holiday';
+                document.getElementById('pageDescription').textContent =
+                    'Update the details of this library holiday.';
+                saveButtonText.textContent = 'Save Changes';
+
+                saveButton.disabled = true;
+                saveButtonText.textContent = 'Loading...';
+
+                try {
+                    const holiday = await request(`${API}/${encodeURIComponent(holidayId)}`);
+
+                    nameInput.value = holiday.name || '';
+                    dateInput.value = holiday.holidayDate || '';
+                    descriptionInput.value = holiday.description || '';
+                    updateDescriptionCount();
+                } catch (error) {
+                    showAlert(`Could not load this holiday: ${error.message}`);
+                } finally {
+                    saveButton.disabled = false;
+                    saveButtonText.textContent = 'Save Changes';
+                }
+            }
+
+            form.addEventListener('submit', async event => {
+                event.preventDefault();
+                alertBox.className = 'hidden';
+
+                if (!form.reportValidity()) return;
+
+                const payload = {
+                    name: nameInput.value.trim(),
+                    holidayDate: dateInput.value,
+                    description: descriptionInput.value.trim()
+                };
+
+                if (!payload.name || !payload.holidayDate) {
+                    showAlert('Please enter a holiday name and date.');
+                    return;
+                }
+
+                setSaving(true);
+
+                try {
+                    await request(
+                        isEditing
+                            ? `${API}/${encodeURIComponent(holidayId)}`
+                            : API,
+                        {
+                            method: isEditing ? 'PUT' : 'POST',
+                            body: JSON.stringify(payload)
+                        }
+                    );
+
+                    window.location.assign(
+                        '/holidays?message=' +
+                        encodeURIComponent(
+                            isEditing
+                                ? 'Holiday updated successfully.'
+                                : 'Holiday created successfully.'
+                        )
+                    );
+                } catch (error) {
+                    showAlert(`Could not save holiday: ${error.message}`);
+                    setSaving(false);
+                }
+            });
+
+            descriptionInput.addEventListener('input', updateDescriptionCount);
+
+            updateDescriptionCount();
+            loadHoliday();
+        })();
+    </script>
+
+</section>
+</body>
+</html>

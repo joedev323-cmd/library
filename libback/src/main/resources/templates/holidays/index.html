@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+
+<head>
+    <title>Holiday Management</title>
+</head>
+
+<body>
+<section layout:fragment="content" class="space-y-6">
+
+    <!-- Page heading -->
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <p class="mt-1 text-sm text-slate-500">
+                Manage library holidays and closure dates.
+            </p>
+        </div>
+
+        <a th:href="@{/holidays/new}"
+           class="inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            Add Holiday
+        </a>
+    </div>
+
+    <!-- Summary cards -->
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="flex items-center justify-between">
+                <p class="text-sm font-medium text-slate-500">Total holidays</p>
+                <span class="rounded-lg bg-indigo-50 p-2 text-indigo-600">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                    </svg>
+                </span>
+            </div>
+            <p id="totalCount" class="mt-3 text-3xl font-bold text-slate-900">—</p>
+            <p class="mt-1 text-xs text-slate-500">All recorded holidays</p>
+        </div>
+
+        <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="flex items-center justify-between">
+                <p class="text-sm font-medium text-slate-500">Upcoming</p>
+                <span class="rounded-lg bg-emerald-50 p-2 text-emerald-600">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                </span>
+            </div>
+            <p id="upcomingCount" class="mt-3 text-3xl font-bold text-slate-900">—</p>
+            <p class="mt-1 text-xs text-slate-500">Today and future dates</p>
+        </div>
+
+        <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="flex items-center justify-between">
+                <p class="text-sm font-medium text-slate-500">Past holidays</p>
+                <span class="rounded-lg bg-slate-100 p-2 text-slate-600">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                </span>
+            </div>
+            <p id="pastCount" class="mt-3 text-3xl font-bold text-slate-900">—</p>
+            <p class="mt-1 text-xs text-slate-500">Dates before today</p>
+        </div>
+    </div>
+
+    <!-- Alerts -->
+    <div id="alertBox" role="status" aria-live="polite"
+         class="hidden rounded-lg border px-4 py-3 text-sm"></div>
+
+    <!-- Holidays table -->
+    <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+
+        <div class="flex flex-col gap-4 border-b border-slate-200 p-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h2 class="text-lg font-semibold text-slate-900">All holidays</h2>
+                <p class="mt-1 text-sm text-slate-500">
+                    View and maintain your library closure dates.
+                </p>
+            </div>
+
+            <div class="flex flex-col gap-2 sm:flex-row">
+                <label for="searchInput" class="sr-only">Search holidays</label>
+                <input id="searchInput" type="search"
+                       placeholder="Search holidays..."
+                       class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 sm:w-64"/>
+
+                <button id="refreshButton" type="button"
+                        class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                    Refresh
+                </button>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200">
+                <thead class="bg-slate-50">
+                <tr>
+                    <th scope="col" class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        Holiday
+                    </th>
+                    <th scope="col" class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        Date
+                    </th>
+                    <th scope="col" class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        Description
+                    </th>
+                    <th scope="col" class="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        Actions
+                    </th>
+                </tr>
+                </thead>
+
+                <tbody id="holidayTableBody" class="divide-y divide-slate-100">
+                <tr>
+                    <td colspan="4" class="px-5 py-12 text-center text-sm text-slate-500">
+                        Loading holidays...
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="flex flex-col gap-2 border-t border-slate-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <p id="resultCount" class="text-sm text-slate-500">Loading records...</p>
+            <p class="text-xs text-slate-400">Dates are displayed in your local calendar.</p>
+        </div>
+    </div>
+
+    <script>
+        (() => {
+            const API_URL = '/api/admin/holidays';
+
+            const tbody = document.getElementById('holidayTableBody');
+            const searchInput = document.getElementById('searchInput');
+            const alertBox = document.getElementById('alertBox');
+            const resultCount = document.getElementById('resultCount');
+
+            let holidays = [];
+
+            function escapeHtml(value) {
+                return String(value ?? '').replace(/[&<>"']/g, char => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                })[char]);
+            }
+
+            function formatDate(dateString) {
+                if (!dateString) return '—';
+
+                const parts = dateString.split('-').map(Number);
+                if (parts.length !== 3 || parts.some(Number.isNaN)) {
+                    return escapeHtml(dateString);
+                }
+
+                return new Intl.DateTimeFormat(undefined, {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                    timeZone: 'UTC'
+                }).format(new Date(Date.UTC(parts[0], parts[1] - 1, parts[2])));
+            }
+
+            function showAlert(message, type = 'error') {
+                alertBox.className = 'rounded-lg border px-4 py-3 text-sm';
+                alertBox.classList.add(
+                    ...(type === 'success'
+                        ? ['border-emerald-200', 'bg-emerald-50', 'text-emerald-800']
+                        : ['border-red-200', 'bg-red-50', 'text-red-800'])
+                );
+                alertBox.textContent = message;
+            }
+
+            function hideAlert() {
+                alertBox.className = 'hidden';
+                alertBox.textContent = '';
+            }
+
+            async function request(url, options = {}) {
+                const response = await fetch(url, {
+                    ...options,
+                    headers: {
+                        ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+                        ...options.headers
+                    }
+                });
+
+                if (!response.ok) {
+                    let message = `Request failed (${response.status}).`;
+
+                    try {
+                        const body = await response.json();
+                        message = body.message || body.detail || body.error || message;
+
+                        if (body.errors && typeof body.errors === 'object') {
+                            message = Object.values(body.errors).join(' ');
+                        }
+                    } catch (_) {
+                        // Keep the fallback message for non-JSON responses.
+                    }
+
+                    throw new Error(message);
+                }
+
+                if (response.status === 204) return null;
+                return response.json();
+            }
+
+            function updateSummary() {
+                const today = new Date();
+                const todayString = [
+                    today.getFullYear(),
+                    String(today.getMonth() + 1).padStart(2, '0'),
+                    String(today.getDate()).padStart(2, '0')
+                ].join('-');
+
+                document.getElementById('totalCount').textContent = holidays.length;
+                document.getElementById('upcomingCount').textContent =
+                    holidays.filter(h => h.holidayDate >= todayString).length;
+                document.getElementById('pastCount').textContent =
+                    holidays.filter(h => h.holidayDate < todayString).length;
+            }
+
+            function renderTable() {
+                const query = searchInput.value.trim().toLowerCase();
+
+                const filtered = holidays.filter(holiday =>
+                    [holiday.name, holiday.description, holiday.holidayDate]
+                        .some(value => String(value ?? '').toLowerCase().includes(query))
+                );
+
+                resultCount.textContent =
+                    `Showing ${filtered.length} of ${holidays.length} holiday${holidays.length === 1 ? '' : 's'}`;
+
+                if (filtered.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="px-5 py-14 text-center">
+                                <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                                <p class="mt-3 font-medium text-slate-700">
+                                    ${holidays.length ? 'No matching holidays' : 'No holidays added yet'}
+                                </p>
+                                <p class="mt-1 text-sm text-slate-500">
+                                    ${holidays.length
+                        ? 'Try another search term.'
+                        : 'Add your first holiday to get started.'}
+                                </p>
+                                ${holidays.length ? '' : `
+                                    <a href="/holidays/new"
+                                       class="mt-4 inline-flex rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">
+                                        Add holiday
+                                    </a>`}
+                            </td>
+                        </tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = filtered.map(holiday => `
+                    <tr class="transition hover:bg-slate-50">
+                        <td class="whitespace-nowrap px-5 py-4">
+                            <div class="font-semibold text-slate-900">${escapeHtml(holiday.name)}</div>
+                            <div class="mt-1 text-xs text-slate-400">ID: ${escapeHtml(holiday.id)}</div>
+                        </td>
+                        <td class="whitespace-nowrap px-5 py-4 text-sm text-slate-700">
+                            <span class="inline-flex rounded-full bg-indigo-50 px-3 py-1 font-medium text-indigo-700">
+                                ${formatDate(holiday.holidayDate)}
+                            </span>
+                        </td>
+                        <td class="max-w-sm px-5 py-4 text-sm text-slate-600">
+                            <span class="line-clamp-2">${escapeHtml(holiday.description || 'No description')}</span>
+                        </td>
+                        <td class="whitespace-nowrap px-5 py-4 text-right text-sm">
+                            <div class="flex justify-end gap-3">
+                                <a href="/holidays/${encodeURIComponent(holiday.id)}/edit"
+                                   class="font-medium text-indigo-600 hover:text-indigo-800">
+                                    Edit
+                                </a>
+                                <button type="button"
+                                        data-delete-id="${escapeHtml(holiday.id)}"
+                                        data-delete-name="${escapeHtml(holiday.name)}"
+                                        class="font-medium text-red-600 hover:text-red-800">
+                                    Delete
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            async function loadHolidays() {
+                hideAlert();
+                tbody.innerHTML = `
+                    <tr><td colspan="4" class="px-5 py-12 text-center text-sm text-slate-500">
+                        Loading holidays...
+                    </td></tr>`;
+
+                try {
+                    const data = await request(API_URL);
+                    if (!Array.isArray(data)) {
+                        throw new Error('The server returned an unexpected holiday list.');
+                    }
+
+                    holidays = data.sort((a, b) =>
+                        String(a.holidayDate).localeCompare(String(b.holidayDate))
+                    );
+
+                    updateSummary();
+                    renderTable();
+                } catch (error) {
+                    tbody.innerHTML = `
+                        <tr><td colspan="4" class="px-5 py-12 text-center text-sm text-red-600">
+                            Could not load holidays. ${escapeHtml(error.message)}
+                        </td></tr>`;
+                    resultCount.textContent = 'Unable to load records';
+                    showAlert(error.message || 'Could not load holidays.');
+                }
+            }
+
+            tbody.addEventListener('click', async event => {
+                const button = event.target.closest('[data-delete-id]');
+                if (!button) return;
+
+                const id = button.dataset.deleteId;
+                const name = button.dataset.deleteName;
+
+                if (!confirm(`Delete "${name}"? This action cannot be undone.`)) return;
+
+                button.disabled = true;
+
+                try {
+                    await request(`${API_URL}/${encodeURIComponent(id)}`, {
+                        method: 'DELETE'
+                    });
+
+                    showAlert(`"${name}" was deleted successfully.`, 'success');
+                    await loadHolidays();
+                } catch (error) {
+                    showAlert(error.message || 'Could not delete the holiday.');
+                    button.disabled = false;
+                }
+            });
+
+            searchInput.addEventListener('input', renderTable);
+            document.getElementById('refreshButton').addEventListener('click', loadHolidays);
+
+            loadHolidays();
+        })();
+    </script>
+
+</section>
+</body>
+</html>
