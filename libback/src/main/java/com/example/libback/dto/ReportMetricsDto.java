@@ -131,10 +131,12 @@ public class ReportMetricsDto {
     // ============================
 
     public long getAvailableCopies() {
+
         return availableCopies;
     }
 
     public void setAvailableCopies(long availableCopies) {
+
         this.availableCopies = availableCopies;
     }
 
@@ -143,18 +145,22 @@ public class ReportMetricsDto {
     }
 
     public void setInventoryAvailable(boolean inventoryAvailable) {
+
         this.inventoryAvailable = inventoryAvailable;
     }
 
     public double getAvailablePercentage() {
+
         return availablePercentage;
     }
 
     public void setAvailablePercentage(double availablePercentage) {
+
         this.availablePercentage = availablePercentage;
     }
 
     public double getActiveLoanPercentage() {
+
         return activeLoanPercentage;
     }
 

@@ -1,360 +1,385 @@
 <!doctype html>
 <html
-    lang="en"
-    xmlns:th="http://www.thymeleaf.org"
-    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-    layout:decorate="~{layouts/main}">
-    <head>
-        <title>Dashboard</title>
-    </head>
+        lang="en"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layouts/main}">
+<head>
+    <title>Dashboard</title>
+</head>
 
-    <body>
-        <div layout:fragment="content">
-            <!-- =====================================================
-         WELCOME / QUICK ACTIONS
-         ===================================================== -->
-            <section
-                class="rounded-2xl bg-gradient-to-r from-purple-700 to-purple-600 p-6 text-white shadow-sm sm:p-8">
-                <div
-                    class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-purple-200">Library
-                            overview</p>
+<body>
+<div layout:fragment="content">
+    <!-- =====================================================
+ WELCOME / QUICK ACTIONS
+ ===================================================== -->
+    <section
+            class="rounded-2xl bg-gradient-to-r from-purple-700 to-purple-600 p-6 text-white shadow-sm sm:p-8">
+        <div
+                class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+                <p class="text-sm font-medium text-purple-200">Library
+                    overview</p>
 
-                        <h2
-                            class="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
-                            Welcome back,
+                <h2
+                        class="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
+                    Welcome back,
 
-                            <span
-                                th:text="${username != null ? username : 'Librarian'}">
+                    <span
+                            th:text="${username != null ? username : 'Librarian'}">
                                 Librarian
                             </span>
-                        </h2>
+                </h2>
 
-                        <p
-                            class="mt-2 max-w-xl text-sm leading-6 text-purple-100">
-                            Keep track of your collection, members and
-                            circulation activity
-                            from one place.
-                        </p>
-                    </div>
+                <p
+                        class="mt-2 max-w-xl text-sm leading-6 text-purple-100">
+                    Keep track of your collection, members and
+                    circulation activity
+                    from one place.
+                </p>
+            </div>
 
-                    <div class="flex flex-wrap gap-3">
-                        <a
-                            th:href="@{/circulation}"
-                            class="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-purple-700 shadow-sm transition hover:bg-purple-50">
-                            <span>＋</span>
+            <div class="flex flex-wrap gap-3">
+                <a
+                        th:href="@{/circulation}"
+                        class="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-purple-700 shadow-sm transition hover:bg-purple-50">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>Issue a book</span>
+                </a>
 
-                            Issue a book
-                        </a>
+                <a
+                        th:href="@{/Catalogue}"
+                        class="inline-flex items-center gap-2 rounded-xl border border-purple-400 bg-purple-700/40 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-purple-700">
+                    <span>Browse catalog</span>
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </section>
 
-                        <a
-                            th:href="@{/Catalogue}"
-                            class="inline-flex items-center gap-2 rounded-xl border border-purple-400 bg-purple-700/40 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-purple-700">
-                            Browse catalog
+    <!-- =====================================================
+ KPI CARDS
+ ===================================================== -->
+    <section class="mt-8">
+        <div class="mb-4">
+            <h2 class="text-base font-semibold text-slate-900">
+                Library at a glance
+            </h2>
 
-                            <span>→</span>
-                        </a>
-                    </div>
-                </div>
-            </section>
+            <p class="mt-1 text-sm text-slate-500">
+                Current collection and circulation figures.
+            </p>
+        </div>
 
-            <!-- =====================================================
-         KPI CARDS
-         ===================================================== -->
-            <section class="mt-8">
-                <div class="mb-4">
-                    <h2 class="text-base font-semibold text-slate-900">
-                        Library at a glance
-                    </h2>
+        <div
+                class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <!-- TOTAL BOOKS -->
+            <article
+                    class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                <p class="text-sm font-medium text-slate-500">Total
+                    books</p>
 
-                    <p class="mt-1 text-sm text-slate-500">
-                        Current collection and circulation figures.
-                    </p>
-                </div>
+                <p
+                        class="mt-2 text-3xl font-bold tracking-tight text-slate-900"
+                        th:text="${stats.totalBooks}">
+                    0
+                </p>
 
-                <div
-                    class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                    <!-- TOTAL BOOKS -->
-                    <article
-                        class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-                        <p class="text-sm font-medium text-slate-500">Total
-                            books</p>
+                <a
+                        th:href="@{/Catalogue}"
+                        class="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-purple-600 hover:text-purple-700">
+                    <span>View catalog</span>
+                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                </a>
+            </article>
 
-                        <p
-                            class="mt-2 text-3xl font-bold tracking-tight text-slate-900"
-                            th:text="${stats.totalBooks}">
-                            0
-                        </p>
+            <!-- BOOKS OUT -->
+            <article
+                    class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                <p class="text-sm font-medium text-slate-500">Books on
+                    loan</p>
 
-                        <a
-                            th:href="@{/Catalogue}"
-                            class="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-purple-600 hover:text-purple-700">
-                            View catalog →
-                        </a>
-                    </article>
+                <p
+                        class="mt-2 text-3xl font-bold tracking-tight text-slate-900"
+                        th:text="${stats.booksOut}">
+                    0
+                </p>
 
-                    <!-- BOOKS OUT -->
-                    <article
-                        class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-                        <p class="text-sm font-medium text-slate-500">Books on
-                            loan</p>
+                <a
+                        th:href="@{/circulation}"
+                        class="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700">
+                    <span>Manage circulation</span>
+                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                </a>
+            </article>
 
-                        <p
-                            class="mt-2 text-3xl font-bold tracking-tight text-slate-900"
-                            th:text="${stats.booksOut}">
-                            0
-                        </p>
+            <!-- OVERDUE -->
+            <article
+                    class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                <p
+                        class="text-sm font-medium text-slate-500">Overdue</p>
 
-                        <a
-                            th:href="@{/circulation}"
-                            class="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700">
-                            Manage circulation →
-                        </a>
-                    </article>
-
-                    <!-- OVERDUE -->
-                    <article
-                        class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-                        <p
-                            class="text-sm font-medium text-slate-500">Overdue</p>
-
-                        <p
-                            class="mt-2 text-3xl font-bold tracking-tight"
-                            th:classappend="${stats.overdueCount > 0
+                <p
+                        class="mt-2 text-3xl font-bold tracking-tight"
+                        th:classappend="${stats.overdueCount > 0
                        ? 'text-red-600'
                        : 'text-slate-900'}"
-                            th:text="${stats.overdueCount}">
-                            0
-                        </p>
+                        th:text="${stats.overdueCount}">
+                    0
+                </p>
 
-                        <a
-                            th:href="@{/circulation}"
-                            class="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-red-600 hover:text-red-700">
-                            Review overdue →
-                        </a>
-                    </article>
-
-                    <!-- MEMBERS -->
-                    <article
-                        class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-                        <p class="text-sm font-medium text-slate-500">Active
-                            members</p>
-
-                        <p
-                            class="mt-2 text-3xl font-bold tracking-tight text-slate-900"
-                            th:text="${stats.activeMembers}">
-                            0
-                        </p>
-
-                        <a
-                            th:href="@{/members}"
-                            class="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 hover:text-emerald-700">
-                            View members →
-                        </a>
-                    </article>
-                </div>
-            </section>
-
-            <!-- =====================================================
-         RECENT ACTIVITY
-         ===================================================== -->
-            <section
-                class="mt-8 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                <div
-                    class="flex items-center justify-between border-b border-slate-100 px-5 py-5 sm:px-6">
-                    <div>
-                        <h2 class="text-base font-semibold text-slate-900">
-                            Recent circulation
-                        </h2>
-
-                        <p class="mt-1 text-sm text-slate-500">
-                            Latest borrowing and return activity.
-                        </p>
-                    </div>
-
-                    <a
+                <a
                         th:href="@{/circulation}"
-                        class="rounded-xl bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-purple-700">
-                        Manage circulation →
-                    </a>
-                </div>
+                        class="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-red-600 hover:text-red-700">
+                    <span>Review overdue</span>
+                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                </a>
+            </article>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead>
-                            <tr
-                                class="border-b border-slate-100 bg-slate-50/80">
-                                <th
-                                    class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500">
-                                    Book
-                                </th>
+            <!-- MEMBERS -->
+            <article
+                    class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                <p class="text-sm font-medium text-slate-500">Active
+                    members</p>
 
-                                <th
-                                    class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500">
-                                    Borrower
-                                </th>
+                <p
+                        class="mt-2 text-3xl font-bold tracking-tight text-slate-900"
+                        th:text="${stats.activeMembers}">
+                    0
+                </p>
 
-                                <th
-                                    class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500">
-                                    Action
-                                </th>
+                <a
+                        th:href="@{/members}"
+                        class="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 hover:text-emerald-700">
+                    <span>View members</span>
+                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                </a>
+            </article>
+        </div>
+    </section>
 
-                                <th
-                                    class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500">
-                                    Due date
-                                </th>
+    <!-- =====================================================
+ RECENT ACTIVITY
+ ===================================================== -->
+    <section
+            class="mt-8 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div
+                class="flex items-center justify-between border-b border-slate-100 px-5 py-5 sm:px-6">
+            <div>
+                <h2 class="text-base font-semibold text-slate-900">
+                    Recent circulation
+                </h2>
 
-                                <th
-                                    class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500">
-                                    Status
-                                </th>
-                            </tr>
-                        </thead>
+                <p class="mt-1 text-sm text-slate-500">
+                    Latest borrowing and return activity.
+                </p>
+            </div>
 
-                        <tbody class="divide-y divide-slate-100">
-                            <tr th:each="log : ${logs}"
-                                class="transition hover:bg-slate-50">
-                                <td
-                                    class="px-6 py-4 font-semibold text-slate-800"
-                                    th:text="${log.bookTitle}">
-                                    Book
-                                </td>
+            <a
+                    th:href="@{/circulation}"
+                    class="inline-flex items-center gap-1.5 rounded-xl bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-purple-700">
+                <span>Manage circulation</span>
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+            </a>
+        </div>
 
-                                <td class="px-6 py-4">
-                                    <p
-                                        class="font-medium text-slate-700"
-                                        th:text="${log.memberName}">
-                                        Member
-                                    </p>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead>
+                <tr
+                        class="border-b border-slate-100 bg-slate-50/80">
+                    <th
+                            class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        Book
+                    </th>
 
-                                    <p class="text-xs text-slate-400"
-                                        th:text="${log.memberId}">
-                                        M-001
-                                    </p>
-                                </td>
+                    <th
+                            class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        Borrower
+                    </th>
 
-                                <td
-                                    class="px-6 py-4 text-sm text-slate-600"
-                                    th:text="${log.action}">
-                                    Issued
-                                </td>
+                    <th
+                            class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        Action
+                    </th>
 
-                                <td
-                                    class="px-6 py-4 text-sm text-slate-500"
-                                    th:text="${log.dueDate != null
+                    <th
+                            class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        Due date
+                    </th>
+
+                    <th
+                            class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        Status
+                    </th>
+                </tr>
+                </thead>
+
+                <tbody class="divide-y divide-slate-100">
+                <tr th:each="log : ${logs}"
+                    class="transition hover:bg-slate-50">
+                    <td
+                            class="px-6 py-4 font-semibold text-slate-800"
+                            th:text="${log.bookTitle}">
+                        Book
+                    </td>
+
+                    <td class="px-6 py-4">
+                        <p
+                                class="font-medium text-slate-700"
+                                th:text="${log.memberName}">
+                            Member
+                        </p>
+
+                        <p class="text-xs text-slate-400"
+                           th:text="${log.memberId}">
+                            M-001
+                        </p>
+                    </td>
+
+                    <td
+                            class="px-6 py-4 text-sm text-slate-600"
+                            th:text="${log.action}">
+                        Issued
+                    </td>
+
+                    <td
+                            class="px-6 py-4 text-sm text-slate-500"
+                            th:text="${log.dueDate != null
                             ? #temporals.format(log.dueDate, 'MMM d, yyyy')
                             : '—'}">
-                                    —
-                                </td>
+                        —
+                    </td>
 
-                                <td class="px-6 py-4">
+                    <td class="px-6 py-4">
                                     <span
-                                        class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold"
-                                        th:text="${log.status}"
-                                        th:classappend="${log.status == 'Overdue'
+                                            class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold"
+                                            th:text="${log.status}"
+                                            th:classappend="${log.status == 'Overdue'
                                   ? 'bg-red-50 text-red-700'
                                   : (log.status == 'On Loan'
                                       ? 'bg-blue-50 text-blue-700'
                                       : 'bg-emerald-50 text-emerald-700')}">
                                         Status
                                     </span>
-                                </td>
-                            </tr>
+                    </td>
+                </tr>
 
-                            <tr th:if="${#lists.isEmpty(logs)}">
-                                <td colspan="5" class="px-6 py-16 text-center">
-                                    <p class="font-medium text-slate-700">
-                                        No circulation activity
-                                    </p>
+                <tr th:if="${#lists.isEmpty(logs)}">
+                    <td colspan="5" class="px-6 py-16 text-center">
+                        <p class="font-medium text-slate-700">
+                            No circulation activity
+                        </p>
 
-                                    <p class="mt-1 text-sm text-slate-500">
-                                        Recent book issues and returns will
-                                        appear here.
-                                    </p>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- =====================================================
-         QUICK ACCESS
-         ===================================================== -->
-            <section class="mt-8">
-                <div class="mb-4">
-                    <h2 class="text-base font-semibold text-slate-900">Quick
-                        access</h2>
-
-                    <p class="mt-1 text-sm text-slate-500">
-                        Common library administration tasks.
-                    </p>
-                </div>
-
-                <div
-                    class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <a
-                        th:href="@{/Catalogue}"
-                        class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-purple-200 hover:shadow-md">
-                        <div
-                            class="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-50 text-purple-600">
-                            📚
-                        </div>
-
-                        <h3
-                            class="mt-4 font-semibold text-slate-800">Catalog</h3>
-
-                        <p class="mt-1 text-sm text-slate-500">Browse and manage
-                            books.</p>
-                    </a>
-
-                    <a
-                        th:href="@{/members}"
-                        class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-purple-200 hover:shadow-md">
-                        <div
-                            class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-                            👥
-                        </div>
-
-                        <h3
-                            class="mt-4 font-semibold text-slate-800">Members</h3>
-
-                        <p class="mt-1 text-sm text-slate-500">Manage library
-                            members.</p>
-                    </a>
-
-                    <a
-                        th:href="@{/admin/categories}"
-                        class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-purple-200 hover:shadow-md">
-                        <div
-                            class="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
-                            🗂️
-                        </div>
-
-                        <h3
-                            class="mt-4 font-semibold text-slate-800">Categories</h3>
-
-                        <p class="mt-1 text-sm text-slate-500">Organize the
-                            collection.</p>
-                    </a>
-
-                    <a
-                        th:href="@{/reports}"
-                        class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-purple-200 hover:shadow-md">
-                        <div
-                            class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-                            📊
-                        </div>
-
-                        <h3
-                            class="mt-4 font-semibold text-slate-800">Reports</h3>
-
-                        <p class="mt-1 text-sm text-slate-500">Review library
-                            activity.</p>
-                    </a>
-                </div>
-            </section>
+                        <p class="mt-1 text-sm text-slate-500">
+                            Recent book issues and returns will
+                            appear here.
+                        </p>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
-    </body>
+    </section>
+
+    <!-- =====================================================
+ QUICK ACCESS
+ ===================================================== -->
+    <section class="mt-8">
+        <div class="mb-4">
+            <h2 class="text-base font-semibold text-slate-900">Quick
+                access</h2>
+
+            <p class="mt-1 text-sm text-slate-500">
+                Common library administration tasks.
+            </p>
+        </div>
+
+        <div
+                class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <a
+                    th:href="@{/Catalogue}"
+                    class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-purple-200 hover:shadow-md">
+                <div
+                        class="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-50 text-purple-600">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                </div>
+
+                <h3
+                        class="mt-4 font-semibold text-slate-800">Catalog</h3>
+
+                <p class="mt-1 text-sm text-slate-500">Browse and manage
+                    books.</p>
+            </a>
+
+            <a
+                    th:href="@{/members}"
+                    class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-purple-200 hover:shadow-md">
+                <div
+                        class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                </div>
+
+                <h3
+                        class="mt-4 font-semibold text-slate-800">Members</h3>
+
+                <p class="mt-1 text-sm text-slate-500">Manage library
+                    members.</p>
+            </a>
+
+            <a
+                    th:href="@{/admin/categories}"
+                    class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-purple-200 hover:shadow-md">
+                <div
+                        class="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                    </svg>
+                </div>
+
+                <h3
+                        class="mt-4 font-semibold text-slate-800">Categories</h3>
+
+                <p class="mt-1 text-sm text-slate-500">Organize the
+                    collection.</p>
+            </a>
+
+            <a
+                    th:href="@{/reports}"
+                    class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-purple-200 hover:shadow-md">
+                <div
+                        class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                </div>
+
+                <h3
+                        class="mt-4 font-semibold text-slate-800">Reports</h3>
+
+                <p class="mt-1 text-sm text-slate-500">Review library
+                    activity.</p>
+            </a>
+        </div>
+    </section>
+</div>
+</body>
 </html>

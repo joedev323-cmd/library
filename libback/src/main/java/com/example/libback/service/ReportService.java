@@ -382,4 +382,89 @@ public class ReportService {
 
                 return generateOverdueLoans();
         }
+
+        public byte[] generateInventoryExcel() {
+                List<Accession> allCopies = accessionRepository.findAll();
+
+                try (org.apache.poi.ss.usermodel.Workbook workbook = new org.apache.poi.xssf.usermodel.XSSFWorkbook();
+                     java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream()) {
+
+                        org.apache.poi.ss.usermodel.Sheet sheet = workbook.createSheet("Inventory Audit");
+
+                        // Create Header Row
+                        int rowIndex = 0;
+                        org.apache.poi.ss.usermodel.Row headerRow = sheet.createRow(rowIndex++);
+                        String[] columns = {"Accession ID", "Barcode", "ISBN", "Title", "Shelf Location", "Availability Status"};
+                        for (int i = 0; i < columns.length; i++) {
+                                headerRow.createCell(i).setCellValue(columns[i]);
+                        }
+
+                        // Populate Data Rows
+                        for (Accession copy : allCopies) {
+                                org.apache.poi.ss.usermodel.Row row = sheet.createRow(rowIndex++);
+                                row.createCell(0).setCellValue(copy.getAccessionId() != null ? copy.getAccessionId() : "");
+                                row.createCell(1).setCellValue(copy.getBarcode() != null ? copy.getBarcode() : "");
+                                row.createCell(2).setCellValue(copy.getBook() != null && copy.getBook().getIsbn() != null ? copy.getBook().getIsbn() : "");
+                                row.createCell(3).setCellValue(copy.getBook() != null && copy.getBook().getTitle() != null ? copy.getBook().getTitle() : "");
+                                row.createCell(4).setCellValue(copy.getShelfLocation() != null ? copy.getShelfLocation() : "");
+                                row.createCell(5).setCellValue(copy.getAvailabilityStatus() != null ? copy.getAvailabilityStatus().name() : "");
+                        }
+
+                        workbook.write(out);
+                        return out.toByteArray();
+                } catch (Exception e) {
+                        throw new RuntimeException("Failed to generate Excel report", e);
+                }
+        }
+
+        public byte[] generateInventoryPdf() {
+                List<Accession> allCopies = accessionRepository.findAll();
+
+                try (java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream()) {
+                        com.lowagie.text.Document document = new com.lowagie.text.Document(com.lowagie.text.PageSize.A4.rotate());
+                        com.lowagie.text.pdf.PdfWriter.getInstance(document, out);
+
+                        document.open();
+
+                        // Title
+                        com.lowagie.text.Font titleFont = com.lowagie.text.FontFactory.getFont(com.lowagie.text.FontFactory.HELVETICA_BOLD, 18);
+                        document.add(new com.lowagie.text.Paragraph("Library Inventory Audit Manifest", titleFont));
+                        document.add(new com.lowagie.text.Paragraph("Generated automatically from BiblioHub\n\n"));
+
+                        // Create Table (6 columns)
+                        com.lowagie.text.pdf.PdfPTable table = new com.lowagie.text.pdf.PdfPTable(6);
+                        table.setWidthPercentage(100);
+
+                        // Header Cells
+                        String[] headers = {"Accession ID", "Barcode", "ISBN", "Title", "Shelf", "Status"};
+                        com.lowagie.text.Font headerFont = com.lowagie.text.FontFactory.getFont(com.lowagie.text.FontFactory.HELVETICA_BOLD, 10);
+                        for (String header : headers) {
+                                com.lowagie.text.pdf.PdfPCell cell = new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Phrase(header, headerFont));
+
+                                // USE java.awt.Color INSTEAD OF BaseColor
+                                cell.setBackgroundColor(java.awt.Color.LIGHT_GRAY);
+
+                                cell.setPadding(6);
+                                table.addCell(cell);
+                        }
+
+                        // Data Cells
+                        com.lowagie.text.Font bodyFont = com.lowagie.text.FontFactory.getFont(com.lowagie.text.FontFactory.HELVETICA, 9);
+                        for (Accession copy : allCopies) {
+                                table.addCell(new com.lowagie.text.Phrase(copy.getAccessionId() != null ? copy.getAccessionId() : "", bodyFont));
+                                table.addCell(new com.lowagie.text.Phrase(copy.getBarcode() != null ? copy.getBarcode() : "", bodyFont));
+                                table.addCell(new com.lowagie.text.Phrase(copy.getBook() != null ? copy.getBook().getIsbn() : "", bodyFont));
+                                table.addCell(new com.lowagie.text.Phrase(copy.getBook() != null ? copy.getBook().getTitle() : "", bodyFont));
+                                table.addCell(new com.lowagie.text.Phrase(copy.getShelfLocation() != null ? copy.getShelfLocation() : "", bodyFont));
+                                table.addCell(new com.lowagie.text.Phrase(copy.getAvailabilityStatus() != null ? copy.getAvailabilityStatus().name() : "", bodyFont));
+                        }
+
+                        document.add(table);
+                        document.close();
+
+                        return out.toByteArray();
+                } catch (Exception e) {
+                        throw new RuntimeException("Failed to generate PDF report", e);
+                }
+        }
 }

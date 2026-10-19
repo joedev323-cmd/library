@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -44,19 +45,36 @@ public class ReportController {
 
         @GetMapping("/reports/export-inventory")
         public void exportInventoryManifest(
-                        HttpServletResponse response) throws IOException {
+                @RequestParam(name = "type", defaultValue = "csv") String type,
+                HttpServletResponse response) throws IOException {
 
-                response.setContentType("text/csv");
+                String lowerType = type.toLowerCase();
 
-                response.setHeader(
-                                "Content-Disposition",
-                                "attachment; filename=inventory_audit_manifest.csv");
+                switch (lowerType) {
+                        case "pdf":
+                                response.setContentType("application/pdf");
+                                response.setHeader("Content-Disposition", "attachment; filename=inventory_audit_manifest.pdf");
+                                byte[] pdfBytes = reportService.generateInventoryPdf(); // Implement in your service
+                                response.getOutputStream().write(pdfBytes);
+                                break;
 
-                String csv = reportService.generateInventoryCsv();
+                        case "excel":
+                        case "xlsx":
+                                response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+                                response.setHeader("Content-Disposition", "attachment; filename=inventory_audit_manifest.xlsx");
+                                byte[] excelBytes = reportService.generateInventoryExcel(); // Implement in your service
+                                response.getOutputStream().write(excelBytes);
+                                break;
 
-                PrintWriter writer = response.getWriter();
-
-                writer.write(csv);
-                writer.flush();
+                        case "csv":
+                        default:
+                                response.setContentType("text/csv");
+                                response.setHeader("Content-Disposition", "attachment; filename=inventory_audit_manifest.csv");
+                                String csv = reportService.generateInventoryCsv();
+                                PrintWriter writer = response.getWriter();
+                                writer.write(csv);
+                                writer.flush();
+                                break;
+                }
         }
 }

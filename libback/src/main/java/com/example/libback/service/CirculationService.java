@@ -13,6 +13,11 @@ import com.example.libback.repository.LoanRepository;
 import com.example.libback.repository.MemberRepository;
 import com.example.libback.repository.PaymentRepository;
 import java.util.List;
+import com.example.libback.notification.dto.NotificationRequest;
+import com.example.libback.notification.service.NotificationService;
+
+import java.time.Instant;
+import java.time.ZoneId;
 
 
 import org.springframework.stereotype.Service;
@@ -30,19 +35,26 @@ public class CirculationService {
         private final LoanRepository loanRepository;
         private final AuditLogService auditLogService;
         private final PaymentRepository paymentRepository;
+        private final NotificationService notificationService;
+
+        private final LibraryCalendarService libraryCalendarService;
 
         public CirculationService(
-                        AccessionRepository accessionRepository,
-                        MemberRepository memberRepository,
-                        LoanRepository loanRepository,
-                        PaymentRepository paymentRepository,
-                        AuditLogService auditLogService) {
+                AccessionRepository accessionRepository,
+                MemberRepository memberRepository,
+                LoanRepository loanRepository,
+                PaymentRepository paymentRepository,
+                AuditLogService auditLogService,
+                NotificationService notificationService,
+                LibraryCalendarService libraryCalendarService) {
 
                 this.accessionRepository = accessionRepository;
                 this.memberRepository = memberRepository;
                 this.loanRepository = loanRepository;
                 this.paymentRepository = paymentRepository;
                 this.auditLogService = auditLogService;
+                this.notificationService = notificationService;
+                this.libraryCalendarService = libraryCalendarService;
         }
 
         // =========================================================
@@ -126,8 +138,14 @@ public class CirculationService {
 
                 loan.setCheckoutDate(checkoutDate);
 
-                loan.setDueDate(
-                                checkoutDate.plusDays(loanDays));
+                LocalDateTime calculatedDueDate =
+                        checkoutDate.plusDays(loanDays);
+
+                LocalDateTime adjustedDueDate =
+                        libraryCalendarService.moveToNextOpenDate(
+                                calculatedDueDate);
+
+                loan.setDueDate(adjustedDueDate);
 
                 loan.setRenewalCount(0);
 
@@ -154,6 +172,18 @@ public class CirculationService {
                 // ---------------------------------------------------------
 
                 Loan savedLoan = loanRepository.save(loan);
+
+                // notify the borrower
+                notifyBorrower(
+                        member,
+                        "Book checkout confirmation",
+                        "Hello " + member.getName()
+                                + ", you borrowed \""
+                                + accession.getBook().getTitle()
+                                + "\". Please return it by "
+                                + savedLoan.getDueDate() + ".",
+                        savedLoan.getDueDate()
+                );
 
                 // ---------------------------------------------------------
                 // 10. Audit
@@ -196,26 +226,25 @@ public class CirculationService {
 
                 BigDecimal totalFine = BigDecimal.ZERO;
 
+
                 // =========================================================
-                // OVERDUE FINE
+                // OVERDUE FINE - EXCLUDE RECORDED CLOSURE DAYS
                 // =========================================================
 
                 if (loan.getDueDate() != null
-                                && now.isAfter(loan.getDueDate())) {
+                        && now.isAfter(loan.getDueDate())) {
 
-                        long daysLate = ChronoUnit.DAYS.between(
+                        long chargeableDays =
+                                libraryCalendarService.countChargeableDays(
                                         loan.getDueDate(),
                                         now);
-                        
+
                         BigDecimal fineRate = BigDecimal.valueOf(15);
 
-                        if (daysLate > 0) {
-
-                                //  can be changed currently its 15
-                                totalFine = fineRate.multiply(
-                                                BigDecimal.valueOf(daysLate));
-                        }
+                        totalFine = fineRate.multiply(
+                                BigDecimal.valueOf(chargeableDays));
                 }
+
 
                 // =========================================================
                 // DAMAGE FINE
@@ -253,6 +282,17 @@ public class CirculationService {
                                 AvailabilityStatus.AVAILABLE);
 
                 accessionRepository.save(accession);
+
+                notifyBorrower(
+                        loan.getMember(),
+                        "Book return confirmation",
+                        "Hello " + loan.getMember().getName()
+                                + ", your return of \""
+                                + loan.getAccession().getBook().getTitle()
+                                + "\" has been recorded. Fine assessed: KSh "
+                                + totalFine + ".",
+                        LocalDateTime.now().plusDays(1)
+                );
 
                 // =========================================================
                 // AUDIT
@@ -312,7 +352,12 @@ public class CirculationService {
                                 .getCategory()
                                 .getLoanPeriodDays();
 
-                LocalDateTime newDueDate = loan.getDueDate().plusDays(loanDays);
+                LocalDateTime calculatedDueDate =
+                        loan.getDueDate().plusDays(loanDays);
+
+                LocalDateTime newDueDate =
+                        libraryCalendarService.moveToNextOpenDate(
+                                calculatedDueDate);
 
                 loan.setDueDate(newDueDate);
 
@@ -320,6 +365,16 @@ public class CirculationService {
                                 loan.getRenewalCount() + 1);
 
                 Loan savedLoan = loanRepository.save(loan);
+
+                notifyBorrower(
+                        savedLoan.getMember(),
+                        "Book renewal confirmation",
+                        "Your loan for \""
+                                + savedLoan.getAccession().getBook().getTitle()
+                                + "\" has been renewed. New due date: "
+                                + savedLoan.getDueDate() + ".",
+                        savedLoan.getDueDate()
+                );
 
                 // ---------------------------------------------------------
                 // Audit
@@ -342,7 +397,7 @@ public class CirculationService {
         }
 
        @Transactional
-public Payment processFinePayment(
+public void processFinePayment(
                 Long loanId,
                 BigDecimal amount,
                 String receiptNumber,
@@ -441,6 +496,19 @@ public Payment processFinePayment(
 
         loanRepository.save(loan);
 
+
+               notifyBorrower(
+                       loan.getMember(),
+                       "Fine payment receipt",
+                       "Hello " + loan.getMember().getName()
+                               + ", your payment of KSh " + amount
+                               + " has been recorded. Receipt: "
+                               + receiptNumber
+                               + ". Outstanding fine: KSh "
+                               + loan.getOutstandingFine() + ".",
+                       LocalDateTime.now().plusDays(1)
+               );
+
         // ---------------------------------------------------------
         // Audit
         // ---------------------------------------------------------
@@ -454,8 +522,7 @@ public Payment processFinePayment(
                                         + " received. Receipt: "
                                         + receiptNumber);
 
-        return savedPayment;
-}
+       }
 
         @Transactional(readOnly = true)
         public Loan findLoanByAccession(
@@ -475,5 +542,35 @@ public Payment processFinePayment(
                 return loanRepository
                                 .findLoansWithOutstandingFineByMember(memberId);
         }
+
+
+        private void notifyBorrower(
+                Member member,
+                String subject,
+                String message,
+                LocalDateTime deadline) {
+
+                Instant now = Instant.now();
+
+                Instant deadlineAt = deadline
+                        .atZone(ZoneId.systemDefault())
+                        .toInstant();
+
+                // NotificationService requires a future deadline.
+                if (!deadlineAt.isAfter(now)) {
+                        deadlineAt = now.plusSeconds(86400);
+                }
+
+                notificationService.create(
+                        new NotificationRequest(
+                                member.getEmail(),
+                                subject,
+                                message,
+                                deadlineAt,
+                                now
+                        )
+                );
+        }
+
 
 }

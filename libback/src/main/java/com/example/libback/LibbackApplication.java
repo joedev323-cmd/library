@@ -14,9 +14,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class LibbackApplication {
 
     public static void main(String[] args) {
-        
+
         SpringApplication.run(LibbackApplication.class, args);
-        System.out.println(">>> Application started successfully!");
     }
     
     @Bean
@@ -29,7 +28,7 @@ public class LibbackApplication {
                 admin.setName("System Admin");
                 admin.setUsername(adminUsername);
                 
-                // Uses the global PasswordEncoder bean configured in your SecurityConfig
+                // Uses the global PasswordEncoder bean configured in the SecurityConfig
                 admin.setPassword(passwordEncoder.encode(adminPassword));
                 
                 admin.setRole(UserRole.SUPER_ADMIN);

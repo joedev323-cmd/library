@@ -123,7 +123,8 @@ public class SecurityConfig {
                                 "/api/accessions/**",
                                 "/api/members/**",
                                 "/api/loans/**",
-                                "/api/reports/**")
+                                "/api/reports/**",
+                                "/api/admin/holidays/**")
                         .hasAnyRole(
                                 "SUPER_ADMIN",
                                 "LIBRARIAN")

@@ -127,4 +127,10 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
         @Param("memberId") String memberId);
 
 
+    List<Loan> findByStatusAndDueDateBetween(
+            LoanStatus status,
+            LocalDateTime start,
+            LocalDateTime end
+    );
+
 }

@@ -71,6 +71,7 @@ public class Loan {
 
     public boolean isOverdue() {
         return status == LoanStatus.ACTIVE
+                && dueDate != null
                 && dueDate.isBefore(LocalDateTime.now());
     }
 

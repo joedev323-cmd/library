@@ -12,6 +12,8 @@
             layout:title-pattern="$CONTENT_TITLE - BiblioHub">BiblioHub</title>
 
         <link rel="stylesheet" th:href="@{/css/tailwind.css}" />
+        <meta name="_csrf" th:content="${_csrf.token}" />
+        <meta name="_csrf_header" th:content="${_csrf.headerName}" />
     </head>
 
     <body class="min-h-screen bg-slate-50 text-slate-900">
