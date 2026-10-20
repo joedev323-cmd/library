@@ -74,43 +74,53 @@ public class Auditlog {
         }
     }
 
-    public Long getAuditId() {
+    public Long getAuditId()
+    {
         return auditId;
     }
 
     public void setAuditId(Long auditId) {
+
         this.auditId = auditId;
     }
 
     public User getActor() {
+
         return actor;
     }
 
     public void setActor(User actor) {
+
         this.actor = actor;
     }
 
     public String getAction() {
+
         return action;
     }
 
     public void setAction(String action) {
+
         this.action = action;
     }
 
     public String getEntityType() {
+
         return entityType;
     }
 
-    public void setEntityType(String entityType) {
+    public void setEntityType(String entityType)
+    {
         this.entityType = entityType;
     }
 
     public String getEntityId() {
+
         return entityId;
     }
 
     public void setEntityId(String entityId) {
+
         this.entityId = entityId;
     }
 
@@ -119,14 +129,17 @@ public class Auditlog {
     }
 
     public void setDetails(String details) {
+
         this.details = details;
     }
 
     public LocalDateTime getTimestamp() {
+
         return timestamp;
     }
 
     public void setTimestamp(LocalDateTime timestamp) {
+
         this.timestamp = timestamp;
     }
 }
